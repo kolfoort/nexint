@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="NEXINT — NEXORA INTERNATIONAL. International trading, investment and strategic business solutions across global energy and commodity markets.">
+<title>NEXINT.EU — Nexora International</title>
+<style>
+:root{
+  --navy:#061a2f;
+  --navy2:#081f37;
+  --gold:#d9a92d;
+  --white:#fff;
+  --muted:#cbd4de;
+  --line:rgba(255,255,255,.16);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--navy);color:var(--white);font-family:Arial,Helvetica,sans-serif}
+a{text-decoration:none;color:inherit}
+.header{
+  position:sticky;top:0;z-index:20;
+  height:82px;background:#fff;color:var(--navy);
+  border-bottom:1px solid rgba(6,26,47,.12);
+}
+.nav{
+  max-width:1280px;height:100%;margin:auto;padding:0 34px;
+  display:flex;align-items:center;gap:34px;
+}
+.logo{width:190px;height:auto;display:block}
+.navlinks{margin-left:auto;display:flex;align-items:center;gap:38px}
+.navlinks a{font-size:12px;font-weight:800;letter-spacing:.16em}
+.navlinks a:hover{color:var(--gold)}
+.cta{
+  margin-left:6px;background:var(--gold);color:var(--navy);
+  padding:15px 25px;font-size:12px;font-weight:900;letter-spacing:.14em;
+}
+.hero{
+  position:relative;min-height:560px;display:flex;align-items:center;
+  overflow:hidden;background:#081a2d;
+}
+.hero::before{
+  content:"";position:absolute;inset:0;
+  background-image:linear-gradient(90deg,rgba(3,17,31,.94) 0%,rgba(3,17,31,.73) 38%,rgba(3,17,31,.10) 72%),url("nexint-hero-tanker.jpg");
+  background-size:cover;background-position:center;
+}
+.hero-content{
+  position:relative;z-index:1;max-width:1280px;width:100%;margin:auto;
+  padding:75px 34px 72px;
+}
+.eyebrow{color:#f0bd3e;font-size:13px;font-weight:900;letter-spacing:.24em;margin-bottom:18px}
+h1{
+  margin:0;max-width:760px;font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(54px,6.2vw,88px);line-height:.94;font-weight:500;
+}
+h1 span{color:#f0bd3e}
+.lead{
+  max-width:590px;margin:28px 0 30px;font-size:18px;line-height:1.55;color:#f0f3f7
+}
+.buttons{display:flex;gap:16px;flex-wrap:wrap}
+.btn{
+  display:inline-block;padding:16px 25px;border:1px solid #eab532;
+  font-size:12px;font-weight:900;letter-spacing:.14em;
+}
+.btn.gold{background:#eab532;color:var(--navy)}
+.btn:hover{transform:translateY(-1px)}
+.services{
+  background:#04182c;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+}
+.services-inner{
+  max-width:1280px;margin:auto;padding:28px 34px;
+  display:grid;grid-template-columns:repeat(3,1fr);
+}
+.service{
+  padding:10px 36px;border-right:1px solid var(--line);
+}
+.service:first-child{padding-left:0}
+.service:last-child{border-right:0}
+.service h2{
+  margin:0 0 8px;font-family:Georgia,"Times New Roman",serif;
+  font-size:25px;font-weight:500
+}
+.service p{margin:0;color:var(--muted);line-height:1.45;font-size:14px}
+.service .icon{color:#f0bd3e;font-size:28px;margin-bottom:8px}
+.global{
+  position:relative;overflow:hidden;background:#061a2f;min-height:520px;
+}
+.global::before{
+  content:"";position:absolute;inset:0;
+  background-image:linear-gradient(90deg,#061a2f 0%,rgba(6,26,47,.98) 27%,rgba(6,26,47,.16) 57%,rgba(6,26,47,.06) 100%),url("nexint-global-map.jpg");
+  background-size:cover;background-position:center;
+}
+.global-inner{
+  position:relative;z-index:1;max-width:1280px;margin:auto;padding:78px 34px;
+}
+.global-copy{max-width:500px}
+.goldline{width:58px;height:3px;background:#eab532;margin:22px 0 26px}
+h3{
+  margin:0;font-family:Georgia,"Times New Roman",serif;font-size:60px;
+  line-height:1.02;font-weight:500
+}
+h3 span{color:#f0bd3e}
+.global-copy p{font-size:17px;line-height:1.65;color:var(--muted)}
+footer{
+  background:#031323;border-top:1px solid var(--line);
+  padding:55px 34px;color:#c8d1db
+}
+.footer-inner{
+  max-width:1280px;margin:auto;display:flex;justify-content:space-between;
+  gap:40px;flex-wrap:wrap
+}
+.footer-title{color:#fff;font-family:Georgia,"Times New Roman",serif;font-size:26px;margin-bottom:15px}
+.footer p{margin:6px 0;font-size:14px;line-height:1.5}
+.gold{color:#eab532}
+@media(max-width:850px){
+  .header{height:72px}
+  .nav{padding:0 18px}
+  .logo{width:145px}
+  .navlinks{gap:12px}
+  .navlinks a{font-size:9px;letter-spacing:.10em}
+  .cta{display:none}
+  .hero{min-height:620px}
+  .hero-content{padding:70px 22px 60px}
+  h1{font-size:clamp(46px,12vw,72px)}
+  .lead{font-size:16px}
+  .services-inner{grid-template-columns:1fr;padding:16px 22px}
+  .service,.service:first-child,.service:last-child{
+    padding:22px 0;border-right:0;border-bottom:1px solid var(--line)
+  }
+  .service:last-child{border-bottom:0}
+  .global{min-height:620px}
+  .global-inner{padding:65px 22px}
+  h3{font-size:49px}
+  .global::before{
+    background-image:linear-gradient(180deg,#061a2f 0%,rgba(6,26,47,.93) 42%,rgba(6,26,47,.35) 100%),url("nexint-global-map.jpg");
+    background-position:center bottom;
+  }
+  footer{padding:42px 22px}
+}
+@media(max-width:560px){
+  .navlinks a:nth-child(2){display:none}
+  .navlinks{gap:10px}
+  .hero{min-height:650px}
+  .hero::before{
+    background-position:62% center;
+    background-image:linear-gradient(180deg,rgba(3,17,31,.90) 0%,rgba(3,17,31,.65) 48%,rgba(3,17,31,.28) 100%),url("nexint-hero-tanker.jpg");
+  }
+  .buttons .btn{width:100%;text-align:center}
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <nav class="nav">
+    <a href="#top"><img class="logo" src="nexora-logo.jpg" alt="Nexora International"></a>
+    <div class="navlinks">
+      <a href="#about">ABOUT</a>
+      <a href="#activities">ACTIVITIES</a>
+      <a href="#global">GLOBAL REACH</a>
+      <a href="#contact">CONTACT</a>
+      <a class="cta" href="mailto:info@nexora-int.eu">GET IN TOUCH</a>
+    </div>
+  </nav>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="hero-content">
+    <div class="eyebrow">NEXINT · NEXORA INTERNATIONAL</div>
+    <h1>Connecting Markets.<br><span>Creating Opportunities.</span></h1>
+    <p class="lead">International trading, investment and strategic business solutions across global energy and commodity markets.</p>
+    <div class="buttons">
+      <a class="btn gold" href="#activities">OUR ACTIVITIES →</a>
+      <a class="btn" href="#contact">CONTACT US →</a>
+    </div>
+  </div>
+</section>
+
+<section class="services" id="activities">
+  <div class="services-inner">
+    <article class="service">
+      <div class="icon">◉</div>
+      <h2>Global Trading</h2>
+      <p>Physical and financial trading across energy and commodity markets.</p>
+    </article>
+    <article class="service">
+      <div class="icon">▥</div>
+      <h2>Strategic Investments</h2>
+      <p>Investing in energy, infrastructure and high-potential markets.</p>
+    </article>
+    <article class="service">
+      <div class="icon">◎</div>
+      <h2>Business Solutions</h2>
+      <p>Tailored advisory and market access for long-term growth.</p>
+    </article>
+  </div>
+</section>
+
+<section class="global" id="global">
+  <div class="global-inner">
+    <div class="global-copy">
+      <div class="eyebrow">GLOBAL REACH</div>
+      <h3>A Stronger Presence<br><span>Across Continents.</span></h3>
+      <div class="goldline"></div>
+      <p>NEXORA INTERNATIONAL operates across key markets worldwide, connecting counterparties, creating value and building long-term partnerships in the global energy and commodity sector.</p>
+      <a class="btn" href="#contact">OUR GLOBAL PRESENCE →</a>
+    </div>
+  </div>
+</section>
+
+<section id="about" style="background:#071d33;padding:78px 34px">
+  <div style="max-width:1280px;margin:auto">
+    <div class="eyebrow">NEXINT · NEXORA INTERNATIONAL</div>
+    <h3 style="font-size:54px">International reach.<br><span>Practical execution.</span></h3>
+    <div class="goldline"></div>
+    <p style="max-width:760px;color:#cbd4de;font-size:17px;line-height:1.7">NEXINT — Nexora International — connects suppliers, partners and opportunities across international markets through a practical, relationship-driven approach.</p>
+  </div>
+</section>
+</main>
+
+<footer id="contact">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-title">NEXORA INTERNATIONAL</div>
+      <p>Johan Huizingalaan 763</p>
+      <p>1067 VH Amsterdam | The Netherlands</p>
+    </div>
+    <div>
+      <p><span class="gold">T:</span> +31 (0)20-308 6243</p>
+      <p><span class="gold">E:</span> <a href="mailto:info@nexora-int.eu">info@nexora-int.eu</a></p>
+      <p><span class="gold">W:</span> <a href="https://www.nexint.eu">www.nexint.eu</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
