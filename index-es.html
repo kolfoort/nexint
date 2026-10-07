@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="NEXORA INTERNATIONAL. International trading, investment and strategic business solutions across global energy and commodity markets.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Nexora International">
+<meta property="og:description" content="Comercio internacional, inversión y soluciones empresariales estratégicas en los mercados mundiales de energía y materias primas.">
+<meta property="og:url" content="https://nexora-int.eu/index-es.html">
+<meta property="og:image" content="https://nexora-int.eu/nexora-share.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="2129">
+<meta property="og:image:height" content="739">
+<meta property="og:image:alt" content="Logotipo de Nexora International">
+<meta name="twitter:card" content="summary_large_image">
+<title>NEXORA-INT.EU — Nexora International</title>
+<style>
+:root{
+  --navy:#061a2f;
+  --navy2:#081f37;
+  --gold:#d9a92d;
+  --white:#fff;
+  --muted:#cbd4de;
+  --line:rgba(255,255,255,.16);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--navy);color:var(--white);font-family:Arial,Helvetica,sans-serif}
+a{text-decoration:none;color:inherit}
+.header{
+  position:sticky;top:0;z-index:20;
+  height:82px;background:#fff;color:var(--navy);
+  border-bottom:1px solid rgba(6,26,47,.12);
+}
+.nav{
+  max-width:1280px;height:100%;margin:auto;padding:0 34px;
+  display:flex;align-items:center;gap:34px;
+}
+.logo{width:190px;height:auto;display:block}
+.navlinks{margin-left:auto;display:flex;align-items:center;gap:22px}
+.navlinks a{font-size:12px;font-weight:800;letter-spacing:.16em}
+.navlinks a:hover{color:var(--gold)}
+.nav-dropdown{position:relative}
+.nav-dropdown-toggle{border:0;background:transparent;color:inherit;font:inherit;font-size:12px;font-weight:800;letter-spacing:.16em;padding:12px 0;cursor:pointer}
+.nav-dropdown-toggle:hover,.nav-dropdown-toggle:focus-visible{color:var(--gold)}
+.dropdown-menu{display:none;position:absolute;top:100%;left:-18px;min-width:210px;padding:8px;background:#fff;box-shadow:0 12px 28px rgba(6,26,47,.18);z-index:25}
+.dropdown-menu a{display:block;padding:13px 12px;font-size:11px!important;letter-spacing:.08em!important;white-space:nowrap}
+.nav-dropdown:hover .dropdown-menu,.nav-dropdown:focus-within .dropdown-menu,.nav-dropdown.open .dropdown-menu{display:block}
+.menu-toggle{display:none;border:1px solid rgba(6,26,47,.22);background:#fff;color:var(--navy);width:44px;height:42px;padding:9px;cursor:pointer}
+.menu-toggle span{display:block;height:2px;background:currentColor;margin:5px 0;transition:transform .2s,opacity .2s}
+.cta{
+  margin-left:6px;background:var(--gold);color:var(--navy);
+  padding:15px 25px;font-size:12px;font-weight:900;letter-spacing:.14em;
+}
+.hero{
+  position:relative;min-height:560px;display:flex;align-items:center;
+  overflow:hidden;background:#081a2d;
+}
+.hero::before{
+  content:"";position:absolute;inset:0;
+  background-image:linear-gradient(90deg,rgba(3,17,31,.94) 0%,rgba(3,17,31,.73) 38%,rgba(3,17,31,.10) 72%),url("nexint-hero-tanker.jpg");
+  background-size:cover;background-position:center;
+}
+.hero-content{
+  position:relative;z-index:1;max-width:1280px;width:100%;margin:auto;
+  padding:75px 34px 72px;
+}
+.eyebrow{color:#f0bd3e;font-size:13px;font-weight:900;letter-spacing:.24em;margin-bottom:18px}
+h1{
+  margin:0;max-width:760px;font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(54px,6.2vw,88px);line-height:.94;font-weight:500;
+}
+h1 span{color:#f0bd3e}
+.lead{
+  max-width:590px;margin:28px 0 30px;font-size:18px;line-height:1.55;color:#f0f3f7
+}
+.buttons{display:flex;gap:16px;flex-wrap:wrap}
+.btn{
+  display:inline-block;padding:16px 25px;border:1px solid #eab532;
+  font-size:12px;font-weight:900;letter-spacing:.14em;
+}
+.btn.gold{background:#eab532;color:var(--navy)}
+.btn:hover{transform:translateY(-1px)}
+.services{
+  background:#04182c;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+}
+.services-inner{
+  max-width:1280px;margin:auto;padding:28px 34px;
+  display:grid;grid-template-columns:repeat(3,1fr);
+}
+.service{
+  padding:10px 36px;border-right:1px solid var(--line);
+}
+.service:first-child{padding-left:0}
+.service:last-child{border-right:0}
+.service h2{
+  margin:0 0 8px;font-family:Georgia,"Times New Roman",serif;
+  font-size:25px;font-weight:500
+}
+.service p{margin:0;color:var(--muted);line-height:1.45;font-size:14px}
+.service .icon{color:#f0bd3e;font-size:28px;margin-bottom:8px}
+.global{
+  position:relative;overflow:hidden;background:#061a2f;min-height:520px;
+}
+.global::before{
+  content:"";position:absolute;inset:0;
+  background-image:linear-gradient(90deg,#061a2f 0%,rgba(6,26,47,.98) 27%,rgba(6,26,47,.16) 57%,rgba(6,26,47,.06) 100%),url("nexint-global-map.jpg");
+  background-size:cover;background-position:center;
+}
+.global-inner{
+  position:relative;z-index:1;max-width:1280px;margin:auto;padding:78px 34px;
+}
+.global-copy{max-width:500px}
+.goldline{width:58px;height:3px;background:#eab532;margin:22px 0 26px}
+h3{
+  margin:0;font-family:Georgia,"Times New Roman",serif;font-size:60px;
+  line-height:1.02;font-weight:500
+}
+h3 span{color:#f0bd3e}
+.global-copy p{font-size:17px;line-height:1.65;color:var(--muted)}
+footer{
+  background:#031323;border-top:1px solid var(--line);
+  padding:55px 34px;color:#c8d1db
+}
+.footer-inner{
+  max-width:1440px;margin:auto;display:grid;
+  grid-template-columns:minmax(210px,.8fr) minmax(260px,1fr) minmax(260px,1fr);
+  align-items:center;gap:36px
+}
+.footer-title{color:#eab532;font-family:Georgia,"Times New Roman",serif;font-size:26px;margin-bottom:15px}
+.footer p{margin:6px 0;font-size:14px;line-height:1.5}.footer-contact{display:flex;align-items:center;gap:10px}.footer-icon{width:17px;height:17px;flex:0 0 17px;color:#eab532}
+.footer-brand-logo{display:block;width:min(205px,100%);height:auto;filter:brightness(0) invert(1)}
+.footer-office{min-height:120px;padding-left:30px;border-left:1px solid rgba(240,189,62,.38)}
+.footer-office p.footer-office-label{margin:0 0 12px!important;color:#eab532;font-size:11px!important;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+.footer-office p{margin:5px 0;color:var(--muted)}
+.footer-office .footer-contact{margin:9px 0}
+.footer-contact-row{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:9px}
+.footer-contact-row .footer-contact{margin:0;gap:8px}
+.footer-whatsapp{display:inline-flex;color:#25d366;line-height:0}.footer-whatsapp svg{width:18px;height:18px}
+.footer-legal{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:18px;border-top:1px solid var(--line);padding-top:18px;font-size:13px}.footer-legal a{color:#eab532}
+.gold{color:#eab532}
+@media(max-width:850px){
+  .header{height:72px}
+  .nav{padding:0 18px}
+  .logo{width:145px}
+  .navlinks{gap:12px}
+  .navlinks a{font-size:9px;letter-spacing:.10em}
+  .cta{display:none}
+  .hero{min-height:620px}
+  .hero-content{padding:70px 22px 60px}
+  h1{font-size:clamp(46px,12vw,72px)}
+  .lead{font-size:16px}
+  .services-inner{grid-template-columns:1fr;padding:16px 22px}
+  .service,.service:first-child,.service:last-child{
+    padding:22px 0;border-right:0;border-bottom:1px solid var(--line)
+  }
+  .service:last-child{border-bottom:0}
+  .global{min-height:620px}
+  .global-inner{padding:65px 22px}
+  h3{font-size:49px}
+  .global::before{
+    background-image:linear-gradient(180deg,#061a2f 0%,rgba(6,26,47,.93) 42%,rgba(6,26,47,.35) 100%),url("nexint-global-map.jpg");
+    background-position:center bottom;
+  }
+  footer{padding:42px 22px}
+  .footer-inner{grid-template-columns:1fr 1fr;gap:26px}
+  .footer-brand{grid-column:1/-1}
+  .footer-office{padding-left:18px}
+  .footer-contact-row{gap:6px}
+  .footer-legal{align-items:flex-start;flex-direction:column}
+}
+@media(max-width:560px){
+  .footer-inner{grid-template-columns:1fr;gap:20px}
+  .footer-brand{grid-column:auto}
+  .footer-office{min-height:0;padding:18px 0 0;border-left:0;border-top:1px solid rgba(240,189,62,.38)}
+  .footer-contact-row{gap:6px}
+  .footer-legal{grid-column:1}
+  .hero{min-height:650px}
+  .hero::before{
+    background-position:62% center;
+    background-image:linear-gradient(180deg,rgba(3,17,31,.90) 0%,rgba(3,17,31,.65) 48%,rgba(3,17,31,.28) 100%),url("nexint-hero-tanker.jpg");
+  }
+  .buttons .btn{width:100%;text-align:center}
+}
+
+@media(max-width:850px){
+  .nav{position:relative;justify-content:space-between}
+  .menu-toggle{display:block;margin-left:auto}
+  .navlinks{display:none;position:absolute;top:100%;left:0;right:0;margin:0;padding:8px 18px 16px;background:#fff;box-shadow:0 12px 24px rgba(6,26,47,.14);align-items:stretch;gap:0;flex-direction:column}
+  .navlinks.open{display:flex}
+  .navlinks>a,.nav-dropdown-toggle{display:block;width:100%;padding:14px 4px;text-align:left;font-size:12px;letter-spacing:.1em}
+  .navlinks .cta{display:block;margin:8px 0 0;padding:14px 16px;text-align:center}
+  .dropdown-menu{position:static;min-width:0;padding:0 0 4px 14px;box-shadow:none;border-left:2px solid var(--gold);margin:0 0 4px 4px}
+  .dropdown-menu a{padding:11px 12px}
+  .nav-dropdown:hover .dropdown-menu{display:none}
+  .nav-dropdown:focus-within:not(.open) .dropdown-menu{display:none}
+  .nav-dropdown.open .dropdown-menu{display:block}
+}
+
+/* Performance Fluids section */
+
+:root{--navy:#061a2f;--navy2:#0b2743;--gold:#eab532;--white:#fff;--muted:#cbd4de;--line:rgba(255,255,255,.14)}
+*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--white);font-family:Arial,Helvetica,sans-serif}
+.top{height:82px;background:white;display:flex;align-items:center;padding:0 max(24px,calc((100vw - 1212px)/2))}.logo{font-size:32px;font-weight:900;letter-spacing:-2px;color:#061a2f}.logo span{color:#d9a92d}
+.section{max-width:1280px;margin:auto;padding:76px 34px 90px}.eyebrow{color:var(--gold);font-size:12px;font-weight:900;letter-spacing:.22em}.heading{display:flex;align-items:end;justify-content:space-between;gap:28px;margin:14px 0 38px}.heading h1{margin:0;font:500 clamp(38px,5vw,62px)/1 Georgia,serif}.heading h1 span{color:var(--gold)}.heading p{max-width:390px;color:var(--muted);font-size:15px;line-height:1.6;margin:0}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.card{overflow:hidden;background:var(--navy2);border:1px solid var(--line);display:flex;flex-direction:column}.image{height:auto;aspect-ratio:429 / 267;display:flex;align-items:end;padding:22px;background:linear-gradient(135deg,#163c5a,#0c243b 55%,#b27b21);position:relative;isolation:isolate}.image:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(3,17,31,.88),transparent 75%),radial-gradient(ellipse at 76% 35%,rgba(234,181,50,.42),transparent 38%)}.image:after{content:"";position:absolute;inset:0;z-index:-1;opacity:.22;background:repeating-linear-gradient(120deg,transparent 0 42px,rgba(255,255,255,.14) 43px 45px)}.image small{font-size:11px;font-weight:800;letter-spacing:.19em;color:var(--gold)}.image strong{display:block;font:700 29px/1.05 Arial,sans-serif;letter-spacing:.01em}.body{padding:22px 24px 23px;display:flex;flex-direction:column;flex:1}.body h2{font:500 23px/1.12 Georgia,serif;margin:0 0 10px}.spec{font-weight:700}.meta,.desc{color:var(--muted);font-size:14px;line-height:1.55;margin:5px 0}.desc{margin-top:13px;min-height:44px}.pack{font-size:13px;color:#e5eaf0;margin:5px 0 19px}.pack b{color:var(--gold)}.button{align-self:flex-start;margin-top:auto;background:var(--gold);color:var(--navy);padding:13px 17px;font-size:11px;font-weight:900;letter-spacing:.12em;text-decoration:none}.button:hover{filter:brightness(1.08)}
+@media(max-width:720px){.section{padding:54px 20px 65px}.heading{display:block}.heading p{margin-top:16px}.grid{grid-template-columns:1fr;gap:18px}.image{height:auto}.top{height:70px}.logo{font-size:29px}}
+@media(min-width:1500px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:721px) and (max-width:1050px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.image{padding:0;background:none}.image:before,.image:after{display:none}.image img{display:block;width:100%;height:100%;object-fit:cover}
+
+.product-group{margin-top:48px}.group-heading{display:flex;align-items:baseline;gap:15px;margin:0 0 20px;padding:0 0 13px;border-bottom:1px solid var(--line)}.group-heading h2{margin:0;color:#fff;font:500 29px/1.1 Georgia,"Times New Roman",serif}.group-heading p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}.product-group .grid{margin:0}.product-group--crude .grid{grid-template-columns:repeat(3,minmax(0,1fr))}.crude-section{background:#04182c;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.crude-section .product-group--crude{margin-top:0}
+@media(max-width:600px){.product-group{margin-top:36px}.group-heading{display:block}.group-heading p{margin-top:7px}.group-heading h2{font-size:25px}}
+@media(max-width:720px){.product-group--crude .grid{grid-template-columns:1fr}}
+@media(min-width:721px) and (max-width:1050px){.product-group--crude .grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.marine-section{background:#061a2f;border-bottom:1px solid var(--line)}.marine-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.marine-grid .body h2{font:700 19px/1.2 Arial,sans-serif;text-transform:uppercase;min-height:46px}.marine-grid .button{margin-top:18px}
+.partners-section{background:#f4f6f8;color:#061a2f;padding:76px 34px 82px;border-top:3px solid #eab532}.partners-inner{max-width:1280px;margin:auto}.partners-title{text-align:center;margin:0 0 38px;font:900 clamp(34px,5vw,58px)/1 Arial,Helvetica,sans-serif;letter-spacing:.015em;text-transform:uppercase;color:#06254a}.partner-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;gap:28px 34px}.partner-logo{min-height:120px;display:flex;align-items:center;justify-content:center}.partner-logo img{display:block;max-width:100%;width:auto;height:auto;max-height:108px;object-fit:contain}
+@media(max-width:720px){.marine-grid{grid-template-columns:1fr}}
+@media(min-width:721px) and (max-width:1050px){.marine-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:850px){.partners-section{padding:60px 22px 66px}.partner-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.partner-logo{min-height:112px}.partner-logo img{max-width:95%;max-height:92px}}
+@media(min-width:851px){.partner-logo:nth-last-child(2){grid-column-start:2}}
+.about-section{background:#061a2f;color:#cbd4de;padding:80px 34px 88px}.about-layout{max-width:1280px;margin:auto;display:grid;grid-template-columns:minmax(300px,.72fr) minmax(0,1.6fr);gap:56px;align-items:start}.about-portrait{display:block;width:100%;height:auto;aspect-ratio:451/542;object-fit:cover;border:1px solid rgba(234,181,50,.45)}.about-note h3{margin:0 0 20px;color:#eab532;font:900 27px/1 Impact,"Arial Narrow",Arial,sans-serif;text-transform:uppercase}.about-note h4{margin:0 0 5px;color:#eab532;font-size:21px;line-height:1.45}.about-note p{margin:0 0 16px;font-size:17px;line-height:1.65}.about-note .about-subhead{margin-top:23px}.about-note ul{margin:2px 0 16px;padding-left:24px;font-size:17px;line-height:1.65}.about-signoff{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:28px;color:#eab532;font-size:18px;font-weight:700}.about-signoff img{display:block;width:min(43%,340px);height:auto}
+@media(max-width:850px){.about-section{padding:62px 22px 70px}.about-layout{grid-template-columns:1fr;gap:38px}.about-welcome h2{font-size:clamp(42px,12vw,64px)}.about-tagline{font-size:clamp(25px,7vw,33px);max-width:470px}.about-portrait{width:min(100%,480px);max-height:600px;object-position:center 40%}.about-note h3{font-size:25px}.about-note p,.about-note ul{font-size:16px}.about-signoff{align-items:flex-start;flex-direction:column}.about-signoff img{width:min(72%,340px)}}
+
+.about-portrait{width:100%;aspect-ratio:auto;object-fit:initial;max-height:none;object-position:initial}
+@media(max-width:850px){.about-portrait{width:min(100%,480px)}}
+.about-signoff img{width:min(21.5%,170px)}
+@media(max-width:850px){.about-signoff img{width:min(36%,170px)}}
+.team-photo-card{margin:0;overflow:hidden;border:1px solid rgba(234,181,50,.55);background:#0b2138;box-shadow:0 18px 45px rgba(0,0,0,.24)}
+.team-photo-card img{display:block;width:100%;height:auto}
+.team-photo-card figcaption{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 17px;color:#cbd4de;font-size:13px;line-height:1.35;letter-spacing:.08em;text-transform:uppercase}
+.team-photo-card figcaption strong{color:#eab532;font-size:13px;letter-spacing:.1em}
+@media(max-width:850px){.team-photo-card{width:min(100%,560px)}.team-photo-card figcaption{font-size:11px}.team-photo-card figcaption strong{font-size:12px}}
+
+.language-bar{position:relative;z-index:21;background:#fff;color:#061a2f;border-bottom:1px solid #e5e9ed;padding:8px max(20px,calc((100vw - 1212px)/2));display:flex;justify-content:flex-end;gap:16px;font:700 12px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.05em}
+.language-bar a{color:#061a2f;text-decoration:none;padding:7px 8px;min-width:44px;min-height:36px;justify-content:center;border-bottom:2px solid transparent;display:inline-flex;align-items:center;gap:7px}
+.language-flag{display:inline-block;width:30px;height:20px;overflow:hidden;border-radius:2px;box-shadow:0 0 0 1px rgba(6,26,47,.14);flex-shrink:0}.language-flag svg{display:block;width:100%;height:100%}
+.language-bar a[aria-current="page"]{color:#8c6810;border-color:#d9a92d}
+.language-bar a:focus-visible{outline:2px solid #d9a92d;outline-offset:3px}
+.navlinks a,.nav-dropdown-toggle{letter-spacing:.075em}
+@media(max-width:1450px){.header:has(.nav){height:74px}.nav{padding:0 22px;gap:16px}.nav .logo{width:160px}.nav .menu-toggle{display:block;margin-left:auto;flex-shrink:0}.navlinks{display:none;position:absolute;top:74px;left:0;right:0;margin:0;padding:20px 22px;background:#fff;box-shadow:0 14px 28px rgba(6,26,47,.16);flex-direction:column;align-items:stretch;gap:12px;max-height:calc(100dvh - 120px);overflow-y:auto}.navlinks.open{display:flex}.navlinks a{padding:10px 0}.nav-dropdown-toggle{width:100%;text-align:left;padding:10px 0}.dropdown-menu{position:static;box-shadow:none;padding:4px 0 4px 14px}.navlinks .cta{margin:0;padding:14px;text-align:center}.language-bar{justify-content:center;padding:6px 15px;gap:14px}}
+.heading h1,.group-heading h2,.service h2,.card h2{overflow-wrap:anywhere}
+</style>
+<link rel="canonical" href="https://nexora-int.eu/index-es.html">
+<link rel="alternate" hreflang="en" href="https://nexora-int.eu/">
+<link rel="alternate" hreflang="de" href="https://nexora-int.eu/index-de.html">
+<link rel="alternate" hreflang="es" href="https://nexora-int.eu/index-es.html">
+<link rel="alternate" hreflang="x-default" href="https://nexora-int.eu/">
+<meta property="og:locale" content="es_ES">
+</head>
+<body>
+<nav class="language-bar" aria-label="Seleccionar idioma"><a href="index.html" hreflang="en" lang="en" aria-label="English" title="English"><span class="language-flag" aria-hidden="true"><svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg"><clipPath id="uk-clip"><path d="M0 0h60v30H0z"/></clipPath><g clip-path="url(#uk-clip)"><path fill="#012169" d="M0 0h60v30H0z"/><path stroke="#fff" stroke-width="6" d="m0 0 60 30m0-30L0 30"/><path stroke="#c8102e" stroke-width="2" d="m0 0 60 30m0-30L0 30"/><path stroke="#fff" stroke-width="10" d="M30 0v30M0 15h60"/><path stroke="#c8102e" stroke-width="6" d="M30 0v30M0 15h60"/></g></svg></span></a><a href="index-de.html" hreflang="de" lang="de" aria-label="Deutsch" title="Deutsch"><span class="language-flag" aria-hidden="true"><svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg"><path fill="#000" d="M0 0h60v14H0z"/><path fill="#d00" d="M0 13.33h60v13.34H0z"/><path fill="#ffce00" d="M0 26.66h60V40H0z"/></svg></span></a><a href="index-es.html" hreflang="es" lang="es" aria-label="Español" title="Español" aria-current="page"><span class="language-flag" aria-hidden="true"><svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg"><path fill="#aa151b" d="M0 0h60v40H0z"/><path fill="#f1bf00" d="M0 10h60v20H0z"/><g transform="translate(15 14)"><path fill="#eee" stroke="#aa151b" stroke-width=".6" d="M0 1h8v8c0 5-8 5-8 0z"/><path fill="#aa151b" d="M0 1h4v5H0zM4 6h4v4H4z"/><path fill="#f1bf00" d="M1 2h2v3H1zM5 7h2v2H5z"/><path fill="#aa151b" d="M-1 0h10v-2H-1z"/></g></svg></span></a></nav>
+<header class="header">
+  <nav class="nav">
+    <a href="#top"><img class="logo" src="nexora-logo.jpg" alt="Nexora International"></a>
+    <div class="navlinks">
+      <a href="#about">NOSOTROS</a>
+      <a href="#activities">ACTIVIDADES</a>
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-toggle" type="button" aria-expanded="false" aria-controls="products-menu">PRODUCTOS <span aria-hidden="true">⌄</span></button>
+        <div class="dropdown-menu" id="products-menu">
+          <a href="#performance">COMBUSTIBLES Y FLUIDOS</a>
+          <a href="#crude-oil">PETRÓLEO CRUDO</a>
+        </div>
+      </div>
+      <a href="#marine-chartering">FLETAMENTO MARÍTIMO</a>
+      <a href="#global">PRESENCIA GLOBAL</a>
+      <a href="#contact">CONTACTO</a>
+      <a class="cta" href="mailto:info@nexora-int.eu">CONTÁCTENOS</a>
+    </div>
+    <button class="menu-toggle" type="button" aria-label="Abrir menú de navegación" aria-expanded="false"><span></span><span></span><span></span></button>
+  </nav>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="hero-content">
+    <div class="eyebrow">NEXORA INTERNATIONAL</div>
+    <h1>Conectamos mercados.<br><span>Creamos oportunidades.</span></h1>
+    <p class="lead">Comercio internacional, inversión y soluciones empresariales estratégicas en los mercados mundiales de energía y materias primas.</p>
+    <div class="buttons">
+      <a class="btn gold" href="#activities">NUESTRAS ACTIVIDADES →</a>
+      <a class="btn" href="#contact">CONTÁCTENOS →</a>
+    </div>
+  </div>
+</section>
+
+<section class="services" id="activities">
+  <div class="services-inner">
+    <article class="service">
+      <div class="icon">◉</div>
+      <h2>Comercio global</h2>
+      <p>Comercio físico y financiero en los mercados de energía y materias primas.</p>
+    </article>
+    <article class="service">
+      <div class="icon">▥</div>
+      <h2>Inversiones estratégicas</h2>
+      <p>Inversión en energía, infraestructura y mercados con gran potencial.</p>
+    </article>
+    <article class="service">
+      <div class="icon">◎</div>
+      <h2>Soluciones empresariales</h2>
+      <p>Asesoramiento personalizado y acceso a mercados para un crecimiento a largo plazo.</p>
+    </article>
+  </div>
+</section>
+
+<section id="performance" class="section">
+  <div class="eyebrow">PRODUCTOS</div>
+  <div class="heading"><h1>Combustibles y <span>fluidos.</span></h1><p>Suministro fiable de combustibles, aceites base y productos industriales para clientes en mercados internacionales.</p></div>
+
+  <section class="product-group">
+    <div class="group-heading"><h2>Combustibles convencionales</h2><p>Gasolina, diésel y combustibles de aviación y marítimos de distintas calidades.</p></div>
+    <div class="grid">
+      <article class="card"><div class="image"><img src="assets/performance-fluids/gasoline.png" alt="Gasolina RON 95/98"></div><div class="body"><h2>Gasolina prémium RON 95/98</h2><p class="meta spec">Calidad: RON 95/98/100</p><p class="meta">Origen: UE y Oriente Medio</p><p class="desc">Gasolina de alta calidad de 95/98 RON para toda la UE.</p><p class="pack"><b>Formato de suministro:</b> A granel a terminal · Cantidad mínima 50 KMT</p><a class="button" href="request-quote-es.html?product=Premium%20Gasoline%20RON%2095%2F98">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/performance-fluids/ulsd.png" alt="Diésel de contenido ultrabajo en azufre"></div><div class="body"><h2>Diésel de contenido ultrabajo en azufre (ULSD)</h2><p class="meta spec">Calidad: EN590 10PPM</p><p class="meta">Origen: UE y Oriente Medio</p><p class="desc">Diésel de alta calidad con contenido ultrabajo en azufre de 10 ppm para toda la UE.</p><p class="pack"><b>Formato de suministro:</b> A granel a terminal · Cantidad mínima 50 KMT</p><a class="button" href="request-quote-es.html?product=Ultra-Low%20Sulphur%20Diesel%20%28ULSD%29">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/performance-fluids/jetfuel.png" alt="Combustible de aviación"></div><div class="body"><h2>Combustible de aviación</h2><p class="meta spec">Calidad: JA1, JP-5, JP-8</p><p class="meta">Origen: Oriente Medio, EE. UU.</p><p class="desc">Suministro eficiente de combustible Jet A-1 de alta calidad.</p><p class="pack"><b>Formato de suministro:</b> A granel a terminal · Cantidad mínima 500K BBL</p><a class="button" href="request-quote-es.html?product=Jetfuel">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/performance-fluids/hfo.png" alt="Fuelóleo pesado"></div><div class="body"><h2>Fuelóleo y fuelóleo pesado (combustibles marítimos, HFO)</h2><p class="meta spec">Calidad: 180CST, 380CST, VLSFO, LSFO, 1%, 3.5%</p><p class="meta">Origen: Oriente Medio</p><p class="desc">Calidades de combustible para el sector marítimo y la industria.</p><p class="pack"><b>Formato de suministro:</b> A granel a terminal · Cantidad mínima 50 KMT</p><a class="button" href="request-quote-es.html?product=%28Heavy%29%20Fuel%20Oil%20%28Marine%20Fuels%2C%20Fuel%20Oil%2C%20HFO%29">SOLICITAR COTIZACIÓN →</a></div></article>
+    </div>
+  </section>
+  <section class="product-group">
+    <div class="group-heading"><h2>Aceites base</h2><p>Aceites base para la formulación de lubricantes de automoción e industriales.</p></div>
+    <div class="grid">
+      <article class="card"><div class="image"><img src="assets/performance-fluids/base-oil-i.png" alt="Aceites base del grupo I"></div><div class="body"><h2>Aceites base del grupo I</h2><p class="meta spec">Calidad: SN150, SN500, BS150</p><p class="meta">Origen: Europa y Oriente Medio</p><p class="desc">Aceites base refinados con disolventes para lubricantes industriales.</p><p class="pack"><b>Formato de suministro:</b> Flexitank · IBC · A granel</p><a class="button" href="request-quote-es.html?product=Group%20I%20Base%20Oils">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/performance-fluids/base-oil-ii.png" alt="Aceites base del grupo II"></div><div class="body"><h2>Aceites base del grupo II</h2><p class="meta spec">Calidad: 70N, 100N, 150N, 220N, 600N</p><p class="meta">Origen: SK, S-Oil &amp; GS Caltex</p><p class="desc">Aceites base hidrotratados para lubricantes de automoción.</p><p class="pack"><b>Formato de suministro:</b> Flexitank · IBC · A granel</p><a class="button" href="request-quote-es.html?product=Group%20II%20Base%20Oils">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/performance-fluids/base-oil-iii.png" alt="Aceites base del grupo III"></div><div class="body"><h2>Aceites base del grupo III</h2><p class="meta spec">Calidad: 4cSt, 6cSt, 8cSt</p><p class="meta">Origen: Adnoc, Petronas, SK</p><p class="desc">Aceites base prémium para la formulación de lubricantes sintéticos.</p><p class="pack"><b>Formato de suministro:</b> Flexitank · IBC · A granel</p><a class="button" href="request-quote-es.html?product=Group%20III%20Base%20Oils">SOLICITAR COTIZACIÓN →</a></div></article>
+    </div>
+  </section>
+  <section class="product-group">
+    <div class="group-heading"><h2>Combustibles renovables</h2><p>Combustibles con menor huella de carbono para el transporte por carretera y la aviación.</p></div>
+    <div class="grid">
+      <article class="card"><div class="image"><img src="assets/performance-fluids/hvo.png" alt="Diésel renovable HVO100"></div><div class="body"><h2>Aceite vegetal hidrotratado (HVO)</h2><p class="meta spec">Calidad: HVO100</p><p class="meta">Origen: Sudamérica, EE. UU.</p><p class="desc">Diésel renovable de uso directo procedente de Sudamérica y Estados Unidos, con suministro en Europa, Oriente Medio y África.</p><p class="pack"><b>Formato de suministro:</b> A granel a instalaciones · Cantidad mínima 3,000 MT</p><a class="button" href="request-quote-es.html?product=Hydrotreated%20Vegetable%20Oil%20%28HVO%29">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/performance-fluids/saf.png" alt="Combustible sostenible de aviación"></div><div class="body"><h2>Combustible sostenible de aviación (SAF)</h2><p class="meta spec">Calidad: HEFA-SPK</p><p class="meta">Origen: UE, EE. UU. y Oriente Medio</p><p class="desc">Combustible de aviación de origen biológico para la descarbonización del sector aéreo.</p><p class="pack"><b>Formato de suministro:</b> A granel a terminal o instalaciones</p><a class="button" href="request-quote-es.html?product=Sustainable%20Aviation%20Fuel%20%28SAF%29">SOLICITAR COTIZACIÓN →</a></div></article>
+    </div>
+  </section>
+  <section class="product-group">
+    <div class="group-heading"><h2>Productos industriales y materias primas</h2><p>Materiales y materias primas para la industria, el control de emisiones y la infraestructura.</p></div>
+    <div class="grid">
+      <article class="card"><div class="image"><img src="assets/performance-fluids/naphtha.png" alt="Nafta"></div><div class="body"><h2>Nafta</h2><p class="meta spec">CAS: 64742-82-1 · Intervalo: 175–215°C</p><p class="meta">Origen: Oriente Medio</p><p class="desc">Fracción ligera del petróleo para disolventes y como materia prima.</p><p class="pack"><b>Formato de suministro:</b> A granel a terminal</p><a class="button" href="request-quote-es.html?product=Naphtha">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/performance-fluids/urea.png" alt="Urea de grado automotriz"></div><div class="body"><h2>Urea de grado automotriz (AGU)</h2><p class="meta spec">Calidad: Perlada</p><p class="meta">Origen: UE, Oriente Medio</p><p class="desc">Urea perlada para la producción de AdBlue, DEF y AUS32.</p><p class="pack"><b>Formato de suministro:</b> A granel a terminal</p><a class="button" href="request-quote-es.html?product=Automotive%20Grade%20Urea%20%28AGU%29">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/performance-fluids/bitumen.png" alt="Betún"></div><div class="body"><h2>Betún</h2><p class="meta spec">Calidad: 60/70, 80/100</p><p class="meta">Origen: Oriente Medio</p><p class="desc">Calidad estándar para pavimentación de carreteras y betún más blando para climas fríos.</p><p class="pack"><b>Formato de suministro:</b> A granel a terminal o instalaciones</p><a class="button" href="request-quote-es.html?product=Bitumen">SOLICITAR COTIZACIÓN →</a></div></article>
+    </div>
+  </section>
+  <section class="product-group">
+    <div class="group-heading"><h2>Fertilizantes y materias primas</h2><p>Materias primas nitrogenadas, fosfatadas e industriales para la agricultura y la producción de fertilizantes.</p></div>
+    <div class="grid">
+      <article class="card"><div class="image"><img src="assets/fertilizer-feedstocks/can.png" alt="Nitrato amónico cálcico CAN"></div><div class="body"><h2>Nitrato amónico cálcico (CAN)</h2><p class="meta spec">Calidad: CAN 26, CAN 27</p><p class="meta">Origen: UE</p><p class="desc">El fertilizante nitrogenado más utilizado en Europa, con eficacia y absorción fiables.</p><p class="pack"><b>Formato de suministro:</b> A granel a terminal e instalaciones</p><a class="button" href="request-quote-es.html?product=Calcium%20Ammonium%20Nitrate%20%28CAN%29">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/fertilizer-feedstocks/urea-46.png" alt="Urea 46 por ciento"></div><div class="body"><h2>Urea 46 %</h2><p class="meta spec">Calidad: Granulada, perlada</p><p class="meta">Origen: UE y Oriente Medio</p><p class="desc">Un fertilizante nitrogenado ampliamente comercializado para un crecimiento vigoroso de los cultivos.</p><p class="pack"><b>Formato de suministro:</b> A granel a terminal · Cantidad mínima 10 KMT</p><a class="button" href="request-quote-es.html?product=Urea%2046%25">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/fertilizer-feedstocks/dap.png" alt="Fosfato diamónico DAP"></div><div class="body"><h2>Fosfato diamónico (DAP)</h2><p class="meta spec">Calidad: 18-46-0</p><p class="meta">Origen: Jordania, Arabia Saudí</p><p class="desc">Fertilizante de alto rendimiento que aporta nitrógeno y fósforo para obtener cosechas óptimas.</p><p class="pack"><b>Formato de suministro:</b> A granel a terminal · Cantidad mínima 10 KMT</p><a class="button" href="request-quote-es.html?product=Diammonium%20Phosphate%20%28DAP%29">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/fertilizer-feedstocks/npk.png" alt="Nitrógeno fósforo potasio NPK"></div><div class="body"><h2>Nitrógeno fósforo potasio (NPK)</h2><p class="meta spec">Calidad: 15-15-15, 16-16-16, 20-20-20</p><p class="meta">Origen: UE, China y Oriente Medio</p><p class="desc">Un fertilizante completo que aporta tres nutrientes esenciales para cultivos productivos.</p><p class="pack"><b>Formato de suministro:</b> A granel a terminal · Cantidad mínima 10 KMT</p><a class="button" href="request-quote-es.html?product=Nitrogen%20Phosphorus%20Potassium%20%28NPK%29">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/fertilizer-feedstocks/rock-phosphate.png" alt="Roca fosfórica"></div><div class="body"><h2>Roca fosfórica</h2><p class="meta spec">Calidad: 30%, 31%, 32% P₂O₅</p><p class="meta">Origen: Oriente Medio</p><p class="desc">Materia prima estratégica para la fabricación de fertilizantes.</p><p class="pack"><b>Formato de suministro:</b> A granel a terminal e instalaciones · Cantidad mínima 50 KMT</p><a class="button" href="request-quote-es.html?product=Rock%20Phosphate">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/fertilizer-feedstocks/granular-sulphur.png" alt="Azufre granulado"></div><div class="body"><h2>Azufre</h2><p class="meta spec">Calidad: Granulada, perlada</p><p class="meta">Origen: Oriente Medio, Kazajistán, EE. UU.</p><p class="desc">Materia prima industrial de alta pureza para aplicaciones agrícolas e industriales.</p><p class="pack"><b>Formato de suministro:</b> A granel a terminal · Cantidad mínima 25 KMT</p><a class="button" href="request-quote-es.html?product=Sulphur">SOLICITAR COTIZACIÓN →</a></div></article>
+    </div>
+  </section>
+
+</section>
+
+<section id="crude-oil" class="crude-section">
+  <div class="section">
+    <div class="eyebrow">PETRÓLEO CRUDO</div>
+    <div class="heading"><h1>Petróleo <span>crudo.</span></h1><p>Suministro de crudo de Nigeria, Irak y los países del CCG, con detalles específicos de cada cargamento disponibles bajo solicitud.</p></div>
+    <div class="product-group product-group--crude">
+      <div class="grid">
+        <article class="card"><div class="image"><img src="assets/crude-oil/bonny-light-nnpc.png" alt="Petrolero de crudo nigeriano en una terminal costera de exportación"></div><div class="body"><h2>Petróleo crudo Bonny Light (BLCO)</h2><p class="meta spec">Calidad: Bonny Light</p><p class="meta">Origen: Nigeria · Proveedor: NNPC</p><p class="desc">Crudo nigeriano Bonny Light. Los análisis del crudo y los detalles de carga específicos del cargamento están disponibles bajo solicitud.</p><p class="pack"><b>Suministro:</b> Carga a granel · Condiciones bajo solicitud</p><a class="button" href="request-quote-es.html?product=Bonny%20Light%20Crude%20Oil%20%28BLCO%29">SOLICITAR COTIZACIÓN →</a></div></article>
+        <article class="card"><div class="image"><img src="assets/crude-oil/gcc-crude-tanker.png" alt="Petrolero en una terminal de exportación del Golfo"></div><div class="body"><h2>Petróleo crudo del CCG</h2><p class="meta spec">Calidad: Específica del cargamento · Análisis bajo solicitud</p><p class="meta">Origen: Región del Consejo de Cooperación del Golfo</p><p class="desc">Crudo procedente de los mercados del Consejo de Cooperación del Golfo. La calidad, el análisis, el volumen y las condiciones de entrega se confirman por cargamento.</p><p class="pack"><b>Suministro:</b> Carga a granel · Condiciones bajo solicitud</p><a class="button" href="request-quote-es.html?product=Crude%20Oil%20from%20the%20GCC">SOLICITAR COTIZACIÓN →</a></div></article>
+        <article class="card"><div class="image"><img src="assets/crude-oil/somo-medium-tanker.png" alt="Petrolero de crudo iraquí en una terminal de exportación"></div><div class="body"><h2>Crudo medio de SOMO</h2><p class="meta spec">Calidad: Basrah Medium · Análisis bajo solicitud</p><p class="meta">Origen: Irak · Proveedor: SOMO</p><p class="desc">Crudo medio iraquí. Los análisis del crudo y los detalles de carga específicos del cargamento están disponibles bajo solicitud.</p><p class="pack"><b>Suministro:</b> Carga a granel · Condiciones bajo solicitud</p><a class="button" href="request-quote-es.html?product=SOMO%20Medium%20Crude">SOLICITAR COTIZACIÓN →</a></div></article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="marine-chartering" class="marine-section">
+  <div class="section">
+    <div class="eyebrow">FLETAMENTO MARÍTIMO</div>
+    <div class="heading"><h1>Fletamento <span>marítimo.</span></h1><p>Clases de buques disponibles para el transporte de productos energéticos y materias primas.</p></div>
+    <div class="marine-grid">
+      <article class="card"><div class="image"><img src="assets/marine-chartering/ulcc.png" alt="Petrolero ultragrande en el mar"></div><div class="body"><h2>Petrolero ultragrande (ULCC)</h2><p class="meta spec">DWT: 315,000 MT</p><p class="meta">Estado de abanderamiento: Grecia</p><a class="button" href="marine-chartering-quote-es.html?vessel=ULCC">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/marine-chartering/vlcc.png" alt="Petrolero de gran tamaño en el mar"></div><div class="body"><h2>Petrolero de gran tamaño (VLCC)</h2><p class="meta spec">DWT: 260,000–285,000 MT</p><p class="meta">Estado de abanderamiento: Grecia</p><a class="button" href="marine-chartering-quote-es.html?vessel=VLCC">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/marine-chartering/obo.png" alt="Buque de mineral, graneles y petróleo en el mar"></div><div class="body"><h2>Buque de mineral, graneles y petróleo (OBO)</h2><p class="meta spec">DWT: 245,000–270,000 MT</p><p class="meta">Estado de abanderamiento: Grecia</p><a class="button" href="marine-chartering-quote-es.html?vessel=OBO">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/marine-chartering/suezmax.png" alt="Petrolero Suezmax en el mar"></div><div class="body"><h2>Suezmax</h2><p class="meta spec">DWT: 120,000–150,000 MT</p><p class="meta">Estado de abanderamiento: Grecia</p><a class="button" href="marine-chartering-quote-es.html?vessel=Suezmax">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/marine-chartering/aframax.png" alt="Petrolero Aframax en el mar"></div><div class="body"><h2>Aframax</h2><p class="meta spec">DWT: 80,000–140,000 MT</p><p class="meta">Estado de abanderamiento: Grecia</p><a class="button" href="marine-chartering-quote-es.html?vessel=Aframax">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/marine-chartering/lng-lpg.png" alt="Buque de GNL y GLP en el mar"></div><div class="body"><h2>LNG | LPG</h2><p class="meta spec">Capacidad: 104,400–177,800 m³</p><p class="meta">Estado de abanderamiento: Grecia</p><a class="button" href="marine-chartering-quote-es.html?vessel=LNG%20%7C%20LPG">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/marine-chartering/chemical-product.png" alt="Buque tanque químico y de productos en el mar"></div><div class="body"><h2>Buque tanque químico y de productos</h2><p class="meta spec">DWT: 7,220–40,472 MT</p><p class="meta">Estado de abanderamiento: Grecia</p><a class="button" href="marine-chartering-quote-es.html?vessel=Chemical%20%7C%20Product%20Tanker">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/marine-chartering/mr-tanker.png" alt="Petrolero MR en el mar"></div><div class="body"><h2>Petrolero MR</h2><p class="meta spec">DWT: 44,000–55,500 MT</p><p class="meta">Estado de abanderamiento: Grecia</p><a class="button" href="marine-chartering-quote-es.html?vessel=MR%20Tanker">SOLICITAR COTIZACIÓN →</a></div></article>
+      <article class="card"><div class="image"><img src="assets/marine-chartering/oil-tanker.png" alt="Petrolero en el mar"></div><div class="body"><h2>Petrolero</h2><p class="meta spec">DWT: 6,500 MT</p><p class="meta">Estado de abanderamiento: Grecia</p><a class="button" href="marine-chartering-quote-es.html?vessel=Oil%20Tanker">SOLICITAR COTIZACIÓN →</a></div></article>
+    </div>
+  </div>
+</section>
+
+<section class="partners-section" aria-labelledby="partners-title">
+  <div class="partners-inner">
+    <h2 class="partners-title" id="partners-title">Nuestros socios de confianza</h2>
+    <div class="partner-grid" aria-label="Socios de NEXORA">
+      <div class="partner-logo"><img src="assets/partners/shell.png" alt="Shell"></div>
+      <div class="partner-logo"><img src="assets/partners/exxon.png" alt="Exxon"></div>
+      <div class="partner-logo"><img src="assets/partners/totalenergies.png" alt="TotalEnergies"></div>
+      <div class="partner-logo"><img src="assets/partners/basf.png" alt="BASF"></div>
+      <div class="partner-logo"><img src="assets/partners/sc-johnson.png" alt="SC Johnson"></div>
+      <div class="partner-logo"><img src="assets/partners/orlen.png" alt="ORLEN"></div>
+      <div class="partner-logo"><img src="assets/partners/sk-chemicals.png" alt="SK chemicals"></div>
+      <div class="partner-logo"><img src="assets/partners/evonik.png" alt="Evonik"></div>
+      <div class="partner-logo"><img src="assets/partners/sirena-mar.png" alt="Sirena Mar Shipping Company SA"></div>
+      <div class="partner-logo"><img src="assets/partners/golf-marin.png" alt="Golf Marin Trading, Investment, Import &amp; Export Shipping Company"></div>
+    </div>
+  </div>
+</section>
+
+<section class="global" id="global">
+  <div class="global-inner">
+    <div class="global-copy">
+      <div class="eyebrow">PRESENCIA GLOBAL</div>
+      <h3>Una presencia sólida<br><span>En todos los continentes.</span></h3>
+      <div class="goldline"></div>
+      <p>NEXORA INTERNATIONAL opera en mercados clave de todo el mundo, conecta contrapartes, crea valor y establece relaciones a largo plazo en el sector global de energía y materias primas.</p>
+      <a class="btn" href="#contact">NUESTRA PRESENCIA GLOBAL →</a>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="about-section">
+  <div class="about-layout">
+    <div class="about-welcome">
+      <figure class="team-photo-card">
+        <img src="assets/about/team-nexora.jpg" alt="El equipo de Nexora en su oficina de Ámsterdam">
+        <figcaption><strong>Equipo Nexora</strong><span>Un equipo. Un mismo estándar.</span></figcaption>
+      </figure>
+    </div>
+    <div class="about-note">
+      <h3>Las personas detrás de Nexora</h3>
+      <h4>Su socio neerlandés de confianza en energía, materias primas y soluciones industriales</h4>
+      <p>Nexora es una empresa familiar neerlandesa de comercio y suministro especializada en productos energéticos, sustancias químicas industriales, materias primas, fertilizantes y fluidos de alto rendimiento. Conectamos compradores cualificados con fuentes de suministro fiables mediante canales directos, comunicación transparente y una ejecución eficiente. Nuestro objetivo es claro: ofrecer soluciones competitivas que funcionan.</p>
+      <h4 class="about-subhead">Directos. Fiables. Eficientes.</h4>
+      <p>En un mercado lleno de intermediarios y promesas vacías, Nexora adopta un enfoque directo. Trabajamos con proveedores verificados y socios logísticos de confianza para gestionar las operaciones de forma profesional, desde la consulta hasta la entrega.</p>
+      <p><em>Nuestros clientes nos valoran por:</em></p>
+      <ul><li>Comunicación directa</li><li>Respuestas rápidas</li><li>Soluciones de suministro fiables</li><li>Ejecución flexible</li><li>Relaciones a largo plazo</li></ul>
+      <h4 class="about-subhead">Basados en valores neerlandeses</h4>
+      <p>Como empresa familiar, creemos en la honestidad, la responsabilidad y una manera íntegra de hacer negocios. Sin capas innecesarias ni promesas poco realistas. Con comunicación clara, soluciones prácticas y resultados fiables.</p>
+      <div class="about-signoff"><span>¡No vendemos oportunidades, las hacemos realidad!</span></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer id="contact">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img class="footer-brand-logo" src="nexora-logo.jpg" alt="Nexora International">
+    </div>
+    <div class="footer-office">
+      <p class="footer-office-label">Oficina de Ámsterdam</p>
+      <p>Herengracht 208</p>
+      <p>1016 BS Amsterdam</p>
+      <p>Países Bajos</p>
+      <div class="footer-contact-row">
+        <p class="footer-contact"><svg class="footer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 3.1 5.18 2 2 0 0 1 5.08 3h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.62 2.63a2 2 0 0 1-.45 2.11L9 10.7a16 16 0 0 0 4.3 4.3l1.24-1.25a2 2 0 0 1 2.11-.45c.85.29 1.73.5 2.63.62A2 2 0 0 1 22 16.92z"/></svg><a href="tel:+31852009082">+31 (0)85-200 9082</a><a class="footer-whatsapp" href="https://wa.me/31852009082" aria-label="Contactar con Nexora Ámsterdam por WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.52 3.48A11.82 11.82 0 0 0 12.08 0C5.5 0 .15 5.34.15 11.92c0 2.1.55 4.15 1.6 5.96L.05 24l6.27-1.64a11.9 11.9 0 0 0 5.76 1.47h.01c6.58 0 11.93-5.35 11.93-11.93 0-3.19-1.24-6.19-3.5-8.42ZM12.09 21.8h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.72.98.99-3.63-.24-.37a9.87 9.87 0 0 1-1.52-5.27c0-5.47 4.45-9.92 9.92-9.92a9.85 9.85 0 0 1 7.02 2.91 9.85 9.85 0 0 1 2.9 7.02c0 5.48-4.45 9.93-9.94 9.93Zm5.45-7.43c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.78.97-.95 1.17-.18.2-.35.23-.65.08-.3-.15-1.26-.46-2.4-1.47-.89-.8-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.53.15-.17.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.68-1.63-.93-2.23-.25-.59-.5-.5-.68-.51h-.58c-.2 0-.53.08-.81.38-.28.3-1.06 1.03-1.06 2.5s1.08 2.9 1.23 3.1c.15.2 2.13 3.25 5.16 4.56.72.31 1.28.5 1.72.64.72.23 1.37.2 1.89.12.58-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.18-1.42-.08-.13-.28-.2-.58-.35Z"/></svg></a></p>
+        <p class="footer-contact"><svg class="footer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><a href="mailto:info@nexora-int.eu">info@nexora-int.eu</a></p>
+      </div>
+    </div>
+    <div class="footer-office">
+      <p class="footer-office-label">Oficina de Dubái</p>
+      <p>Marsa Dubai</p>
+      <p>Al Emreef Street, Dubai</p>
+      <p>Emiratos Árabes Unidos</p>
+      <div class="footer-contact-row">
+        <p class="footer-contact"><svg class="footer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 3.1 5.18 2 2 0 0 1 5.08 3h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.62 2.63a2 2 0 0 1-.45 2.11L9 10.7a16 16 0 0 0 4.3 4.3l1.24-1.25a2 2 0 0 1 2.11-.45c.85.29 1.73.5 2.63.62A2 2 0 0 1 22 16.92z"/></svg><a href="tel:+971568167110">+971 56 816 7110</a><a class="footer-whatsapp" href="https://wa.me/971568167110" aria-label="Contactar con Nexora Dubái por WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.52 3.48A11.82 11.82 0 0 0 12.08 0C5.5 0 .15 5.34.15 11.92c0 2.1.55 4.15 1.6 5.96L.05 24l6.27-1.64a11.9 11.9 0 0 0 5.76 1.47h.01c6.58 0 11.93-5.35 11.93-11.93 0-3.19-1.24-6.19-3.5-8.42ZM12.09 21.8h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.72.98.99-3.63-.24-.37a9.87 9.87 0 0 1-1.52-5.27c0-5.47 4.45-9.92 9.92-9.92a9.85 9.85 0 0 1 7.02 2.91 9.85 9.85 0 0 1 2.9 7.02c0 5.48-4.45 9.93-9.94 9.93Zm5.45-7.43c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.78.97-.95 1.17-.18.2-.35.23-.65.08-.3-.15-1.26-.46-2.4-1.47-.89-.8-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.53.15-.17.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.68-1.63-.93-2.23-.25-.59-.5-.5-.68-.51h-.58c-.2 0-.53.08-.81.38-.28.3-1.06 1.03-1.06 2.5s1.08 2.9 1.23 3.1c.15.2 2.13 3.25 5.16 4.56.72.31 1.28.5 1.72.64.72.23 1.37.2 1.89.12.58-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.18-1.42-.08-.13-.28-.2-.58-.35Z"/></svg></a></p>
+        <p class="footer-contact"><svg class="footer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><a href="mailto:info@nexora-int.eu">info@nexora-int.eu</a></p>
+      </div>
+    </div>
+    <div class="footer-legal"><span>© 2021-2026 Nexora International. Todos los derechos reservados.</span><a href="privacy-policy-es.html">Política de privacidad</a></div>
+  </div>
+</footer>
+<script>
+const menuToggle=document.querySelector('.menu-toggle');
+const navLinks=document.querySelector('.navlinks');
+const productsToggle=document.querySelector('.nav-dropdown-toggle');
+const productsDropdown=document.querySelector('.nav-dropdown');
+menuToggle.addEventListener('click',()=>{
+  const isOpen=navLinks.classList.toggle('open');
+  menuToggle.setAttribute('aria-expanded',String(isOpen));
+  menuToggle.setAttribute('aria-label',isOpen?'Cerrar menú de navegación':'Abrir menú de navegación');
+});
+productsToggle.addEventListener('click',()=>{
+  const isOpen=productsDropdown.classList.toggle('open');
+  productsToggle.setAttribute('aria-expanded',String(isOpen));
+});
+navLinks.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{
+  navLinks.classList.remove('open');
+  productsDropdown.classList.remove('open');
+  menuToggle.setAttribute('aria-expanded','false');
+  productsToggle.setAttribute('aria-expanded','false');
+}));
+</script>
+<script>document.querySelectorAll('.language-bar a').forEach(a=>{a.href+=window.location.search;});</script>
+</body>
+</html>

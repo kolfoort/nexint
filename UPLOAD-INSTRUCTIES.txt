@@ -1,0 +1,7 @@
+NEXORA — ENGLISH / DEUTSCH / ESPAÑOL
+
+Pak deze ZIP uit. Upload de bestanden UIT deze map naar de hoofdmap van de bestaande GitHub-repository kolfoort/nexint. Upload niet de map zelf als submap. Vervang index.html en de drie bestaande formulier/privacy HTML-bestanden. Voeg de acht HTML-bestanden met -de en -es toe. De afbeeldingen zijn hetzelfde en zijn bijgevoegd. Behoud de assets-mapstructuur.
+
+Talen: index.html (Engels), index-de.html (Duits), index-es.html (Spaans).
+
+Dit pakket is voorbereid voor upload; het is nog niet op GitHub gepubliceerd.
