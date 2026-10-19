@@ -2,13 +2,13 @@ import { config } from './portal-config.js';
 
 const $ = id => document.getElementById(id);
 const page = document.body.dataset.page;
-let db, member, documents = [], members = [];
+let db, member, documents = [], members = [], submissions = [];
 let generation = 0;
 function message(text) { $('status').textContent = text; $('status').hidden = !text; }
 function node(tag, text, cls) { const e = document.createElement(tag); if(text !== undefined) e.textContent = text; if(cls) e.className = cls; return e; }
 function fail(error) { console.error(error); message('Unable to complete this request. Please try again or contact info@nexint.eu.'); }
 function check(result) { if(result.error) throw result.error; return result.data; }
-function resetPrivateView() { generation++; documents = []; members = []; for(const id of ['document-list','member-list','admin-documents']) if($(id)) $(id).replaceChildren(); if($('protected')) $('protected').hidden = true; }
+function resetPrivateView() { generation++; documents = []; members = []; submissions = []; for(const id of ['document-list','member-list','admin-documents','submission-list','incoming-list']) if($(id)) $(id).replaceChildren(); if($('protected')) $('protected').hidden = true; }
 function date(value) { return value ? new Date(value+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—'; }
 async function action(button, work) { button.disabled = true; try { await work(); } catch(error) { fail(error); } finally { button.disabled = false; } }
 async function authorize() {
@@ -29,6 +29,71 @@ async function loadDocuments() {
   documents = data;
   renderDocuments();
 }
+async function downloadPDF(bucket, path, title) {
+  const blob = check(await db.storage.from(bucket).download(path));
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = title.replace(/[^a-zA-Z0-9 _.-]/g,'_')+'.pdf'; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+async function validPDF(file) {
+  if(!file || file.size===0 || file.size>20*1024*1024 || !file.name.toLowerCase().endsWith('.pdf')) return false;
+  // Convenience validation only: private storage and database RLS enforce access.
+  const signature = new TextDecoder().decode(await file.slice(0,5).arrayBuffer());
+  return signature === '%PDF-';
+}
+function missingUploadSetup(error) { return ['PGRST205','42P01'].includes(error?.code); }
+async function loadSubmissions() {
+  const current=generation;
+  const result=await db.from('portal_submissions').select('id,user_id,title,note,storage_path,status,created_at').order('created_at',{ascending:false});
+  if(current!==generation) return;
+  if(result.error && missingUploadSetup(result.error)) {
+    if($('client-upload-section')) $('client-upload-section').hidden=true;
+    if($('incoming-list')) $('incoming-list').replaceChildren(node('p','Client uploads are being prepared.'));
+    return;
+  }
+  submissions=check(result);
+  if(page==='documents') {
+    $('client-upload-section').hidden=false;
+    renderSubmissions($('submission-list'),false);
+  } else renderSubmissions($('incoming-list'),true);
+}
+function renderSubmissions(container, admin) {
+  container.replaceChildren();
+  if(!submissions.length) { container.append(node('p',admin?'No client documents have been received yet.':'You have not shared any documents with Nexora yet.')); return; }
+  for(const item of submissions) {
+    const row=node('article',undefined,'submission');
+    const status=item.status==='reviewed'?'Reviewed':'Received';
+    row.append(node('div',status,'tag'),node('h3',item.title));
+    if(admin) row.append(node('div',members.find(p=>p.user_id===item.user_id)?.email || 'Client account','account'));
+    row.append(node('div',new Date(item.created_at).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'}),'meta'));
+    if(item.note) row.append(node('p',item.note));
+    const controls=node('div',undefined,'submission-actions'), download=node('button','Download PDF','secondary'); download.type='button';
+    download.addEventListener('click',()=>action(download,()=>downloadPDF('nexora-client-uploads',item.storage_path,item.title))); controls.append(download);
+    if(admin && item.status!=='reviewed') {
+      const reviewed=node('button','Mark as reviewed');reviewed.type='button';
+      reviewed.addEventListener('click',()=>action(reviewed,async()=>{
+        check(await db.from('portal_submissions').update({status:'reviewed'}).eq('id',item.id));
+        await loadSubmissions();
+      }));controls.append(reviewed);
+    }
+    row.append(controls);container.append(row);
+  }
+}
+function bindClientUpload() {
+  $('client-upload').addEventListener('submit',event=>{
+    event.preventDefault(); action($('client-upload-button'),async()=>{
+      const form=event.target,file=form.elements.file.files[0];
+      if(!await validPDF(file)){message('Please select a valid PDF smaller than 20 MB.');return;}
+      const title=form.elements.title.value.trim();
+      if(!title){message('Please enter a document title.');return;}
+      const id=crypto.randomUUID(),path=member.user_id+'/'+id+'.pdf';
+      check(await db.storage.from('nexora-client-uploads').upload(path,file,{contentType:'application/pdf',upsert:false}));
+      const result=await db.from('portal_submissions').insert({id,user_id:member.user_id,title,note:form.elements.note.value.trim(),storage_path:path});
+      if(result.error) { await db.storage.from('nexora-client-uploads').remove([path]); throw result.error; }
+      form.reset(); message('Your document has been shared with Nexora. It is visible only to your account and authorized Nexora administrators.'); await loadSubmissions();
+    });
+  });
+}
 function renderDocuments() {
   const term = $('search').value.trim().toLowerCase(), category = $('category').value;
   const visible = documents.filter(d => (!category || d.category === category) && (d.title+' '+d.description).toLowerCase().includes(term));
@@ -39,11 +104,7 @@ function renderDocuments() {
     card.append(node('div',doc.category+(doc.is_draft?' · DRAFT':''),'tag'),node('h2',doc.title),node('p',doc.description),node('div','Version: '+date(doc.version_date),'meta'));
     const button = node('button','Download PDF'); button.type='button';
     button.addEventListener('click', () => action(button, async () => {
-      // Download with the user's JWT; never create public or reusable file URLs.
-      const blob = check(await db.storage.from('nexora-documents').download(doc.storage_path));
-      const url = URL.createObjectURL(blob), a = document.createElement('a');
-      a.href = url; a.download = doc.title.replace(/[^a-zA-Z0-9 _.-]/g,'_')+'.pdf'; a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      await downloadPDF('nexora-documents',doc.storage_path,doc.title);
     }));
     card.append(button); $('document-list').append(card);
   }
@@ -88,7 +149,7 @@ function bindAdmin() {
   $('upload').addEventListener('submit',event=>{
     event.preventDefault(); action($('upload-button'),async()=>{
       const form=event.target, file=form.elements.file.files[0];
-      if(!file || file.type!=='application/pdf' || file.size>20*1024*1024) { message('Please select a PDF smaller than 20 MB.'); return; }
+      if(!await validPDF(file)) { message('Please select a valid PDF smaller than 20 MB.'); return; }
       const id=crypto.randomUUID(), path=id+'.pdf';
       check(await db.storage.from('nexora-documents').upload(path,file,{contentType:'application/pdf',upsert:false}));
       try { check(await db.from('portal_documents').insert({id,title:form.elements.title.value.trim(),description:form.elements.description.value.trim(),category:form.elements.category.value,version_date:form.elements.version_date.value,is_draft:form.elements.is_draft.checked,storage_path:path,published:false})); }
@@ -129,8 +190,9 @@ async function start() {
       check(await db.auth.updateUser({password:$('password').value})); location.replace('documents.html');
     });});
   } else if(await authorize()) {
-    if(page==='documents') { $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);await loadDocuments(); }
-    if(page==='admin') {bindAdmin();await loadAdmin();}
+    if($('refresh-submissions')) $('refresh-submissions').addEventListener('click',()=>action($('refresh-submissions'),loadSubmissions));
+    if(page==='documents') { $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
+    if(page==='admin') {bindAdmin();await loadAdmin();await loadSubmissions();}
   }
 }
 start().catch(fail);
