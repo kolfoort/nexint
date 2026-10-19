@@ -245,6 +245,8 @@ footer{
 .heading h1,.group-heading h2,.service h2,.card h2{overflow-wrap:anywhere}
 
 .nav .language-bar{position:static;display:flex;align-items:center;margin-left:auto;padding:0;border:0;background:transparent;gap:4px;flex-shrink:0}.nav .language-bar a{min-width:38px;min-height:38px;padding:7px 4px}.nav .menu-toggle{margin-left:8px}.language-flag{width:26px;height:18px}@media(max-width:650px){.nav{gap:8px;padding:0 14px}.nav .logo{width:130px}.nav .language-bar{gap:0}.nav .language-bar a{min-width:32px;padding:7px 3px}.nav .menu-toggle{margin-left:4px}}@media(max-width:360px){.nav .logo{width:105px}.nav{gap:4px}.nav .language-bar a{min-width:29px}.language-flag{width:24px;height:16px}}
+
+.client-account{display:flex;flex-direction:column;align-items:stretch;gap:5px;margin-left:6px;min-width:155px;max-width:235px}.client-account .cta{display:block;margin:0;text-align:center;white-space:nowrap}.navlinks .cta:hover,.navlinks .cta:focus-visible{color:var(--navy);background:#efbf43}.account-details{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--navy);font-size:10px;line-height:13px}.account-details[hidden]{display:none}.account-email{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.account-signout{flex-shrink:0;border:0;background:none;padding:0;color:var(--navy);font:inherit;cursor:pointer;text-decoration:underline}.account-signout:disabled{opacity:.5;cursor:wait}@media(max-width:1450px){.client-account{margin:0;max-width:none}.client-account .cta{padding:14px 16px}.account-details{font-size:12px;line-height:18px;padding:4px 0}}
 </style>
 <link rel="canonical" href="https://nexora-int.eu/index-de.html">
 <link rel="alternate" hreflang="en" href="https://nexora-int.eu/">
@@ -271,7 +273,7 @@ footer{
       <a href="#marine-chartering">SCHIFFSBEFRACHTUNG</a>
       <a href="#global">WELTWEITE PRÄSENZ</a>
       <a href="#contact">KONTAKT</a>
-      <a class="cta" href="client-login.html">KUNDENLOGIN</a>
+      <div class="client-account" data-client-account><a class="cta" data-account-link href="client-login.html">KUNDENLOGIN</a><div class="account-details" data-account-details hidden><span class="account-email" data-account-email></span><button type="button" class="account-signout" data-account-logout>Sign out</button></div></div>
     </div>
     <div class="language-bar" aria-label="Sprache wählen"><a href="index.html" hreflang="en" lang="en" aria-label="English" title="English"><span class="language-flag" aria-hidden="true"><svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg"><clipPath id="uk-clip"><path d="M0 0h60v30H0z"/></clipPath><g clip-path="url(#uk-clip)"><path fill="#012169" d="M0 0h60v30H0z"/><path stroke="#fff" stroke-width="6" d="m0 0 60 30m0-30L0 30"/><path stroke="#c8102e" stroke-width="2" d="m0 0 60 30m0-30L0 30"/><path stroke="#fff" stroke-width="10" d="M30 0v30M0 15h60"/><path stroke="#c8102e" stroke-width="6" d="M30 0v30M0 15h60"/></g></svg></span></a><a href="index-de.html" hreflang="de" lang="de" aria-label="Deutsch" title="Deutsch" aria-current="page"><span class="language-flag" aria-hidden="true"><svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg"><path fill="#000" d="M0 0h60v14H0z"/><path fill="#d00" d="M0 13.33h60v13.34H0z"/><path fill="#ffce00" d="M0 26.66h60V40H0z"/></svg></span></a><a href="index-es.html" hreflang="es" lang="es" aria-label="Español" title="Español"><span class="language-flag" aria-hidden="true"><svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg"><path fill="#aa151b" d="M0 0h60v40H0z"/><path fill="#f1bf00" d="M0 10h60v20H0z"/><g transform="translate(15 14)"><path fill="#eee" stroke="#aa151b" stroke-width=".6" d="M0 1h8v8c0 5-8 5-8 0z"/><path fill="#aa151b" d="M0 1h4v5H0zM4 6h4v4H4z"/><path fill="#f1bf00" d="M1 2h2v3H1zM5 7h2v2H5z"/><path fill="#aa151b" d="M-1 0h10v-2H-1z"/></g></svg></span></a></div>
     <button class="menu-toggle" type="button" aria-label="Navigationsmenü öffnen" aria-expanded="false"><span></span><span></span><span></span></button>
@@ -497,5 +499,6 @@ navLinks.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{
 }));
 </script>
 <script>document.querySelectorAll('.language-bar a').forEach(a=>{a.href+=window.location.search;});</script>
+<script type="module" src="site-account.js?v=20261019-account1"></script>
 </body>
 </html>
