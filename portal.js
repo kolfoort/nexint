@@ -62,19 +62,38 @@ function renderSubmissions(container, admin) {
   if(!submissions.length) { container.append(node('p',admin?'No client documents have been received yet.':'You have not shared any documents with Nexora yet.')); return; }
   for(const item of submissions) {
     const row=node('article',undefined,'submission');
-    const status=item.status==='reviewed'?'Reviewed':'Received';
-    row.append(node('div',status,'tag'),node('h3',item.title));
+    const labels={received:'Received',in_review:'In review',reviewed:'In review',approved:'Approved',denied:'Denied'};
+    const status=labels[item.status] || 'Received';
+    row.append(node('div',status,'tag status-'+(item.status==='reviewed'?'in_review':item.status)),node('h3',item.title));
     if(admin) row.append(node('div',members.find(p=>p.user_id===item.user_id)?.email || 'Client account','account'));
     row.append(node('div',new Date(item.created_at).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'}),'meta'));
     if(item.note) row.append(node('p',item.note));
     const controls=node('div',undefined,'submission-actions'), download=node('button','Download PDF','secondary'); download.type='button';
     download.addEventListener('click',()=>action(download,()=>downloadPDF('nexora-client-uploads',item.storage_path,item.title))); controls.append(download);
-    if(admin && item.status!=='reviewed') {
-      const reviewed=node('button','Mark as reviewed');reviewed.type='button';
-      reviewed.addEventListener('click',()=>action(reviewed,async()=>{
-        check(await db.from('portal_submissions').update({status:'reviewed'}).eq('id',item.id));
-        await loadSubmissions();
-      }));controls.append(reviewed);
+    if(admin) {
+      const reviewLabel=node('label','Document status','status-control');
+      const select=document.createElement('select');select.setAttribute('aria-label','Status for '+item.title);
+      for(const value of ['received','in_review','approved','denied']) {
+        const option=node('option',labels[value]); option.value=value;select.append(option);
+      }
+      select.value=item.status==='reviewed'?'in_review':item.status;
+      reviewLabel.append(select);
+      const save=node('button','Save status');save.type='button';
+      save.addEventListener('click',()=>action(save,async()=>{
+        check(await db.from('portal_submissions').update({status:select.value}).eq('id',item.id).select('id').single());
+        await loadSubmissions();message('Document status updated. The client can see the new status after refreshing.');
+      }));
+      const remove=node('button','Delete','danger');remove.type='button';
+      remove.addEventListener('click',()=>{
+        if(!window.confirm('Permanently delete “'+item.title+'” and its PDF? This cannot be undone.')) return;
+        action(remove,async()=>{
+          // Remove the actual private PDF first, so a failed delete cannot leave an accessible orphan.
+          check(await db.storage.from('nexora-client-uploads').remove([item.storage_path]));
+          check(await db.from('portal_submissions').delete().eq('id',item.id).select('id').single());
+          await loadSubmissions();message('Document and PDF deleted.');
+        });
+      });
+      controls.append(reviewLabel,save,remove);
     }
     row.append(controls);container.append(row);
   }
