@@ -210,7 +210,7 @@ async function start() {
     });});
   } else if(await authorize()) {
     if($('refresh-submissions')) $('refresh-submissions').addEventListener('click',()=>action($('refresh-submissions'),loadSubmissions));
-    if(page==='documents') { const {bindNda}=await import('./nda.js?v=20261020-nda1');bindNda({db,member,check,action,message,onSubmitted:loadSubmissions}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
+    if(page==='documents') { const {bindNda}=await import('./nda.js?v=20261020-mcnda2');bindNda({db,member,check,action,message,onSubmitted:loadSubmissions}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
     if(page==='admin') {bindAdmin();await loadAdmin();await loadSubmissions();}
   }
 }
