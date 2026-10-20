@@ -8,7 +8,7 @@ function message(text) { $('status').textContent = text; $('status').hidden = !t
 function node(tag, text, cls) { const e = document.createElement(tag); if(text !== undefined) e.textContent = text; if(cls) e.className = cls; return e; }
 function fail(error) { console.error(error); message('Unable to complete this request. Please try again or contact info@nexint.eu.'); }
 function check(result) { if(result.error) throw result.error; return result.data; }
-function resetPrivateView() { generation++; documents = []; members = []; submissions = []; for(const id of ['document-list','member-list','admin-documents','submission-list','incoming-list']) if($(id)) $(id).replaceChildren(); if($('protected')) $('protected').hidden = true; }
+function resetPrivateView() { generation++; documents = []; members = []; submissions = []; for(const id of ['document-list','member-list','admin-documents','submission-list','incoming-list']) if($(id)) $(id).replaceChildren(); if($('protected')) $('protected').hidden = true; if($('nda-frame')) $('nda-frame').src='about:blank'; }
 function date(value) { return value ? new Date(value+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—'; }
 async function action(button, work) { button.disabled = true; try { await work(); } catch(error) { fail(error); } finally { button.disabled = false; } }
 async function authorize() {
@@ -210,7 +210,7 @@ async function start() {
     });});
   } else if(await authorize()) {
     if($('refresh-submissions')) $('refresh-submissions').addEventListener('click',()=>action($('refresh-submissions'),loadSubmissions));
-    if(page==='documents') { $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
+    if(page==='documents') { const {bindNda}=await import('./nda.js?v=20261020-nda1');bindNda({db,member,check,action,message,onSubmitted:loadSubmissions}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
     if(page==='admin') {bindAdmin();await loadAdmin();await loadSubmissions();}
   }
 }
