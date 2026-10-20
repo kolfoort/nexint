@@ -1,4 +1,4 @@
-import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261020-company1';
+import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261020-profile2';
 import { config } from './portal-config.js';
 
 const $ = id => document.getElementById(id);
@@ -217,11 +217,11 @@ async function start() {
   if($('logout')) $('logout').addEventListener('click',()=>action($('logout'),async()=>{check(await db.auth.signOut());location.replace('client-login.html');}));
   if(page==='login') {
     $('login-form').hidden=false;
-    if(session) { location.replace('documents.html'); return; }
+    if(session) { location.replace('documents.html?v=20261020-profile2'); return; }
     $('login-form').addEventListener('submit',event=>{event.preventDefault();action($('login-button'),async()=>{
       const result=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
       if(result.error){message('Sign-in unsuccessful. Check your email and password, or contact Nexora.');return;}
-      location.replace('documents.html');
+      location.replace('documents.html?v=20261020-profile2');
     });});
     $('reset').addEventListener('click',()=>action($('reset'),async()=>{
       if(!$('email').reportValidity() || !$('email').value.trim()){message('Enter your email address first.');return;}
@@ -235,11 +235,12 @@ async function start() {
     $('password-form').hidden=false;
     $('password-form').addEventListener('submit',event=>{event.preventDefault();action($('save-password'),async()=>{
       if($('password').value!==$('confirm').value){message('The passwords do not match.');return;}
-      check(await db.auth.updateUser({password:$('password').value})); location.replace('documents.html');
+      check(await db.auth.updateUser({password:$('password').value})); location.replace('documents.html?v=20261020-profile2');
     });});
   } else if(await authorize()) {
     if($('refresh-submissions')) $('refresh-submissions').addEventListener('click',()=>action($('refresh-submissions'),loadSubmissions));
-    if(page==='documents') { const company=await initCompanyProfile({db,member,check,action,message}); const {bindNda}=await import('./nda.js?v=20261020-company1');await bindNda({db,member,check,action,message,onSubmitted:loadSubmissions,company}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
+    if(page==='company') await initCompanyProfile({db,member,check,action,message});
+    if(page==='documents') { const company=await initCompanyProfile({db,member,check,action,message}); const {bindNda}=await import('./nda.js?v=20261020-profile2');await bindNda({db,member,check,action,message,onSubmitted:loadSubmissions,company}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
     if(page==='admin') {bindAdmin();await loadAdmin();await loadSubmissions();await loadCompanyAdmin({db,check,action,message,members});$('refresh-companies').addEventListener('click',()=>action($('refresh-companies'),()=>loadCompanyAdmin({db,check,action,message,members})));}
   }
 }

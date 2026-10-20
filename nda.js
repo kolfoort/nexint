@@ -1,5 +1,5 @@
 import { PDFDocument, StandardFonts, rgb } from './assets/vendor/pdf-lib.esm.min.js';
-import { companyFields } from './company-profile.js?v=20261020-company1';
+import { companyFields } from './company-profile.js?v=20261020-profile2';
 import { layout } from './nda-layout.js';
 const $=id=>document.getElementById(id);
 const specs=companyFields;
@@ -8,22 +8,29 @@ function fit(page,text,font,rect,size=9){let [x,y,r,t]=rect;while(font.widthOfTe
 export async function createNda(values,signature,stamp,{now=new Date(),reference='',email='',loadTemplate}={}){
  if(!loadTemplate)throw new Error('The private MCNDA template is not available. Please contact Nexora.');
  const pdf=await PDFDocument.load(await loadTemplate()),font=await pdf.embedFont(StandardFonts.Helvetica),datesFont=await pdf.embedFont(StandardFonts.TimesRoman),pages=pdf.getPages();
- const day=dateText(now);
- for(const field of layout.fields){if(field.signature)continue;fit(pages[field.page],field.key==='B_SIGNATURE_DATE'?day:values[field.key]||'',font,field.rect,field.page===1?8:9);}
+ const day=dateText(now),bold=await pdf.embedFont(StandardFonts.HelveticaBold);
+ // Fixed label and value columns, with a shared baseline on every row.
+ const first=pages[1];first.drawRectangle({x:42,y:482,width:246,height:99,color:rgb(1,1,1)});
+ const rows=[['B_COMPANY','Company'],['B_REGISTRATION','Registration'],['B_ADDRESS','Registered office'],['B_COUNTRY','Country'],['B_REPRESENTATIVE','Representative'],['B_TITLE','Title'],['B_PHONE','Telephone'],['B_EMAIL','Email'],['B_WEBSITE','Website']];
+ rows.forEach(([key,label],i)=>{const y=572.239-i*10.85;first.drawText(label,{x:42.6,y,size:7.5,font:bold,color:rgb(0,.125,.25)});fit(first,values[key]||'',font,[122.6,y-2,287,y+8],8);});
  for(const d of layout.dates){let size=d.size;while(datesFont.widthOfTextAtSize(day,size)>d.width)size-=.1;pages[d.page].drawText(day,{x:d.x,y:d.y+1,size,font:datesFont,color:rgb(0,.125,.25)});}
  const last=pages[7];
- // A separate signature and stamp area replaces only the original blank Party B signing lines.
- last.drawRectangle({x:35,y:276,width:510,height:139,color:rgb(1,1,1)});
- last.drawText('Signature of authorized representative',{x:36,y:400,size:8,font,color:rgb(0,.125,.25)});
- last.drawText('Company stamp',{x:325,y:400,size:8,font,color:rgb(0,.125,.25)});
- async function imageIn(data,box){const img=await pdf.embedPng(data),scale=Math.min(box.w/img.width,box.h/img.height);last.drawImage(img,{x:box.x+(box.w-img.width*scale)/2,y:box.y+(box.h-img.height*scale)/2,width:img.width*scale,height:img.height*scale});}
- if(signature)await imageIn(signature,{x:36,y:316,w:255,h:78});
- if(stamp)await imageIn(stamp,{x:325,y:300,w:180,h:94});
- last.drawLine({start:{x:36,y:313},end:{x:290,y:313},thickness:.4,color:rgb(.65,.7,.75)});
- last.drawText('Date: '+day,{x:36,y:296,size:9,font});
- last.drawText('Portal submission: '+reference,{x:36,y:264,size:7,font});
- last.drawText('Account: '+email+' | Submitted: '+now.toISOString(),{x:36,y:252,size:7,font});
- last.drawText('Electronic signature: drawn by the representative; no certificate-based digital signature.',{x:36,y:240,size:7,font});
+ // Rebuild Party B as a table with equal signature/stamp boxes.
+ last.drawRectangle({x:35,y:222,width:510,height:293,color:rgb(1,1,1)});
+ last.drawRectangle({x:42.6,y:490,width:488,height:20,color:rgb(0,.125,.25)});
+ last.drawText('PARTY B',{x:52.6,y:496,size:9,font:bold,color:rgb(1,1,1)});
+ const partyRows=[['Company name','B_COMPANY'],['Registered address','B_ADDRESS'],['Represented by','B_REPRESENTATIVE'],['Title','B_TITLE']];
+ partyRows.forEach(([label,key],i)=>{const y=473-i*18;last.drawText(label,{x:42.6,y,size:9,font:bold,color:rgb(0,.125,.25)});fit(last,values[key]||'',font,[158,y-2,530,y+10],9);});
+ const boxes=[{x:42.6,y:289,w:235,h:95,label:'Authorized signature'},{x:295.6,y:289,w:235,h:95,label:'Company stamp'}];
+ boxes.forEach(box=>{last.drawText(box.label,{x:box.x,y:394,size:8,font:bold,color:rgb(0,.125,.25)});last.drawRectangle({x:box.x,y:box.y,width:box.w,height:box.h,borderWidth:.5,borderColor:rgb(.82,.85,.88)});});
+ async function imageIn(data,box){const img=await pdf.embedPng(data),scale=Math.min((box.w-20)/img.width,(box.h-16)/img.height);last.drawImage(img,{x:box.x+(box.w-img.width*scale)/2,y:box.y+(box.h-img.height*scale)/2,width:img.width*scale,height:img.height*scale});}
+ if(signature)await imageIn(signature,boxes[0]);
+ if(stamp)await imageIn(stamp,boxes[1]);
+ last.drawText('Date',{x:42.6,y:273,size:9,font:bold,color:rgb(0,.125,.25)});
+ last.drawText(day,{x:158,y:273,size:9,font,color:rgb(0,.125,.25)});
+ last.drawText('Portal reference: '+reference,{x:42.6,y:248,size:7,font,color:rgb(.4,.45,.5)});
+ fit(last,'Account: '+email+' | Submitted: '+now.toISOString(),font,[42.6,234,530,246],7);
+ last.drawText('Electronic signature image supplied by the representative; no digital signing certificate.',{x:42.6,y:226,size:7,font,color:rgb(.4,.45,.5)});
  pdf.setTitle('Nexora MCNDA - '+values.B_COMPANY);pdf.setCreationDate(now);pdf.setModificationDate(now);
  return new Blob([await pdf.save()],{type:'application/pdf'});
 }
