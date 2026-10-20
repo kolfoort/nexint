@@ -1,9 +1,11 @@
+import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261020-company1';
 import { config } from './portal-config.js';
 
 const $ = id => document.getElementById(id);
 const page = document.body.dataset.page;
 let db, member, documents = [], members = [], submissions = [];
 let generation = 0;
+let documentProfiles=[];
 function message(text) { $('status').textContent = text; $('status').hidden = !text; }
 function node(tag, text, cls) { const e = document.createElement(tag); if(text !== undefined) e.textContent = text; if(cls) e.className = cls; return e; }
 function fail(error) { console.error(error); message('Unable to complete this request. Please try again or contact info@nexint.eu.'); }
@@ -52,6 +54,7 @@ async function loadSubmissions() {
     return;
   }
   submissions=check(result);
+  documentProfiles=check(await db.from('portal_document_profiles').select('submission_id,company_version,company_status,details'));
   if(page==='documents') {
     $('client-upload-section').hidden=false;
     renderSubmissions($('submission-list'),false);
@@ -68,6 +71,9 @@ function renderSubmissions(container, admin) {
     if(admin) row.append(node('div',members.find(p=>p.user_id===item.user_id)?.email || 'Client account','account'));
     row.append(node('div',new Date(item.created_at).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'}),'meta'));
     if(item.note) row.append(node('p',item.note));
+    const savedProfile=documentProfiles.find(p=>p.submission_id===item.id);
+    if(savedProfile){const details=node('details');details.append(node('summary','Company record at submission · Version '+savedProfile.company_version+' · '+(savedProfile.company_status==='approved'?'Approved':'Pending review')));for(const [key,label] of [['B_COMPANY','Company'],['B_REGISTRATION','Registration'],['B_ADDRESS','Address'],['B_COUNTRY','Country'],['B_REPRESENTATIVE','Representative'],['B_TITLE','Title'],['B_PHONE','Phone'],['B_EMAIL','Email'],['B_WEBSITE','Website']])details.append(node('div',label+': '+(savedProfile.details[key]||'—'),'account'));row.append(details);}
+
     const controls=node('div',undefined,'submission-actions'), download=node('button','Download PDF','secondary'); download.type='button';
     download.addEventListener('click',()=>action(download,()=>downloadPDF('nexora-client-uploads',item.storage_path,item.title))); controls.append(download);
     if(admin) {
@@ -233,8 +239,8 @@ async function start() {
     });});
   } else if(await authorize()) {
     if($('refresh-submissions')) $('refresh-submissions').addEventListener('click',()=>action($('refresh-submissions'),loadSubmissions));
-    if(page==='documents') { const {bindNda}=await import('./nda.js?v=20261020-mcnda2');bindNda({db,member,check,action,message,onSubmitted:loadSubmissions}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
-    if(page==='admin') {bindAdmin();await loadAdmin();await loadSubmissions();}
+    if(page==='documents') { const company=await initCompanyProfile({db,member,check,action,message}); const {bindNda}=await import('./nda.js?v=20261020-company1');await bindNda({db,member,check,action,message,onSubmitted:loadSubmissions,company}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
+    if(page==='admin') {bindAdmin();await loadAdmin();await loadSubmissions();await loadCompanyAdmin({db,check,action,message,members});$('refresh-companies').addEventListener('click',()=>action($('refresh-companies'),()=>loadCompanyAdmin({db,check,action,message,members})));}
   }
 }
 start().catch(fail);
