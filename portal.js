@@ -151,7 +151,30 @@ async function loadAdmin() {
   for(const doc of documents) {
     const row=node('section',undefined,'admin-doc'); row.append(node('h3',doc.title),node('p',doc.category+' · '+date(doc.version_date)+(doc.is_draft?' · DRAFT':'')));
     const toggle=node('button',doc.published?'Unpublish':'Publish','secondary'); toggle.type='button';
-    toggle.addEventListener('click',()=>action(toggle,async()=>{check(await db.from('portal_documents').update({published:!doc.published}).eq('id',doc.id));await loadAdmin();})); row.append(toggle);
+    toggle.addEventListener('click',()=>action(toggle,async()=>{check(await db.from('portal_documents').update({published:!doc.published}).eq('id',doc.id));await loadAdmin();}));
+    const controls=node('div',undefined,'submission-actions');
+    const remove=node('button','Delete','danger');remove.type='button';
+    remove.setAttribute('aria-label','Delete '+doc.title);
+    remove.addEventListener('click',()=>{
+      if(!window.confirm('Permanently delete “'+doc.title+'”, its PDF and all client access assignments? This cannot be undone. Previously downloaded copies will remain with recipients.')) return;
+      action(remove,async()=>{
+        const inputs=[...row.querySelectorAll('button,input')];inputs.forEach(e=>e.disabled=true);
+        try {
+          if(!member.is_admin || doc.storage_path!==doc.id+'.pdf') throw new Error('Invalid document deletion request.');
+          // Stop client downloads before removing the private file. Database policies enforce admin access.
+          check(await db.from('portal_documents').update({published:false}).eq('id',doc.id).select('id').single());
+          check(await db.storage.from('nexora-documents').remove([doc.storage_path]));
+          // Client access rows are removed by the existing ON DELETE CASCADE foreign key.
+          check(await db.from('portal_documents').delete().eq('id',doc.id).select('id').single());
+          await loadAdmin();message('Document, PDF and client access assignments deleted.');
+        } catch(error) {
+          await loadAdmin();
+          message('Deletion could not be completed. Refresh the document list before trying again. If the document was unpublished, it remains unavailable to clients.');
+          console.error(error);
+        } finally {inputs.forEach(e=>e.disabled=false);}
+      });
+    });
+    controls.append(toggle,remove);row.append(controls);
     row.append(node('p','Client access'));
     for(const person of members.filter(p=>!p.is_admin)) {
       const label=node('label',undefined,'check'), box=document.createElement('input'); box.type='checkbox'; box.checked=access.some(a=>a.document_id===doc.id && a.user_id===person.user_id);
