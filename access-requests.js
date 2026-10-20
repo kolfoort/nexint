@@ -24,22 +24,22 @@ export async function bindAccessAdmin({db,check,message,onInvited}){
    if(r.message){const note=el('p',r.message);note.className='request-note';card.append(note);}
    if(r.invitation_error)card.append(el('p',r.invitation_error));
    if(!r.admin_notified||!r.applicant_notified)card.append(el('p','Email delivery is pending. The application has been saved.'));
-   const actions=el('div');actions.className='submission-actions';
+   const actions=el('div');actions.className='submission-actions';const feedback=el('div');feedback.className='status';feedback.hidden=true;feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');
    const stale=r.status==='inviting'&&Date.now()-new Date(r.invite_started_at).getTime()>600000;
    const reviewable=['pending','invitation_failed'].includes(r.status)||stale;
    async function review(kind,button){
     const prompt=kind==='approve'?`Send a Nexora portal invitation to ${r.details.B_EMAIL} and prepare a company profile for ${r.details.B_COMPANY}? No commercial documents will be assigned.`:`Decline the access request from ${r.details.B_EMAIL}? No invitation or decline email will be sent.`;
     if(!confirm(prompt))return;
-    for(const b of actions.querySelectorAll('button'))b.disabled=true;
+    for(const b of actions.querySelectorAll('button'))b.disabled=true;feedback.hidden=false;feedback.textContent=kind==='approve'?'Preparing invitation…':'Updating request…';
     try{
      const {data,error}=await db.functions.invoke('access-requests',{body:{action:kind,id:r.id}});
      if(error){let text='Unable to process the request. Refresh and try again.';try{const response=await error.context.json();text=response.message||text;}catch{}throw new Error(text);}
-     message(data.message);await load();if(kind==='approve')await onInvited();
-    }catch(error){message(error.message||'Unable to process the request.');for(const b of actions.querySelectorAll('button'))b.disabled=false;}
+     message(data.message);document.getElementById('status')?.scrollIntoView({block:'nearest',behavior:'smooth'});await load();if(kind==='approve')await onInvited();
+    }catch(error){feedback.hidden=false;feedback.textContent=error.message||'Unable to process the request.';message(feedback.textContent);for(const b of actions.querySelectorAll('button'))b.disabled=false;}
    }
    if(reviewable){const approve=el('button',r.status==='invitation_failed'||stale?'Retry approve & invite':'Approve & invite');approve.type='button';approve.addEventListener('click',()=>review('approve',approve));actions.append(approve);}
    if(['pending','invitation_failed','existing_account'].includes(r.status)){const decline=el('button','Decline');decline.type='button';decline.className='secondary';decline.addEventListener('click',()=>review('decline',decline));actions.append(decline);}
-   card.append(actions);list.append(card);
+   card.append(actions,feedback);list.append(card);
   }
  }
  refresh.addEventListener('click',async()=>{refresh.disabled=true;try{await load();}catch{message('Unable to load access requests. Please try again.');}finally{refresh.disabled=false;}});
