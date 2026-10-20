@@ -7,7 +7,7 @@ if(root && config.url && config.publishableKey && !config.url.includes('bibzafct
   const link=root.querySelector('[data-account-link]'),details=root.querySelector('[data-account-details]'),email=root.querySelector('[data-account-email]'),logout=root.querySelector('[data-account-logout]');
   function render(user) {
     link.textContent=user?labels.documents:labels.login;
-    link.href=user?'documents.html':'client-login.html';
+    link.href=user?'documents.html?v=20261020-profile2':'client-login.html?v=20261020-profile2';
     details.hidden=!user;
     email.textContent=user?.email || '';
     email.title=user?.email || '';
