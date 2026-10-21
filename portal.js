@@ -224,11 +224,16 @@ async function start() {
       if(result.error){message('Sign-in unsuccessful. Check your email and password, or contact Nexora.');return;}
       location.replace('documents.html?v=20261020-profile2');
     });});
-    $('reset').addEventListener('click',()=>action($('reset'),async()=>{
-      if(!$('email').reportValidity() || !$('email').value.trim()){message('Enter your email address first.');return;}
-      check(await db.auth.resetPasswordForEmail($('email').value.trim(),{redirectTo:new URL('set-password.html',location.href).href}));
-      message('If your account is eligible, you will receive an email with the next steps.');
-    }));
+  } else if(page==='recovery') {
+    $('recovery-form').hidden=false;
+    $('recovery-form').addEventListener('submit',event=>{event.preventDefault();action($('recovery-button'),async()=>{
+      if(!$('recovery-form').reportValidity())return;
+      const result=await db.auth.resetPasswordForEmail($('recovery-email').value.trim(),{redirectTo:new URL('set-password.html',location.href).href});
+      const feedback=$('recovery-result');feedback.hidden=false;
+      if(result.error){feedback.textContent='We could not process your request. Please wait a moment and try again.';return;}
+      feedback.textContent='If this email is eligible for a Nexora account, you will receive a password reset email shortly. Check your spam folder and use the link in the newest email.';
+      $('recovery-form').hidden=true;
+    });});
   } else if(page==='password') {
     if(!session) {message('This invitation or reset link is invalid or has expired. Please contact Nexora for a new link.');return;}
     // Remove credentials from the address bar after Supabase has processed the link.
