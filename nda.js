@@ -5,7 +5,7 @@ const $=id=>document.getElementById(id);
 const specs=companyFields;
 const dateText=d=>new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Amsterdam',day:'numeric',month:'long',year:'numeric'}).format(d);
 function fit(page,text,font,rect,size=9){let [x,y,r,t]=rect;while(font.widthOfTextAtSize(text,size)>r-x && size>6)size-=.25;if(font.widthOfTextAtSize(text,size)>r-x)throw new Error('A company detail is too long to fit. Please shorten the address or company name.');font.encodeText(text);page.drawText(text,{x,y:y+2,size,font,color:rgb(0,.125,.25)});}
-export async function createNda(values,signature,stamp,{now=new Date(),reference='',email='',loadTemplate}={}){
+export async function createNda(values,signature,stamp,{now=new Date(),reference='',email='',loadTemplate,draft=false}={}){
  if(!loadTemplate)throw new Error('The private MCNDA template is not available. Please contact Nexora.');
  const pdf=await PDFDocument.load(await loadTemplate()),font=await pdf.embedFont(StandardFonts.Helvetica),datesFont=await pdf.embedFont(StandardFonts.TimesRoman),pages=pdf.getPages();
  const day=dateText(now),bold=await pdf.embedFont(StandardFonts.HelveticaBold);
@@ -29,9 +29,10 @@ export async function createNda(values,signature,stamp,{now=new Date(),reference
  last.drawText('Date',{x:42.6,y:273,size:9,font:bold,color:rgb(0,.125,.25)});
  last.drawText(day,{x:158,y:273,size:9,font,color:rgb(0,.125,.25)});
  last.drawText('Portal reference: '+reference,{x:42.6,y:248,size:7,font,color:rgb(.4,.45,.5)});
- fit(last,'Account: '+email+' | Submitted: '+now.toISOString(),font,[42.6,234,530,246],7);
- last.drawText('Electronic signature image supplied by the representative; no digital signing certificate.',{x:42.6,y:226,size:7,font,color:rgb(.4,.45,.5)});
- pdf.setTitle('Nexora MCNDA - '+values.B_COMPANY);pdf.setCreationDate(now);pdf.setModificationDate(now);
+ fit(last,'Account: '+email+(draft?' | Preview generated: ':' | Submitted: ')+now.toISOString(),font,[42.6,234,530,246],7);
+ last.drawText(draft?'Unsigned preview only. This document has not been signed or submitted.':'Electronic signature image supplied by the representative; no digital signing certificate.',{x:42.6,y:226,size:7,font,color:rgb(.4,.45,.5)});
+ if(draft)for(const page of pages)page.drawText('UNSIGNED PREVIEW - NOT SUBMITTED',{x:190,y:12,size:8,font:bold,color:rgb(.5,.5,.5)});
+ pdf.setTitle((draft?'Unsigned preview - ':'')+'Nexora MCNDA - '+values.B_COMPANY);pdf.setCreationDate(now);pdf.setModificationDate(now);
  return new Blob([await pdf.save()],{type:'application/pdf'});
 }
 async function imageFile(file){
@@ -41,6 +42,18 @@ async function imageFile(file){
 export async function bindNda({db,member,check,action,message,onSubmitted,company}){
  const form=$('nda-form'),container=$('nda-fields');let signed=false,stamp=null,signatureImage=null,review=null,revision=0,stampLoading=false,stampRevision=0,stampPath='';
  for(const [key,label,max,required] of specs){const wrap=document.createElement('div'),l=document.createElement('label'),input=document.createElement('input');l.htmlFor=key;l.textContent=label+(required?'':' (optional)');input.id=key;input.name=key;input.maxLength=max;input.required=required;if(key==='B_EMAIL'){input.type='email';input.value=member.email;}wrap.append(l,input);container.append(wrap);}
+ let readPreviewUrl=null;
+ function clearReadPreview(){if(readPreviewUrl)URL.revokeObjectURL(readPreviewUrl);readPreviewUrl=null;if($('nda-read-result'))$('nda-read-result').hidden=true;if($('nda-read-frame'))$('nda-read-frame').src='about:blank';}
+ if($('nda-read-button'))$('nda-read-button').addEventListener('click',()=>action($('nda-read-button'),async()=>{
+  const profile=company.getProfile(),values=profile?.details;
+  if(!values||specs.some(([key,,,required])=>required&&!String(values[key]||'').trim())){message('Complete and save all required company profile details before previewing the MCNDA.');return;}
+  clearReadPreview();const current=revision;
+  try{
+   const blob=await createNda(values,null,null,{draft:true,reference:'Unsigned preview',email:member.email,loadTemplate:async()=>{const result=await db.storage.from('nexora-documents').download('nda-template-v20261020.pdf');if(result.error)throw new Error('The MCNDA template could not be loaded. Please contact Nexora.');return result.data.arrayBuffer();}});
+   if(current!==revision)return;
+   readPreviewUrl=URL.createObjectURL(blob);$('nda-read-frame').src=readPreviewUrl;$('nda-read-download').href=readPreviewUrl;$('nda-read-download').download='Nexora_MCNDA_Unsigned_Preview.pdf';$('nda-read-result').hidden=false;$('nda-read-result').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(error){message(error.message.includes('WinAnsi')?'A company detail contains a character that cannot be displayed in this PDF. Please use Latin characters.':error.message);}
+ }));
  const canvas=$('nda-signature'),ctx=canvas.getContext('2d');ctx.strokeStyle='#002040';ctx.lineWidth=2.4;ctx.lineCap='round';ctx.lineJoin='round';let drawing=false,last=null;
  function invalidate(){revision++;if(review){URL.revokeObjectURL(review.url);review=null;}$('nda-review').hidden=true;$('nda-frame').src='about:blank';$('nda-confirm').checked=false;}
  form.addEventListener('input',e=>{if(e.target.id!=='nda-confirm')invalidate();});
@@ -81,7 +94,7 @@ export async function bindNda({db,member,check,action,message,onSubmitted,compan
   $('nda-result-download').href=current.url;$('nda-result-download').download='Nexora_MCNDA_Submitted.pdf';$('nda-success').hidden=false;$('nda-review').hidden=true;form.hidden=true;message('Your signed MCNDA has been submitted to Nexora for review. You can download it below or from Your shared documents.');await onSubmitted();
  }));
  async function applyProfile(profile){
-  invalidate();ctx.clearRect(0,0,canvas.width,canvas.height);signed=false;signatureImage=null;stamp=null;stampPath='';
+  clearReadPreview();invalidate();ctx.clearRect(0,0,canvas.width,canvas.height);signed=false;signatureImage=null;stamp=null;stampPath='';
   for(const [key] of specs)form.elements[key].value=profile?.details[key]||(key==='B_EMAIL'?member.email:'');
   $('nda-stamp-preview').hidden=true;
   const saved=profile?.details.B_STAMP_PATH;if(!saved)return;
@@ -91,5 +104,5 @@ export async function bindNda({db,member,check,action,message,onSubmitted,compan
   finally{stampLoading=false;$('nda-preview').disabled=false;}
  }
  company.subscribe(applyProfile);await applyProfile(company.getProfile());
- window.addEventListener('pagehide',()=>{if(review)URL.revokeObjectURL(review.url);});
+ window.addEventListener('pagehide',()=>{clearReadPreview();if(review)URL.revokeObjectURL(review.url);});
 }
