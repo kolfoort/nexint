@@ -6,6 +6,7 @@ const page = document.body.dataset.page;
 let db, member, documents = [], members = [], submissions = [];
 let generation = 0;
 let documentProfiles=[];
+let companyContext=null;
 function message(text) { $('status').textContent = text; $('status').hidden = !text; }
 function node(tag, text, cls) { const e = document.createElement(tag); if(text !== undefined) e.textContent = text; if(cls) e.className = cls; return e; }
 function fail(error) { console.error(error); message('Unable to complete this request. Please try again or contact info@nexint.eu.'); }
@@ -55,11 +56,34 @@ async function loadSubmissions() {
     return;
   }
   submissions=check(result);
-  documentProfiles=check(await db.from('portal_document_profiles').select('submission_id,company_version,company_status,details'));
+  documentProfiles=check(await db.from('portal_document_profiles').select('submission_id,company_id,company_version,company_status,details'));
   if(page==='documents') {
     $('client-upload-section').hidden=false;
     renderSubmissions($('submission-list'),false);
+    renderMcndaStatus();
   } else renderSubmissions($('incoming-list'),true);
+}
+function renderMcndaStatus() {
+  const existing=$('nda-existing'),preparation=$('nda-preparation');if(!existing||!preparation)return;
+  const profile=companyContext?.getProfile();
+  const signed=submissions.find(item=>{
+    if(item.user_id!==member.user_id || !/^MCNDA\s*-/i.test(item.title) || !item.note?.startsWith('Completed and electronically signed via the Nexora portal.'))return false;
+    const snapshot=documentProfiles.find(record=>record.submission_id===item.id);
+    return !snapshot?.company_id || !profile?.id || snapshot.company_id===profile.id;
+  });
+  existing.replaceChildren();existing.hidden=!signed;preparation.hidden=!!signed;$('nda-form-intro').hidden=!!signed;
+  if(!signed){$('nda-heading').textContent='Complete & Sign MCNDA';$('nda-intro').hidden=true;return;}
+  $('nda-heading').textContent='MCNDA signed & submitted';$('nda-intro').hidden=false;
+  $('nda-intro').textContent=signed.status==='denied'?'Your previous MCNDA was signed and submitted, but was not approved. Contact Nexora about the next steps.':'Your signed MCNDA has been shared with Nexora. You do not need to complete it again.';
+  preparation.open=false;
+  const statuses={received:['Awaiting review','Nexora has received your signed MCNDA.'],in_review:['In review','Nexora is reviewing your signed MCNDA.'],approved:['Approved','Nexora has approved your submitted MCNDA.'],denied:['Denied','Nexora has denied this submission. Contact Nexora before preparing a replacement.']};
+  const [label,description]=statuses[signed.status]||['Submitted','Your signed MCNDA has been submitted.'];
+  existing.append(node('div',label,'tag'),node('p',description),node('p','Submitted '+new Intl.DateTimeFormat('en-GB',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Amsterdam'}).format(new Date(signed.created_at))+' · Amsterdam time','account'));
+  const download=node('button','Download signed MCNDA','secondary');download.type='button';download.addEventListener('click',()=>action(download,()=>downloadPDF('nexora-client-uploads',signed.storage_path,signed.title)));existing.append(download);
+  if(signed.status==='denied'){
+    const replace=node('button','Prepare a replacement MCNDA','text-button');replace.type='button';
+    replace.addEventListener('click',()=>{if(!confirm('Prepare a new MCNDA? The previously signed submission will remain in your shared documents.'))return;preparation.hidden=false;$('nda-form-intro').hidden=false;preparation.open=true;$('nda-form').hidden=false;$('nda-success').hidden=true;$('nda-clear').click();preparation.scrollIntoView({behavior:'smooth',block:'start'});});existing.append(replace);
+  }
 }
 function renderSubmissions(container, admin) {
   container.replaceChildren();
@@ -246,7 +270,7 @@ async function start() {
   } else if(await authorize()) {
     if($('refresh-submissions')) $('refresh-submissions').addEventListener('click',()=>action($('refresh-submissions'),loadSubmissions));
     if(page==='company') await initCompanyProfile({db,member,check,action,message});
-    if(page==='documents') { const company=await initCompanyProfile({db,member,check,action,message}); const {bindNda}=await import('./nda.js?v=20261021-company1');await bindNda({db,member,check,action,message,onSubmitted:loadSubmissions,company}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
+    if(page==='documents') { const company=await initCompanyProfile({db,member,check,action,message}); companyContext=company; const {bindNda}=await import('./nda.js?v=20261021-company1');await bindNda({db,member,check,action,message,onSubmitted:loadSubmissions,company}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
     if(page==='admin') {const {bindAccessAdmin}=await import('./access-requests.js?v=20261021-access2');await bindAccessAdmin({db,check,message,onInvited:async()=>{await loadAdmin();await loadCompanyAdmin({db,check,action,message,members});}});bindAdmin();await loadAdmin();await loadSubmissions();await loadCompanyAdmin({db,check,action,message,members});$('refresh-companies').addEventListener('click',()=>action($('refresh-companies'),()=>loadCompanyAdmin({db,check,action,message,members})));}
   }
 }
