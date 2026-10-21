@@ -17,6 +17,9 @@ export async function bindAccessAdmin({db,check,message,onInvited}){
  async function load(){
   const rows=check(await db.from('portal_access_requests').select('id,details,message,status,created_at,reviewed_at,invite_started_at,invitation_error,admin_notified,applicant_notified').order('created_at',{ascending:false}).limit(100));list.replaceChildren();
   if(!rows.length){list.append(el('p','No access requests yet. New applications will appear here.'));return;}
+  const active=el('div'),history=el('details'),historyList=el('div');history.className='request-history';const completed=rows.filter(r=>['invited','declined'].includes(r.status));const summary=el('summary','View request history ('+completed.length+')');history.append(summary,historyList);
+  if(rows.every(r=>['invited','declined'].includes(r.status)))active.append(el('p','No access requests need attention. Existing clients can be managed under Company profiles.'));
+  list.append(active);if(completed.length)list.append(history);
   for(const r of rows){
    const card=el('article');card.className='access-request';const tag=el('span',({pending:'Awaiting review',inviting:'Invitation in progress',invited:'Invited',declined:'Declined',invitation_failed:'Invitation needs attention',existing_account:'Existing account — manual review'})[r.status]||r.status);tag.className='tag';card.append(tag,el('h3',r.details.B_COMPANY));
    const dl=el('dl');dl.className='company-details';for(const [key,label] of [['B_REPRESENTATIVE','Contact person'],['B_EMAIL','Business email'],['B_COUNTRY','Country'],['B_REGISTRATION','Registration'],['B_ADDRESS','Registered address'],['B_TITLE','Position / title'],['B_PHONE','Telephone'],['B_WEBSITE','Website']])if(r.details[key])dl.append(el('dt',label),el('dd',r.details[key]));card.append(dl);
@@ -39,7 +42,7 @@ export async function bindAccessAdmin({db,check,message,onInvited}){
    }
    if(reviewable){const approve=el('button',r.status==='invitation_failed'||stale?'Retry approve & invite':'Approve & invite');approve.type='button';approve.addEventListener('click',()=>review('approve',approve));actions.append(approve);}
    if(['pending','invitation_failed','existing_account'].includes(r.status)){const decline=el('button','Decline');decline.type='button';decline.className='secondary';decline.addEventListener('click',()=>review('decline',decline));actions.append(decline);}
-   card.append(actions,feedback);list.append(card);
+   card.append(actions,feedback);(['invited','declined'].includes(r.status)?historyList:active).append(card);
   }
  }
  refresh.addEventListener('click',async()=>{refresh.disabled=true;try{await load();}catch{message('Unable to load access requests. Please try again.');}finally{refresh.disabled=false;}});
