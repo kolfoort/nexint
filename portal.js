@@ -1,4 +1,4 @@
-import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261020-access1';
+import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261021-company1';
 import { config } from './portal-config.js';
 
 const $ = id => document.getElementById(id);
@@ -18,6 +18,7 @@ async function authorize() {
   if(!user) { location.replace('client-login.html'); return false; }
   member = check(await db.from('portal_members').select('user_id,email,is_admin,active').eq('user_id',user.id).maybeSingle());
   if(!member?.active) { resetPrivateView(); message('Your access has not been enabled. Please contact Nexora International.'); return false; }
+  if(!check(await db.rpc('my_portal_access_allowed'))) {resetPrivateView();message('Your company access is paused or archived. Please contact Nexora International.');return false;}
   if(page === 'admin' && !member.is_admin) { resetPrivateView(); message('This page is reserved for Nexora administrators.'); return false; }
   $('account').textContent = member.email;
   $('protected').hidden = false;
@@ -240,7 +241,7 @@ async function start() {
   } else if(await authorize()) {
     if($('refresh-submissions')) $('refresh-submissions').addEventListener('click',()=>action($('refresh-submissions'),loadSubmissions));
     if(page==='company') await initCompanyProfile({db,member,check,action,message});
-    if(page==='documents') { const company=await initCompanyProfile({db,member,check,action,message}); const {bindNda}=await import('./nda.js?v=20261020-profile2');await bindNda({db,member,check,action,message,onSubmitted:loadSubmissions,company}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
+    if(page==='documents') { const company=await initCompanyProfile({db,member,check,action,message}); const {bindNda}=await import('./nda.js?v=20261021-company1');await bindNda({db,member,check,action,message,onSubmitted:loadSubmissions,company}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
     if(page==='admin') {const {bindAccessAdmin}=await import('./access-requests.js?v=20261021-access2');await bindAccessAdmin({db,check,message,onInvited:async()=>{await loadAdmin();await loadCompanyAdmin({db,check,action,message,members});}});bindAdmin();await loadAdmin();await loadSubmissions();await loadCompanyAdmin({db,check,action,message,members});$('refresh-companies').addEventListener('click',()=>action($('refresh-companies'),()=>loadCompanyAdmin({db,check,action,message,members})));}
   }
 }
