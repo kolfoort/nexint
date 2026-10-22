@@ -24,7 +24,7 @@ export async function initCompanyProfile({db,member,check,action,message}){
  });});
  $('company-profile-refresh').addEventListener('click',()=>action($('company-profile-refresh'),()=>refresh(true)));
  await refresh();
- await initSigningImages({db,container:form.parentElement,message});
+ await initSigningImages({db,container:form.parentElement,message,onChange:()=>refresh(true)});
  return {getProfile:()=>profile,refresh,subscribe:listener=>listeners.push(listener)};
 }
 export {loadCompanyAdmin} from './company-management.js?v=20261021-company1';
