@@ -1,3 +1,4 @@
+import {initClientFile,loadClientFile} from './client-file.js?v=20261022-1';
 import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261021-company1';
 import { config } from './portal-config.js';
 
@@ -7,6 +8,7 @@ let db, member, documents = [], members = [], submissions = [];
 let generation = 0;
 let documentProfiles=[];
 let companyContext=null;
+let mcndaAssignments=[];
 function message(text) { $('status').textContent = text; $('status').hidden = !text; }
 function node(tag, text, cls) { const e = document.createElement(tag); if(text !== undefined) e.textContent = text; if(cls) e.className = cls; return e; }
 function fail(error) { console.error(error); message('Unable to complete this request. Please try again or contact info@nexint.eu.'); }
@@ -32,6 +34,7 @@ async function loadDocuments() {
   if(current !== generation) return;
   documents = data;
   renderDocuments();
+  if(page==='documents')await loadClientFile({db,member,company:companyContext});
 }
 async function downloadPDF(bucket, path, title) {
   const blob = check(await db.storage.from(bucket).download(path));
@@ -60,7 +63,9 @@ async function loadSubmissions() {
   if(page==='documents') {
     $('client-upload-section').hidden=false;
     renderSubmissions($('submission-list'),false);
+    mcndaAssignments=check(await db.from('portal_mcnda_assignments').select('*').order('assigned_at',{ascending:false}));
     renderMcndaStatus();
+    await loadClientFile({db,member,company:companyContext});
   } else renderSubmissions($('incoming-list'),true);
 }
 function renderMcndaStatus() {
@@ -72,7 +77,11 @@ function renderMcndaStatus() {
     return !snapshot?.company_id || !profile?.id || snapshot.company_id===profile.id;
   });
   existing.replaceChildren();existing.hidden=!signed;preparation.hidden=!!signed;if($('nda-readonly'))$('nda-readonly').hidden=!!signed;$('nda-form-intro').hidden=!!signed;
-  if(!signed){$('nda-heading').textContent='Complete & Sign MCNDA';$('nda-intro').hidden=true;return;}
+  const pending=mcndaAssignments.some(a=>a.user_id===member.user_id&&a.status==='assigned');
+  if(!signed&&!pending){$('nda-section').hidden=true;return;}
+  $('nda-section').hidden=false;
+  if(pending){existing.hidden=true;preparation.hidden=false;if($('nda-readonly'))$('nda-readonly').hidden=false;$('nda-form-intro').hidden=false;$('nda-heading').textContent='Assigned MCNDA';$('nda-intro').hidden=true;return;}
+  if(!signed){$('nda-section').hidden=true;return;}
   $('nda-heading').textContent='MCNDA signed & submitted';$('nda-intro').hidden=false;
   $('nda-intro').textContent=signed.status==='denied'?'Your previous MCNDA was signed and submitted, but was not approved. Contact Nexora about the next steps.':'Your signed MCNDA has been shared with Nexora. You do not need to complete it again.';
   preparation.open=false;
@@ -80,10 +89,7 @@ function renderMcndaStatus() {
   const [label,description]=statuses[signed.status]||['Submitted','Your signed MCNDA has been submitted.'];
   existing.append(node('div',label,'tag'),node('p',description),node('p','Submitted '+new Intl.DateTimeFormat('en-GB',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Amsterdam'}).format(new Date(signed.created_at))+' · Amsterdam time','account'));
   const download=node('button','Download signed MCNDA','secondary');download.type='button';download.addEventListener('click',()=>action(download,()=>downloadPDF('nexora-client-uploads',signed.storage_path,signed.title)));existing.append(download);
-  if(signed.status==='denied'){
-    const replace=node('button','Prepare a replacement MCNDA','text-button');replace.type='button';
-    replace.addEventListener('click',()=>{if(!confirm('Prepare a new MCNDA? The previously signed submission will remain in your shared documents.'))return;preparation.hidden=false;if($('nda-readonly'))$('nda-readonly').hidden=false;$('nda-form-intro').hidden=false;preparation.open=true;$('nda-form').hidden=false;$('nda-success').hidden=true;$('nda-clear').click();preparation.scrollIntoView({behavior:'smooth',block:'start'});});existing.append(replace);
-  }
+
 }
 function renderSubmissions(container, admin) {
   container.replaceChildren();
@@ -95,7 +101,7 @@ function renderSubmissions(container, admin) {
     row.append(node('div',status,'tag status-'+(item.status==='reviewed'?'in_review':item.status)),node('h3',item.title));
     if(admin) row.append(node('div',members.find(p=>p.user_id===item.user_id)?.email || 'Client account','account'));
     row.append(node('div',new Date(item.created_at).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'}),'meta'));
-    if(item.note) row.append(node('p',item.note));
+    if(item.note){const note=node('details');note.append(node('summary','Submission details'),node('p',item.note));row.append(note);}
     const savedProfile=documentProfiles.find(p=>p.submission_id===item.id);
     if(savedProfile){const details=node('details');details.append(node('summary','Company record at submission · Version '+savedProfile.company_version+' · '+(savedProfile.company_status==='approved'?'Approved':'Pending review')));for(const [key,label] of [['B_COMPANY','Company'],['B_REGISTRATION','Registration'],['B_ADDRESS','Address'],['B_COUNTRY','Country'],['B_REPRESENTATIVE','Representative'],['B_TITLE','Title'],['B_PHONE','Phone'],['B_EMAIL','Email'],['B_WEBSITE','Website']])details.append(node('div',label+': '+(savedProfile.details[key]||'—'),'account'));row.append(details);}
 
@@ -146,7 +152,7 @@ function bindClientUpload() {
 }
 function renderDocuments() {
   const term = $('search').value.trim().toLowerCase(), category = $('category').value;
-  const visible = documents.filter(d => (!category || d.category === category) && (d.title+' '+d.description).toLowerCase().includes(term));
+  const visible = documents.filter(d => !/MCNDA/i.test(d.title) && (!category || d.category === category) && (d.title+' '+d.description).toLowerCase().includes(term));
   $('document-list').replaceChildren();
   if(!visible.length) { $('document-list').append(node('p', documents.length ? 'No documents match your search.' : 'No documents have been assigned to your account yet.')); return; }
   for(const doc of visible) {
@@ -270,7 +276,7 @@ async function start() {
   } else if(await authorize()) {
     if($('refresh-submissions')) $('refresh-submissions').addEventListener('click',()=>action($('refresh-submissions'),loadSubmissions));
     if(page==='company') await initCompanyProfile({db,member,check,action,message});
-    if(page==='documents') { const company=await initCompanyProfile({db,member,check,action,message}); companyContext=company; const {bindNda}=await import('./nda.js?v=20261021-mcnda2');await bindNda({db,member,check,action,message,onSubmitted:loadSubmissions,company}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
+    if(page==='documents') { initClientFile(); const company=await initCompanyProfile({db,member,check,action,message}); companyContext=company; company.subscribe(()=>loadClientFile({db,member,company})); const {bindNda}=await import('./nda.js?v=20261022-assigned1');await bindNda({db,member,check,action,message,onSubmitted:loadSubmissions,company}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
     if(page==='admin') {const {bindAccessAdmin}=await import('./access-requests.js?v=20261021-history1');await bindAccessAdmin({db,check,message,onInvited:async()=>{await loadAdmin();await loadCompanyAdmin({db,check,action,message,members});}});bindAdmin();await loadAdmin();await loadSubmissions();await loadCompanyAdmin({db,check,action,message,members});$('refresh-companies').addEventListener('click',()=>action($('refresh-companies'),()=>loadCompanyAdmin({db,check,action,message,members})));}
   }
 }

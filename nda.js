@@ -88,7 +88,7 @@ export async function bindNda({db,member,check,action,message,onSubmitted,compan
   } catch(error){
     await db.storage.from('nexora-client-uploads').remove([path]);
     if(newStampPath)await db.storage.from('nexora-company-assets').remove([newStampPath]);
-    message('Unable to submit. Your company profile may have changed. Refresh the company profile and generate a new preview before trying again.');console.error(error);return;
+    message('Unable to submit. Your MCNDA assignment or company profile may have changed. Refresh your client file and contact Nexora if the agreement is no longer assigned.');console.error(error);return;
   }
   await company.refresh();
   $('nda-result-download').href=current.url;$('nda-result-download').download='Nexora_MCNDA_Submitted.pdf';$('nda-success').hidden=false;$('nda-review').hidden=true;form.hidden=true;message('Your signed MCNDA has been submitted to Nexora for review. You can download it below or from Your shared documents.');await onSubmitted();
