@@ -1,6 +1,7 @@
-import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-preview1';
-import {loadAssignedDocuments} from './shared-documents.js?v=20261022-explicit-sharing';
-import {initClientFile,loadClientFile} from './client-file.js?v=20261022-docgrid1';
+import {prepareDocumentPreview,setDocumentAccess} from './document-sharing.js?v=20261022-viewrights1';
+import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
+import {loadAssignedDocuments} from './shared-documents.js?v=20261022-viewrights1';
+import {initClientFile,loadClientFile} from './client-file.js?v=20261022-viewrights1';
 import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261022-live2';
 import { config } from './portal-config.js';
 
@@ -166,7 +167,7 @@ function renderDocuments() {
     button.addEventListener('click', () => action(button, async () => {
       await downloadPDF('nexora-documents',doc.storage_path,doc.title);
     }));
-    card.prepend(pdfBadge());const actions=node('div',undefined,'document-actions');actions.append(previewButton({db,bucket:'nexora-documents',path:doc.storage_path,title:doc.title}),button);card.append(actions); $('document-list').append(card);
+    if(doc.can_download===false)card.append(node('div','Preview only','tag'));card.prepend(pdfBadge());const actions=node('div',undefined,'document-actions');actions.append(previewButton({db,bucket:'nexora-documents',path:doc.storage_path,title:doc.title,documentId:doc.id,canDownload:doc.can_download!==false}),...(doc.can_download===false?[]:[button]));card.append(actions); $('document-list').append(card);
   }
 }
 async function loadAdmin() {
@@ -174,7 +175,7 @@ async function loadAdmin() {
   const [people, docs, grants] = await Promise.all([
     db.from('portal_members').select('user_id,email,active,is_admin').order('email'),
     db.from('portal_documents').select('*').order('created_at',{ascending:false}),
-    db.from('portal_document_access').select('document_id,user_id')
+    db.from('portal_document_access').select('document_id,user_id,can_download')
   ]);
   if(current !== generation) return;
   members=check(people); documents=check(docs); const access=check(grants);
@@ -218,12 +219,15 @@ async function loadAdmin() {
     row.prepend(pdfBadge());controls.append(previewButton({db,bucket:'nexora-documents',path:doc.storage_path,title:doc.title}),toggle,remove);row.append(controls);
     row.append(node('p','Client access'));
     for(const person of members.filter(p=>!p.is_admin)) {
-      const label=node('label',undefined,'check'), box=document.createElement('input'); box.type='checkbox'; box.checked=access.some(a=>a.document_id===doc.id && a.user_id===person.user_id);
-      box.addEventListener('change',async()=>{
-        box.disabled=true;
-        try { if(box.checked) check(await db.from('portal_document_access').insert({document_id:doc.id,user_id:person.user_id})); else check(await db.from('portal_document_access').delete().eq('document_id',doc.id).eq('user_id',person.user_id)); }
-        catch(error){box.checked=!box.checked;fail(error);} finally{box.disabled=false;}
-      }); label.append(box,document.createTextNode(person.email+(person.active?'':' (disabled)'))); row.append(label);
+      let assigned=access.find(a=>a.document_id===doc.id&&a.user_id===person.user_id);
+      const permissionRow=node('div',undefined,'document-permission-row'),label=node('label',undefined,'check'),box=document.createElement('input'),mode=document.createElement('select');box.type='checkbox';box.checked=!!assigned;
+      mode.setAttribute('aria-label','Document permission for '+person.email);for(const [value,text] of [['preview','Preview only'],['download','Preview + download']]){const option=node('option',text);option.value=value;mode.append(option)}
+      mode.value=(assigned?assigned.can_download:doc.default_can_download)!==false?'download':'preview';mode.disabled=!box.checked;
+      async function saveAccess(){const old=assigned,oldMode=old?.can_download===false?'preview':'download';box.disabled=mode.disabled=true;try{
+        if(box.checked){await setDocumentAccess({db,doc,userId:person.user_id,canDownload:mode.value==='download',progress:message});assigned={document_id:doc.id,user_id:person.user_id,can_download:mode.value==='download'};message('Document permission saved: '+(assigned.can_download?'preview + download.':'preview only.'))}
+        else{check(await db.from('portal_document_access').delete().eq('document_id',doc.id).eq('user_id',person.user_id));assigned=null;message('Document access removed.')}
+      }catch(error){box.checked=!!old;mode.value=oldMode;message(error.message||'Unable to save this document permission.')}finally{box.disabled=false;mode.disabled=!box.checked}}
+      box.onchange=saveAccess;mode.onchange=saveAccess;label.append(box,document.createTextNode(person.email+(person.active?'':' (disabled)')));permissionRow.append(label,mode);row.append(permissionRow);
     }
     $('admin-documents').append(row);
   }
@@ -235,8 +239,9 @@ function bindAdmin() {
       if(!await validPDF(file)) { message('Please select a valid PDF smaller than 20 MB.'); return; }
       const id=crypto.randomUUID(), path=id+'.pdf';
       check(await db.storage.from('nexora-documents').upload(path,file,{contentType:'application/pdf',upsert:false}));
-      try { check(await db.from('portal_documents').insert({id,title:form.elements.title.value.trim(),description:form.elements.description.value.trim(),category:form.elements.category.value,version_date:form.elements.version_date.value,is_draft:form.elements.is_draft.checked,storage_path:path,published:false})); }
+      try { check(await db.from('portal_documents').insert({id,title:form.elements.title.value.trim(),description:form.elements.description.value.trim(),category:form.elements.category.value,version_date:form.elements.version_date.value,is_draft:form.elements.is_draft.checked,storage_path:path,published:false,default_can_download:form.elements.default_access.value==='download'})); }
       catch(error) { await db.storage.from('nexora-documents').remove([path]); throw error; }
+      if(form.elements.default_access.value==='preview'){try{await prepareDocumentPreview({db,doc:{id,storage_path:path},progress:message})}catch(error){await loadAdmin();message('PDF saved as an unpublished draft. Preview preparation failed: '+error.message);return;}}
       form.reset(); message('PDF uploaded. Assign client access and publish when ready.'); await loadAdmin();
     });
   });
