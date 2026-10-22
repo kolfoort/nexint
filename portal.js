@@ -1,5 +1,6 @@
+import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-preview1';
 import {loadAssignedDocuments} from './shared-documents.js?v=20261022-explicit-sharing';
-import {initClientFile,loadClientFile} from './client-file.js?v=20261022-explicit-sharing';
+import {initClientFile,loadClientFile} from './client-file.js?v=20261022-preview1';
 import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261022-live2';
 import { config } from './portal-config.js';
 
@@ -14,7 +15,7 @@ function message(text) { $('status').textContent = text; $('status').hidden = !t
 function node(tag, text, cls) { const e = document.createElement(tag); if(text !== undefined) e.textContent = text; if(cls) e.className = cls; return e; }
 function fail(error) { console.error(error); message('Unable to complete this request. Please try again or contact info@nexint.eu.'); }
 function check(result) { if(result.error) throw result.error; return result.data; }
-function resetPrivateView() { generation++; documents = []; members = []; submissions = []; for(const id of ['document-list','member-list','admin-documents','submission-list','incoming-list']) if($(id)) $(id).replaceChildren(); if($('protected')) $('protected').hidden = true; if($('nda-frame')) $('nda-frame').src='about:blank'; }
+function resetPrivateView() { closePdfPreview();generation++; documents = []; members = []; submissions = []; for(const id of ['document-list','member-list','admin-documents','submission-list','incoming-list']) if($(id)) $(id).replaceChildren(); if($('protected')) $('protected').hidden = true; if($('nda-frame')) $('nda-frame').src='about:blank'; }
 function date(value) { return value ? new Date(value+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—'; }
 async function action(button, work) { button.disabled = true; try { await work(); } catch(error) { fail(error); } finally { button.disabled = false; } }
 async function authorize() {
@@ -91,7 +92,7 @@ function renderMcndaStatus() {
   const statuses={received:['Awaiting review','Nexora has received your signed MCNDA.'],in_review:['In review','Nexora is reviewing your signed MCNDA.'],approved:['Approved','Nexora has approved your submitted MCNDA.'],denied:['Denied','Nexora has denied this submission. Contact Nexora before preparing a replacement.']};
   const [label,description]=statuses[signed.status]||['Submitted','Your signed MCNDA has been submitted.'];
   existing.append(node('div',label,'tag'),node('p',description),node('p','Submitted '+new Intl.DateTimeFormat('en-GB',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Amsterdam'}).format(new Date(signed.created_at))+' · Amsterdam time','account'));
-  const download=node('button','Download signed MCNDA','secondary');download.type='button';download.addEventListener('click',()=>action(download,()=>downloadPDF('nexora-client-uploads',signed.storage_path,signed.title)));existing.append(download);
+  const download=node('button','Download signed MCNDA','secondary');download.type='button';download.addEventListener('click',()=>action(download,()=>downloadPDF('nexora-client-uploads',signed.storage_path,signed.title)));existing.append(previewButton({db,bucket:'nexora-client-uploads',path:signed.storage_path,title:signed.title}),download);
 
 }
 function renderSubmissions(container, admin) {
@@ -109,7 +110,7 @@ function renderSubmissions(container, admin) {
     if(savedProfile){const details=node('details');details.append(node('summary','Company record at submission · Version '+savedProfile.company_version+' · '+(savedProfile.company_status==='approved'?'Approved':'Pending review')));for(const [key,label] of [['B_COMPANY','Company'],['B_REGISTRATION','Registration'],['B_ADDRESS','Address'],['B_COUNTRY','Country'],['B_REPRESENTATIVE','Representative'],['B_TITLE','Title'],['B_PHONE','Phone'],['B_EMAIL','Email'],['B_WEBSITE','Website']])details.append(node('div',label+': '+(savedProfile.details[key]||'—'),'account'));row.append(details);}
 
     const controls=node('div',undefined,'submission-actions'), download=node('button','Download PDF','secondary'); download.type='button';
-    download.addEventListener('click',()=>action(download,()=>downloadPDF('nexora-client-uploads',item.storage_path,item.title))); controls.append(download);
+    download.addEventListener('click',()=>action(download,()=>downloadPDF('nexora-client-uploads',item.storage_path,item.title))); controls.append(previewButton({db,bucket:'nexora-client-uploads',path:item.storage_path,title:item.title}),download);row.prepend(pdfBadge());
     if(admin) {
       const reviewLabel=node('label','Document status','status-control');
       const select=document.createElement('select');select.setAttribute('aria-label','Status for '+item.title);
@@ -165,7 +166,7 @@ function renderDocuments() {
     button.addEventListener('click', () => action(button, async () => {
       await downloadPDF('nexora-documents',doc.storage_path,doc.title);
     }));
-    card.append(button); $('document-list').append(card);
+    card.prepend(pdfBadge());const actions=node('div',undefined,'document-actions');actions.append(previewButton({db,bucket:'nexora-documents',path:doc.storage_path,title:doc.title}),button);card.append(actions); $('document-list').append(card);
   }
 }
 async function loadAdmin() {
@@ -214,7 +215,7 @@ async function loadAdmin() {
         } finally {inputs.forEach(e=>e.disabled=false);}
       });
     });
-    controls.append(toggle,remove);row.append(controls);
+    row.prepend(pdfBadge());controls.append(previewButton({db,bucket:'nexora-documents',path:doc.storage_path,title:doc.title}),toggle,remove);row.append(controls);
     row.append(node('p','Client access'));
     for(const person of members.filter(p=>!p.is_admin)) {
       const label=node('label',undefined,'check'), box=document.createElement('input'); box.type='checkbox'; box.checked=access.some(a=>a.document_id===doc.id && a.user_id===person.user_id);
