@@ -23,6 +23,7 @@ async function authorize() {
   if(!member?.active) { resetPrivateView(); message('Your access has not been enabled. Please contact Nexora International.'); return false; }
   if(!check(await db.rpc('my_portal_access_allowed'))) {resetPrivateView();message('Your company access is paused or archived. Please contact Nexora International.');return false;}
   if(page === 'admin' && !member.is_admin) { resetPrivateView(); message('This page is reserved for Nexora administrators.'); return false; }
+  if(page==='documents'&&member.is_admin){location.replace('client-files.html');return false;}
   $('account').textContent = member.email;
   $('protected').hidden = false;
   if(member.is_admin && $('admin-link')) $('admin-link').hidden = false;
