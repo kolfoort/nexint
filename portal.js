@@ -1,4 +1,5 @@
-import {initClientFile,loadClientFile} from './client-file.js?v=20261022-1';
+import {loadAssignedDocuments} from './shared-documents.js?v=20261022-explicit-sharing';
+import {initClientFile,loadClientFile} from './client-file.js?v=20261022-explicit-sharing';
 import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261022-live2';
 import { config } from './portal-config.js';
 
@@ -32,7 +33,7 @@ async function authorize() {
 }
 async function loadDocuments() {
   const current = generation;
-  const data = check(await db.from('portal_documents').select('id,title,description,category,version_date,is_draft,storage_path').eq('published',true).order('version_date',{ascending:false}));
+  const data = await loadAssignedDocuments(db,member.user_id,'id,title,description,category,version_date,is_draft,storage_path');
   if(current !== generation) return;
   documents = data;
   renderDocuments();
@@ -154,7 +155,7 @@ function bindClientUpload() {
 }
 function renderDocuments() {
   const term = $('search').value.trim().toLowerCase(), category = $('category').value;
-  const visible = documents.filter(d => !/MCNDA/i.test(d.title) && (!category || d.category === category) && (d.title+' '+d.description).toLowerCase().includes(term));
+  const visible = documents.filter(d => (!category || d.category === category) && (d.title+' '+d.description).toLowerCase().includes(term));
   $('document-list').replaceChildren();
   if(!visible.length) { $('document-list').append(node('p', documents.length ? 'No documents match your search.' : 'No documents have been assigned to your account yet.')); return; }
   for(const doc of visible) {
