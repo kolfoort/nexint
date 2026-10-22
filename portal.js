@@ -1,6 +1,6 @@
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-preview1';
 import {loadAssignedDocuments} from './shared-documents.js?v=20261022-explicit-sharing';
-import {initClientFile,loadClientFile} from './client-file.js?v=20261022-preview1';
+import {initClientFile,loadClientFile} from './client-file.js?v=20261022-docgrid1';
 import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261022-live2';
 import { config } from './portal-config.js';
 
