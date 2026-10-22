@@ -45,7 +45,7 @@ async function startClientFiles(){
   document.querySelector('main').replaceWith(doc.querySelector('main'));document.querySelector('header + nav#workspace-nav')?.remove();document.body.classList.add('commission-page');
   const style=document.createElement('link');style.rel='stylesheet';style.href='commission.css?v=20261022-live2';document.head.append(style);
   const back=document.createElement('a');back.className='button secondary';back.textContent='Back to client file';back.href='client-files.html?client='+encodeURIComponent(new URLSearchParams(location.search).get('client')||'');document.querySelector('main').prepend(back);
-  await import('./commission.js?v=20261022-crypto-optional');
+  await import('./commission.js?v=20261022-sign-feedback');
  }else{await init();document.getElementById('workspace-nav').hidden=false;}
 }
 startClientFiles().catch(e=>{const box=document.getElementById('status')||document.getElementById('message');box.textContent=e.message||'Could not load client file.';box.hidden=false;});
