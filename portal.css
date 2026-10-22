@@ -19,3 +19,6 @@
 
 .file-agreement-dialog{width:95vw;max-width:1500px;padding:16px;border:1px solid #ccd7e4}.file-agreement-dialog::backdrop{background:#102e5a88}.file-agreement-dialog iframe{display:block;width:100%;height:82vh;border:0;margin-top:12px}
 .file-tabs a{display:inline-block;padding:15px 24px;color:var(--muted);text-decoration:none;font-size:12px;font-weight:bold;border-bottom:3px solid transparent;white-space:nowrap}.file-tabs a.active{color:var(--navy);border-bottom-color:var(--gold)}.admin-overview-cards{margin-top:24px}.file-tabs{align-items:stretch}
+
+/* Use one select appearance across Safari and Chromium while retaining native menus and keyboard access. */
+select{-webkit-appearance:none;appearance:none;min-height:46px;padding:12px 44px 12px 14px;border:1px solid #c6d0dc;border-radius:0;background-color:#fff;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%23002040' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:16px 16px;font:inherit;color:var(--ink);line-height:1.35}select::-ms-expand{display:none}@media(forced-colors:active){select{-webkit-appearance:auto;appearance:auto;background-image:none}}
