@@ -54,5 +54,5 @@ async function init(){
  $('#admin-nav').hidden=!member.is_admin;
  $('#logout').onclick=async()=>{await db.auth.signOut();location.replace('client-login.html')};
  db.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT'){current=null;agreements=[];$('#detail').replaceChildren();$('#list').replaceChildren();if(pdfUrl)URL.revokeObjectURL(pdfUrl);location.replace('client-login.html')}});
- await load();if(member.is_admin&&dossierClient)$('#new').click();
+ await load(dossierParams.get('agreement'));if(member.is_admin&&dossierClient)$('#new').click();
 };init().catch(e=>msg(e.message));
