@@ -1,3 +1,4 @@
+import {initSigningImages} from './signing-images.js?v=20261022-live2';
 export const companyFields=[['B_COMPANY','Legal company name',100,true],['B_REGISTRATION','Company registration number',60,true],['B_ADDRESS','Registered address',150,true],['B_COUNTRY','Country of incorporation',60,true],['B_REPRESENTATIVE','Authorized representative',80,true],['B_TITLE','Position / title',80,true],['B_PHONE','Telephone',50,true],['B_EMAIL','Business email',100,true],['B_WEBSITE','Website',100,false]];
 const $=id=>document.getElementById(id);
 const element=(tag,text)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;return e;};
@@ -23,6 +24,7 @@ export async function initCompanyProfile({db,member,check,action,message}){
  });});
  $('company-profile-refresh').addEventListener('click',()=>action($('company-profile-refresh'),()=>refresh(true)));
  await refresh();
+ await initSigningImages({db,container:form.parentElement,message});
  return {getProfile:()=>profile,refresh,subscribe:listener=>listeners.push(listener)};
 }
 export {loadCompanyAdmin} from './company-management.js?v=20261021-company1';
