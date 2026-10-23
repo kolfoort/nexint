@@ -7,13 +7,13 @@ const dateText=d=>new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Amsterdam',d
 function fit(page,text,font,rect,size=9){let [x,y,r,t]=rect;while(font.widthOfTextAtSize(text,size)>r-x && size>6)size-=.25;if(font.widthOfTextAtSize(text,size)>r-x)throw new Error('A company detail is too long to fit. Please shorten the address or company name.');font.encodeText(text);page.drawText(text,{x,y:y+2,size,font,color:rgb(0,.125,.25)});}
 export async function createNda(values,signature,stamp,{now=new Date(),reference='',email='',loadTemplate,draft=false}={}){
  if(!loadTemplate)throw new Error('The private MCNDA template is not available. Please contact Nexora.');
- const pdf=await PDFDocument.load(await loadTemplate()),font=await pdf.embedFont(StandardFonts.Helvetica),datesFont=await pdf.embedFont(StandardFonts.TimesRoman),pages=pdf.getPages();
+ const pdf=await PDFDocument.load(await loadTemplate()),font=await pdf.embedFont(StandardFonts.Helvetica),pages=pdf.getPages();
  const day=dateText(now),bold=await pdf.embedFont(StandardFonts.HelveticaBold);
  // Fixed label and value columns, with a shared baseline on every row.
  const first=pages[1];first.drawRectangle({x:42,y:482,width:246,height:99,color:rgb(1,1,1)});
  const rows=[['B_COMPANY','Company'],['B_REGISTRATION','Registration'],['B_ADDRESS','Registered office'],['B_COUNTRY','Country'],['B_REPRESENTATIVE','Representative'],['B_TITLE','Title'],['B_PHONE','Telephone'],['B_EMAIL','Email'],['B_WEBSITE','Website']];
  rows.forEach(([key,label],i)=>{const y=572.239-i*10.85;first.drawText(label,{x:42.6,y,size:7.5,font:bold,color:rgb(0,.125,.25)});fit(first,values[key]||'',font,[122.6,y-2,287,y+8],8);});
- for(const d of layout.dates){let size=d.size;while(datesFont.widthOfTextAtSize(day,size)>d.width)size-=.1;pages[d.page].drawText(day,{x:d.x,y:d.y+1,size,font:datesFont,color:rgb(0,.125,.25)});}
+ for(const d of layout.dates){const dateFont=d.page===1?bold:font;let size=d.size;while(dateFont.widthOfTextAtSize(day,size)>d.width)size-=.1;pages[d.page].drawText(day,{x:d.x,y:d.y+1,size,font:dateFont,color:rgb(0,32/255,64/255)});}
  const last=pages[7];
  // Rebuild Party B as a table with equal signature/stamp boxes.
  last.drawRectangle({x:35,y:222,width:510,height:293,color:rgb(1,1,1)});
