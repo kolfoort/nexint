@@ -1,4 +1,5 @@
-import {mountSPAAdmin} from './spa-client-file.js?v=20261023-spa2';
+import {mountFCOAdmin} from './fco-client-file.js?v=20261023-fco1';
+import {mountSPAAdmin} from './spa-client-file.js?v=20261023-fco1';
 import {prepareDocumentPreview,setDocumentAccess} from './document-sharing.js?v=20261022-viewrights1';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
 import {companyFields} from './company-profile.js?v=20261021-company1';
@@ -24,6 +25,7 @@ async function refresh(){closePdfPreview();const tick=++version,id=selected;$('c
  function viewFile(view){overview.hidden=view!=='overview';sections.forEach((section,i)=>section.hidden=!(view==='company'?i===0:view==='agreements'?[1,2,3].includes(i):view==='documents'?i===4:false));for(const b of tabs.children){b.classList.toggle('active',b.dataset.view===view);b.setAttribute('aria-selected',String(b.dataset.view===view))}}
  for(const [key,label] of [['overview','Overview'],['agreements','Agreements'],['documents','Documents'],['company','Company profile']]){const b=document.createElement('button');b.type='button';b.dataset.view=key;b.textContent=label;b.onclick=()=>viewFile(key);tabs.append(b)}file.prepend(tabs,overview);overview.querySelectorAll('[data-dossier-go]').forEach(b=>b.onclick=()=>viewFile(b.dataset.dossierGo));viewFile('overview');
  await mountSPAAdmin({db,clientId:id,section:sections[3],overview,createAfter:$('create-fee')});
+await mountFCOAdmin({db,clientId:id,section:sections[3],overview,createAfter:document.getElementById('create-fee')});
  const openAgreement=url=>{const params=new URL(url,location.href).searchParams;params.set('view','commission');params.set('client',id);location.assign('client-files.html?'+params.toString())};
  $('create-fee').onclick=()=>openAgreement('commission-agreements.html?client='+encodeURIComponent(id)+'&recipient='+encodeURIComponent($('signer').value));
  document.querySelectorAll('[data-fee]').forEach(b=>b.onclick=()=>openAgreement('commission-agreements.html?agreement='+encodeURIComponent(b.dataset.fee)));

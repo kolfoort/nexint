@@ -1,7 +1,7 @@
 import {config as portalConfig} from './portal-config.js';
 import {initSigningImages} from './signing-images.js?v=20261022-live2';
-import {products} from './spa-products.js?v=20261023-spa2';
-import {createSPAPDF} from './spa-pdf.js?v=20261023-spa2';
+import {products} from './spa-products.js?v=20261023-fco1';
+import {createSPAPDF} from './spa-pdf.js?v=20261023-fco1';
 let db,pdfUrl=null,reviewEvidence=null,signingProfile=null;
 const templateCache=new Map();
 const $=id=>document.getElementById(id);let config,profiles=[],me,items=[],current=null,tab='parties',dirty=false;
