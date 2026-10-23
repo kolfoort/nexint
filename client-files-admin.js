@@ -1,4 +1,4 @@
-import {mountSPAAdmin} from './spa-client-file.js?v=20261023-spa1';
+import {mountSPAAdmin} from './spa-client-file.js?v=20261023-spa2';
 import {prepareDocumentPreview,setDocumentAccess} from './document-sharing.js?v=20261022-viewrights1';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
 import {companyFields} from './company-profile.js?v=20261021-company1';
