@@ -255,3 +255,10 @@ footer{
 .catalogue-related a:hover,.catalogue-related a:focus-visible{border-color:var(--gold);color:var(--gold)}
 .catalogue-page .navlinks a[aria-current="page"]{color:#806014;border-bottom:2px solid var(--gold)}
 @media(max-width:720px){.catalogue-intro{display:block}.catalogue-intro p{margin-top:16px}.catalogue-grid{grid-template-columns:1fr;gap:18px}.catalogue-card img{aspect-ratio:16/7}.catalogue-breadcrumb{padding:24px 20px 0}.catalogue-related{padding:0 20px 48px}.catalogue-related nav{flex-direction:column}.catalogue-related a{justify-content:space-between}.catalogue-page main>.section,.catalogue-page .crude-section>.section,.catalogue-page .marine-section>.section{padding-top:30px}}
+
+/* Center the public navigation; keep portal access beside the languages. */
+.nav{position:relative;max-width:none}.nav>.client-account{margin-left:auto;flex-shrink:0}.nav>.language-bar{margin-left:0}.nav>.client-account .cta{font-size:12px;font-weight:800;letter-spacing:.075em}.nav>.client-account .cta:hover{color:var(--navy);background:#efbf43}
+@media(min-width:1451px){.nav>.navlinks{position:absolute;left:50%;transform:translateX(-50%);margin:0}.nav>.client-account{min-width:155px}.nav>.language-bar{margin-left:0}}
+@media(max-width:1450px){.nav>.client-account{min-width:120px;max-width:190px}.nav>.client-account .cta{padding:12px 14px}.nav>.navlinks{transform:none}.nav>.language-bar{margin-left:0}.nav>.menu-toggle{margin-left:0}}
+@media(max-width:650px){.nav{gap:6px;padding:0 10px}.nav .logo{width:100px}.nav>.client-account{min-width:0;max-width:125px}.nav>.client-account .cta{padding:10px 8px;font-size:9px;letter-spacing:.02em}.nav>.language-bar a{min-width:25px;padding:6px 2px}.nav .language-flag{width:21px;height:15px}.nav>.menu-toggle{width:28px;min-width:28px}.nav>.client-account .account-details{font-size:9px;line-height:12px;gap:3px}.nav>.client-account .account-email{max-width:65px}}
+@media(max-width:360px){.nav .logo{width:80px}.nav{gap:4px}.nav>.client-account .cta{font-size:8px;padding:10px 6px}.nav>.language-bar a{min-width:23px}.nav .language-flag{width:19px}}
