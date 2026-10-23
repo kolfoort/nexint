@@ -2,7 +2,7 @@ import {config} from './portal-config.js';
 
 const root=document.querySelector('[data-client-account]');
 if(root && config.url && config.publishableKey && !config.url.includes('bibzafctpkekixsevqfx')) {
-  const copy={ar:{login:'بوابة العملاء',documents:'بوابة العملاء',logout:'تسجيل الخروج'},en:{login:'CLIENT PORTAL',documents:'CLIENT PORTAL',logout:'Sign out'},de:{login:'KUNDENLOGIN',documents:'MEINE DOKUMENTE',logout:'Abmelden'},es:{login:'ACCESO CLIENTES',documents:'MIS DOCUMENTOS',logout:'Cerrar sesión'}};
+  const copy={nl:{login:"KLANTENPORTAAL",documents:"KLANTENPORTAAL",logout:"Uitloggen"},ar:{login:'بوابة العملاء',documents:'بوابة العملاء',logout:'تسجيل الخروج'},en:{login:'CLIENT PORTAL',documents:'CLIENT PORTAL',logout:'Sign out'},de:{login:'KUNDENLOGIN',documents:'MEINE DOKUMENTE',logout:'Abmelden'},es:{login:'ACCESO CLIENTES',documents:'MIS DOCUMENTOS',logout:'Cerrar sesión'}};
   const labels=copy[document.documentElement.lang] || copy.en;
   const link=root.querySelector('[data-account-link]'),details=root.querySelector('[data-account-details]'),email=root.querySelector('[data-account-email]'),logout=root.querySelector('[data-account-logout]');
   function render(user) {
