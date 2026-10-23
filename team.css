@@ -18,3 +18,21 @@
 
 /* Preserve headroom for JP and John on narrow screens. */
 @media(max-width:650px){.nex-team-card[aria-label="J.P. Kolfoort"] .nex-team-photo,.nex-team-card[aria-label="John Szabo"] .nex-team-photo{object-fit:contain;object-position:center bottom;padding:28px 10px 0;box-sizing:border-box}}
+
+/* Match mobile head size and headroom across all human team portraits. */
+@media(max-width:650px){
+.nex-team-section .nex-team-card[aria-label]:not([aria-label="Rocky"]) .nex-team-photo{position:absolute;left:50%;top:calc(24px - var(--portrait-leading,4%));translate:-50% 0;width:auto;height:var(--portrait-height,110%);max-width:none;object-fit:contain;object-position:center top;padding:0;box-sizing:border-box}
+.nex-team-card[aria-label="J.P. Kolfoort"]{--portrait-height:80.3%;--portrait-leading:4.44%}
+.nex-team-card[aria-label="Jeremy Green"]{--portrait-height:118.2%;--portrait-leading:5.97%}
+.nex-team-card[aria-label="John Szabo"]{--portrait-height:130.7%;--portrait-leading:4.02%}
+.nex-team-card[aria-label="Kerstin Schacht"]{--portrait-height:96.4%;--portrait-leading:4.43%}
+.nex-team-card[aria-label="Oliver Reed"]{--portrait-height:112.6%;--portrait-leading:4.11%}
+.nex-team-card[aria-label="Charlotte van Dijk"]{--portrait-height:120.4%;--portrait-leading:7.45%}
+.nex-team-card[aria-label="Alexander Brooks"]{--portrait-height:120.7%;--portrait-leading:4.60%}
+.nex-team-card[aria-label="Sophie de Vries"]{--portrait-height:129.9%;--portrait-leading:5.01%}
+.nex-team-card[aria-label="Maarten de Groot"]{--portrait-height:111.2%;--portrait-leading:1.61%}
+.nex-team-card[aria-label="Nadia van Leeuwen"]{--portrait-height:99.9%;--portrait-leading:2.74%}
+.nex-team-card[aria-label="Daniel Foster"]{--portrait-height:101.9%;--portrait-leading:3.71%}
+.nex-team-card[aria-label="Samuel Carter"]{--portrait-height:91%;--portrait-leading:3.45%}
+.nex-team-card[aria-label="Emma Jansen"]{--portrait-height:110.8%;--portrait-leading:4.03%}
+}
