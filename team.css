@@ -7,3 +7,6 @@
 @media(prefers-reduced-motion:reduce){.nex-team-card *{transition:none!important;transform:none!important}}
 
 .nex-team-page{padding-top:74px;background:#002040}.nex-about-intro h1{font:400 clamp(40px,5vw,64px)/1.06 Georgia,serif;letter-spacing:-.02em;margin:0;color:#fff}.nex-about-intro h1 span{color:#d9a92d}.nex-team-link{display:inline-block;background:#d9a92d;color:#002040;padding:14px 24px;font:700 14px/1.5 Arial,Helvetica,sans-serif;text-decoration:none;margin-top:10px}.nex-team-link:hover{background:#efbd43}.nex-team-link:focus-visible{outline:2px solid white;outline-offset:4px}.nex-team-section:has(.nex-team-link) .nex-about-intro{margin-bottom:0}
+
+/* Keep Sophie and Maarten fully inside their portrait frames. */
+.nex-team-card[aria-label="Sophie de Vries"] .nex-team-photo,.nex-team-card[aria-label="Maarten de Groot"] .nex-team-photo{object-fit:contain;object-position:center bottom;padding:16px 8px 0;box-sizing:border-box}
