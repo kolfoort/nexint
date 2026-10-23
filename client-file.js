@@ -1,5 +1,5 @@
-import {loadFCOClientSummary} from './fco-client-file.js?v=20261023-fco1';
-import {loadSPAClientSummary} from './spa-client-file.js?v=20261023-fco1';
+import {loadFCOClientSummary} from './fco-client-file.js?v=20261023-offers1';
+import {loadSPAClientSummary} from './spa-client-file.js?v=20261023-offers1';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
 import {loadAssignedDocuments} from './shared-documents.js?v=20261022-viewrights1';
 const $=id=>document.getElementById(id);
@@ -13,7 +13,7 @@ export async function loadClientFile({db,member,company}){
  const pending=nda.filter(r=>r.status==='assigned');const open=fees.filter(a=>a.status==='awaiting_client');tasks.append(el('p',pending.length+open.length?`${pending.length+open.length} agreement(s) awaiting your action.`:'No agreements currently require your signature.'));
  for(const a of fees){const row=el('div',undefined,'file-row');row.append(el('strong',a.data.title||'Commission agreement'),el('span',a.transaction_code+' · Version '+a.version+' · '+({awaiting_client:'Awaiting your signature',awaiting_approval:'Awaiting Nexora approval',completed:'Completed',cancelled:'Cancelled'}[a.status]||a.status),'meta'));const link=el('a','Open agreement','button secondary');link.href='commission-agreements.html';row.append(link);list.append(row)}
  await loadSPAClientSummary({db,member,tasks,list,basePending:pending.length+open.length});
-await loadFCOClientSummary({db,member,tasks,list,basePending:0});
+$('file-offer-list').replaceChildren();await loadFCOClientSummary({db,member,tasks,list:$('file-offer-list'),basePending:0});
  if(!fees.length)list.append(el('p','No commission agreements have been assigned to you.','file-empty'));
  if(!nda.length)list.append(el('p','No MCNDA has been assigned to you.','file-empty'));else{const row=el('p',`${pending.length?'MCNDA assigned — complete the form below.':'Your previous MCNDA is retained below and in your documents.'}`);list.prepend(row)}
  const recent=$('file-recent');recent.replaceChildren();for(const f of [...files.map(x=>({...x,bucket:'nexora-client-uploads'})),...docs.map(x=>({...x,bucket:'nexora-documents'}))].slice(0,6)){const row=el('div',undefined,'file-row');row.append(el('strong',f.title.replaceAll('_',' ')));if(f.status)row.append(el('span',f.status.replaceAll('_',' '),'meta'));const button=el('button','Download PDF','secondary');button.type='button';button.onclick=async()=>{button.disabled=true;try{const blob=check(await db.storage.from(f.bucket).download(f.storage_path)),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download=f.title.replace(/[^a-zA-Z0-9 ._-]/g,'_')+'.pdf';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000)}finally{button.disabled=false}};if(f.can_download===false)row.append(el('span','Preview only','tag'));row.prepend(pdfBadge());const actions=el('div',undefined,'document-actions');actions.append(previewButton({db,bucket:f.bucket,path:f.storage_path,title:f.title,documentId:f.id,canDownload:f.can_download!==false}),...(f.can_download===false?[]:[button]));row.append(actions);recent.append(row)}if(!recent.childElementCount)recent.append(el('p','No documents in your client file yet.','file-empty'));
