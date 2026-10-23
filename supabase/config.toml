@@ -2,3 +2,8 @@
 # Public applications and one-time mail tokens are validated in the handler.
 # Review actions additionally verify the JWT and active administrator role.
 verify_jwt = false
+
+[functions.document-notifications]
+# Database queue dispatches an expiring, single-use random token.
+# The handler claims that token server-side and rechecks recipient access.
+verify_jwt = false
