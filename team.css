@@ -15,3 +15,6 @@
 
 /* Leave headroom above Oliver, Charlotte and Alexander. */
 .nex-team-card[aria-label="Oliver Reed"] .nex-team-photo,.nex-team-card[aria-label="Charlotte van Dijk"] .nex-team-photo,.nex-team-card[aria-label="Alexander Brooks"] .nex-team-photo{object-fit:contain;object-position:center bottom;padding:48px 12px 0;box-sizing:border-box}
+
+/* Preserve headroom for JP and John on narrow screens. */
+@media(max-width:650px){.nex-team-card[aria-label="J.P. Kolfoort"] .nex-team-photo,.nex-team-card[aria-label="John Szabo"] .nex-team-photo{object-fit:contain;object-position:center bottom;padding:28px 10px 0;box-sizing:border-box}}
