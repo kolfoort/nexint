@@ -262,3 +262,6 @@ footer{
 @media(max-width:1450px){.nav>.client-account{min-width:120px;max-width:190px}.nav>.client-account .cta{padding:12px 14px}.nav>.navlinks{transform:none}.nav>.language-bar{margin-left:0}.nav>.menu-toggle{margin-left:0}}
 @media(max-width:650px){.nav{gap:6px;padding:0 10px}.nav .logo{width:100px}.nav>.client-account{min-width:0;max-width:125px}.nav>.client-account .cta{padding:10px 8px;font-size:9px;letter-spacing:.02em}.nav>.language-bar a{min-width:25px;padding:6px 2px}.nav .language-flag{width:21px;height:15px}.nav>.menu-toggle{width:28px;min-width:28px}.nav>.client-account .account-details{font-size:9px;line-height:12px;gap:3px}.nav>.client-account .account-email{max-width:65px}}
 @media(max-width:360px){.nav .logo{width:80px}.nav{gap:4px}.nav>.client-account .cta{font-size:8px;padding:10px 6px}.nav>.language-bar a{min-width:23px}.nav .language-flag{width:19px}}
+
+.language-ar{display:flex;align-items:center;justify-content:center;width:26px;height:18px;font:700 17px/1 Tahoma,Arial,sans-serif;color:#002040}.language-bar a[hreflang="ar"]{text-transform:none}
+@media(max-width:650px){.nav .logo{width:88px}.nav{gap:4px;padding-inline:8px}.nav>.language-bar a{min-width:23px}.language-ar{width:20px;font-size:16px}}
