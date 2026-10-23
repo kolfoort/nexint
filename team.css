@@ -12,3 +12,6 @@
 .nex-team-card[aria-label="Sophie de Vries"] .nex-team-photo,.nex-team-card[aria-label="Maarten de Groot"] .nex-team-photo{object-fit:contain;object-position:center bottom;padding:16px 8px 0;box-sizing:border-box}
 
 .nex-team-card[aria-label="Daniel Foster"] .nex-team-photo,.nex-team-card[aria-label="Emma Jansen"] .nex-team-photo{object-fit:contain;object-position:center bottom;padding:16px 8px 0;box-sizing:border-box}
+
+/* Leave headroom above Oliver, Charlotte and Alexander. */
+.nex-team-card[aria-label="Oliver Reed"] .nex-team-photo,.nex-team-card[aria-label="Charlotte van Dijk"] .nex-team-photo,.nex-team-card[aria-label="Alexander Brooks"] .nex-team-photo{object-fit:contain;object-position:center bottom;padding:48px 12px 0;box-sizing:border-box}
