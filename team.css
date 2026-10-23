@@ -10,3 +10,5 @@
 
 /* Keep Sophie and Maarten fully inside their portrait frames. */
 .nex-team-card[aria-label="Sophie de Vries"] .nex-team-photo,.nex-team-card[aria-label="Maarten de Groot"] .nex-team-photo{object-fit:contain;object-position:center bottom;padding:16px 8px 0;box-sizing:border-box}
+
+.nex-team-card[aria-label="Daniel Foster"] .nex-team-photo,.nex-team-card[aria-label="Emma Jansen"] .nex-team-photo{object-fit:contain;object-position:center bottom;padding:16px 8px 0;box-sizing:border-box}
