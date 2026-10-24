@@ -4,7 +4,7 @@ const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2.102.0'
 const db=createClient(config.url,config.publishableKey,{auth:{storage:sessionStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'implicit'}});
 let requestKey=crypto.randomUUID(),user=null,profile=null;
 const param=new URLSearchParams(location.search).get(marine?'vessel':'product');
-const fertilizerProducts=['Calcium Ammonium Nitrate (CAN)','Urea 46%','Diammonium Phosphate (DAP)','Nitrogen Phosphorus Potassium (NPK)','Rock Phosphate','Sulphur'];
+const fertilizerProducts=['Naphtha', 'Automotive Grade Urea (AGU)', 'Bitumen', 'Calcium Ammonium Nitrate (CAN)','Urea 46%','Diammonium Phosphate (DAP)','Nitrogen Phosphorus Potassium (NPK)','Rock Phosphate','Sulphur'];
 if(location.pathname.includes('performance-fluids-quote')&&fertilizerProducts.includes(param))location.replace('/fertilizers-feedstocks-quote.html'+location.search);
 
 if(param){const option=[...form.elements.product.options].find(o=>o.value.toLowerCase()===param.toLowerCase());if(option)form.elements.product.value=option.value;}
