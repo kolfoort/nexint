@@ -10,3 +10,5 @@
 #amsterdam .office-photo img,#dubai .office-photo img{object-fit:cover;object-position:center 42%;background:transparent}
 
 html[lang="ar"] .contact-page{direction:rtl;text-align:right}html[lang="ar"] .contact-intro h1,html[lang="ar"] .office-card h2,html[lang="ar"] .request-heading h2,html[lang="ar"] .request-grid h3,html[lang="ar"] .contact-client h2{font-family:Arial,sans-serif;letter-spacing:0}.office-phone{direction:ltr;justify-content:flex-start}.office-details>a{direction:ltr;unicode-bidi:isolate;align-self:flex-start}html[lang="ar"] .office-phone{justify-content:flex-end}html[lang="ar"] .office-details>a{align-self:flex-end}
+
+.request-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.request-grid article{padding:24px}.request-grid h3{min-height:2.5em}.request-grid p{flex:1}@media(max-width:1050px){.request-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.request-grid{grid-template-columns:1fr}.request-grid h3{min-height:0}}
