@@ -36,3 +36,6 @@
 .nex-team-card[aria-label="Samuel Carter"]{--portrait-height:91%;--portrait-leading:3.45%}
 .nex-team-card[aria-label="Emma Jansen"]{--portrait-height:110.8%;--portrait-leading:4.03%}
 }
+
+/* Match the homepage team introduction to the site background. */
+#about.nex-team-section{background:var(--navy,#061a2f)}
