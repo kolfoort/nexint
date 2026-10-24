@@ -29,7 +29,9 @@ async function authorize() {
   if(member.is_admin){document.querySelectorAll('header .nav a[href^="company-profile.html"]').forEach(link=>link.remove());if(page==='company'){location.replace('document-admin.html');return false;}}
   if(page==='documents'&&member.is_admin){location.replace('client-files.html');return false;}
   $('account').textContent = member.email;
+  const quoteClaim=await db.rpc('claim_my_quotes');if(quoteClaim.error)throw quoteClaim.error;
   $('protected').hidden = false;
+  const requestsLink=document.createElement('a');requestsLink.href='/quote-requests.html';requestsLink.textContent=member.is_admin?'Requests':'My requests';document.querySelector('header .nav')?.append(requestsLink);
   if(member.is_admin && $('admin-link')) $('admin-link').hidden = false;
   return true;
 }

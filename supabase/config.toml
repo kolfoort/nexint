@@ -7,3 +7,8 @@ verify_jwt = false
 # Database queue dispatches an expiring, single-use random token.
 # The handler claims that token server-side and rechecks recipient access.
 verify_jwt = false
+
+[functions.quote-requests]
+# Public submission is validated server-side; account actions require a verified JWT.
+# Mail dispatch requires an expiring single-use database token.
+verify_jwt = false
