@@ -271,3 +271,12 @@ footer{
 
 /* Four homepage product ranges, aligned with the Services menu. */
 .catalogue-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.catalogue-card{min-width:0}.catalogue-card-body{padding:22px}.catalogue-card h3{font-size:25px;min-height:2.5em}.catalogue-card .button{font-size:11px;padding:13px 15px;justify-content:center;max-width:100%;text-align:center}@media(max-width:1050px){.catalogue-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.catalogue-grid{grid-template-columns:1fr}.catalogue-card h3{min-height:0}}
+
+/* The same compact navigation at every viewport width. */
+.header:has(.nav){height:74px}
+.nav>.menu-toggle{display:block;flex-shrink:0;margin-left:0}
+.nav>.navlinks{display:none;position:absolute;top:100%;left:0;right:0;transform:none;margin:0;padding:20px 22px;background:#fff;box-shadow:0 14px 28px rgba(6,26,47,.16);flex-direction:column;align-items:stretch;gap:12px;max-height:calc(100dvh - 90px);overflow-y:auto}
+.nav>.navlinks.open{display:flex}
+.nav>.navlinks>a,.nav>.navlinks .nav-dropdown-toggle{display:block;width:100%;padding:10px 0;text-align:left;font-size:12px;letter-spacing:.075em}
+.nav>.navlinks .dropdown-menu{position:static;box-shadow:none;padding:4px 0 4px 14px}
+@media(min-width:651px){.header .nav{padding:0 22px;gap:16px}.header .nav .logo{width:160px}.header .nav>.client-account{min-width:120px;max-width:190px;margin-left:auto}.header .nav>.client-account .cta{padding:12px 14px}.header .nav .account-details{font-size:12px;line-height:18px;padding:4px 0}}
