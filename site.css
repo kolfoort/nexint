@@ -280,3 +280,7 @@ footer{
 .nav>.navlinks>a,.nav>.navlinks .nav-dropdown-toggle{display:block;width:100%;padding:10px 0;text-align:left;font-size:12px;letter-spacing:.075em}
 .nav>.navlinks .dropdown-menu{position:static;box-shadow:none;padding:4px 0 4px 14px}
 @media(min-width:651px){.header .nav{padding:0 22px;gap:16px}.header .nav .logo{width:160px}.header .nav>.client-account{min-width:120px;max-width:190px;margin-left:auto}.header .nav>.client-account .cta{padding:12px 14px}.header .nav .account-details{font-size:12px;line-height:18px;padding:4px 0}}
+
+/* Align header controls to the same centered content column as the media page. */
+.header .nav{max-width:1200px;margin-inline:auto}
+@media(min-width:651px){.header .nav{padding-inline:24px}}
