@@ -1,7 +1,7 @@
 import {prepareDocumentPreview,setDocumentAccess} from './document-sharing.js?v=20261022-viewrights1';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
 import {loadAssignedDocuments} from './shared-documents.js?v=20261022-viewrights1';
-import {initClientFile,loadClientFile} from './client-file.js?v=20261027-jvreview1';
+import {initClientFile,loadClientFile} from './client-file.js?v=20261027-allreview1';
 import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261027-role3';
 import { config } from './portal-config.js';
 
@@ -85,7 +85,7 @@ function renderMcndaStatus() {
   });
   existing.replaceChildren();existing.hidden=!signed;preparation.hidden=!!signed;if($('nda-readonly'))$('nda-readonly').hidden=!!signed;$('nda-form-intro').hidden=!!signed;
   const pending=mcndaAssignments.some(a=>a.user_id===member.user_id&&a.status==='assigned');
-  if(!signed&&!pending){$('nda-section').hidden=true;return;}
+  const draftReview=mcndaAssignments.some(a=>a.user_id===member.user_id&&a.status==='draft_review');if(draftReview&&!pending){$('nda-section').hidden=false;existing.hidden=true;preparation.hidden=true;$('nda-form-intro').hidden=true;if($('nda-readonly'))$('nda-readonly').hidden=false;$('nda-heading').textContent='MCNDA draft — for review only';$('nda-intro').hidden=false;$('nda-intro').textContent='Nexora has assigned this draft for read-only review. Signing becomes available only after Nexora releases it for signature.';return;}if(!signed&&!pending){$('nda-section').hidden=true;return;}
   $('nda-section').hidden=false;
   if(pending){existing.hidden=true;preparation.hidden=false;if($('nda-readonly'))$('nda-readonly').hidden=false;$('nda-form-intro').hidden=false;$('nda-heading').textContent='Assigned MCNDA';$('nda-intro').hidden=true;return;}
   if(!signed){$('nda-section').hidden=true;return;}
@@ -287,7 +287,7 @@ async function start() {
   } else if(await authorize()) {
     if($('refresh-submissions')) $('refresh-submissions').addEventListener('click',()=>action($('refresh-submissions'),loadSubmissions));
     if(page==='company') await initCompanyProfile({db,member,check,action,message});
-    if(page==='documents') { initClientFile(); const company=await initCompanyProfile({db,member,check,action,message}); companyContext=company; company.subscribe(()=>loadClientFile({db,member,company})); const {bindNda}=await import('./nda.js?v=20261023-date1');await bindNda({db,member,check,action,message,onSubmitted:loadSubmissions,company}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
+    if(page==='documents') { initClientFile(); const company=await initCompanyProfile({db,member,check,action,message}); companyContext=company; company.subscribe(()=>loadClientFile({db,member,company})); const {bindNda}=await import('./nda.js?v=20261027-allreview1');await bindNda({db,member,check,action,message,onSubmitted:loadSubmissions,company}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
     if(page==='admin') {const {initAdminWorkspace}=await import('./admin-workspace.js?v=20261027-jv1');initAdminWorkspace();const {bindAccessAdmin}=await import('./access-requests.js?v=20261021-history1');await bindAccessAdmin({db,check,message,onInvited:async()=>{await loadAdmin();await loadCompanyAdmin({db,check,action,message,members});}});bindAdmin();await loadAdmin();await loadSubmissions();await loadCompanyAdmin({db,check,action,message,members});$('refresh-companies').addEventListener('click',()=>action($('refresh-companies'),()=>loadCompanyAdmin({db,check,action,message,members})));}
   }
 }
