@@ -1,5 +1,5 @@
 import {initSigningImages} from './signing-images.js?v=20261022-live2';
-import {createCommissionPDF} from "./commission-pdf.js?v=20261027-allreview1";
+import {createCommissionPDF} from "./commission-pdf.js?v=20261027-allreview2";
 import {config} from "./portal-config.js";
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let me,accounts=[],agreements=[],current=null,companyDefaults={};

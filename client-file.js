@@ -1,6 +1,7 @@
-import {loadJVClientSummary} from './jv-client-file.js?v=20261027-allreview1';
-import {loadFCOClientSummary} from './fco-client-file.js?v=20261027-allreview1';
-import {loadSPAClientSummary} from './spa-client-file.js?v=20261027-allreview1';
+import {mountMCNDAApprovals} from './mcnda-approval.js?v=20261027-mcndafinal1';
+import {loadJVClientSummary} from './jv-client-file.js?v=20261027-allreview2';
+import {loadFCOClientSummary} from './fco-client-file.js?v=20261027-allreview2';
+import {loadSPAClientSummary} from './spa-client-file.js?v=20261027-allreview2';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
 import {loadAssignedDocuments} from './shared-documents.js?v=20261022-viewrights1';
 const $=id=>document.getElementById(id);
@@ -14,6 +15,7 @@ export async function loadClientFile({db,member,company}){
  const pending=nda.filter(r=>r.status==='assigned');const open=fees.filter(a=>a.status==='awaiting_client');tasks.append(el('p',pending.length+open.length?`${pending.length+open.length} agreement(s) awaiting your action.`:'No agreements currently require your signature.'));
  for(const a of fees){const row=el('div',undefined,'file-row');row.append(el('strong',a.data.title||'Commission agreement'),el('span',a.transaction_code+' · Version '+a.version+' · '+({draft:'Draft assigned for review',awaiting_client:'Awaiting your signature',awaiting_approval:'Awaiting Nexora approval',completed:'Completed',cancelled:'Cancelled'}[a.status]||a.status),'meta'));const link=el('a','Open agreement','button secondary');link.href='commission-agreements.html';row.append(link);list.append(row)}
  await loadSPAClientSummary({db,member,tasks,list,basePending:pending.length+open.length});
+ await mountMCNDAApprovals({db,recipient:member.user_id,container:list,message:t=>{const node=$('status');node.hidden=false;node.textContent=t}});
  await loadJVClientSummary({db,member,tasks,list});
 $('file-offer-list').replaceChildren();await loadFCOClientSummary({db,member,tasks,list:$('file-offer-list'),basePending:0});
  if(!fees.length)list.append(el('p','No commission agreements have been assigned to you.','file-empty'));

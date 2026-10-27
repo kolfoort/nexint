@@ -1,7 +1,7 @@
 import {config as portalConfig} from './portal-config.js';
 import {initSigningImages} from './signing-images.js?v=20261022-live2';
 import {products} from './spa-products.js?v=20261023-offers1';
-import {createFCOPDF} from './fco-pdf.js?v=20261027-allreview1';
+import {createFCOPDF} from './fco-pdf.js?v=20261027-allreview2';
 let db,pdfUrl=null,reviewEvidence=null,signingProfile=null;
 const templateCache=new Map();
 const $=id=>document.getElementById(id);let config,profiles=[],me,items=[],current=null,tab='parties',dirty=false;

@@ -1,3 +1,4 @@
+async function blobBase64(blob){const bytes=new Uint8Array(await blob.arrayBuffer());let s='';for(let i=0;i<bytes.length;i+=8192)s+=String.fromCharCode(...bytes.subarray(i,i+8192));return btoa(s)}
 import { PDFDocument, StandardFonts, rgb } from './assets/vendor/pdf-lib.esm.min.js';
 import { companyFields } from './company-profile.js?v=20261027-role3';
 import { layout } from './nda-layout.js';
@@ -30,7 +31,7 @@ export async function createNda(values,signature,stamp,{now=new Date(),reference
  last.drawText(day,{x:158,y:273,size:9,font,color:rgb(0,.125,.25)});
  last.drawText('Portal reference: '+reference,{x:42.6,y:248,size:7,font,color:rgb(.4,.45,.5)});
  fit(last,'Account: '+email+(draft?' | Preview generated: ':' | Submitted: ')+now.toISOString(),font,[42.6,234,530,246],7);
- last.drawText(draft?'Unsigned preview only. This document has not been signed or submitted.':'Electronic signature image supplied by the representative; no digital signing certificate.',{x:42.6,y:226,size:7,font,color:rgb(.4,.45,.5)});
+ last.drawText(draft?'Unsigned preview only. This document has not been signed or submitted.':'Client signed only. Awaiting explicit Nexora final approval and countersignature.',{x:42.6,y:226,size:7,font,color:rgb(.4,.45,.5)});
  if(draft)for(const page of pages)page.drawText('UNSIGNED PREVIEW - NOT SUBMITTED',{x:190,y:12,size:8,font:bold,color:rgb(.5,.5,.5)});
  pdf.setTitle((draft?'Unsigned preview - ':'')+'Nexora MCNDA - '+values.B_COMPANY);pdf.setCreationDate(now);pdf.setModificationDate(now);
  return new Blob([await pdf.save()],{type:'application/pdf'});
@@ -50,7 +51,7 @@ export async function bindNda({db,member,check,action,message,onSubmitted,compan
   if(!values||specs.some(([key,,,required])=>required&&!String(values[key]||'').trim())){message('Complete and save all required company profile details before previewing the MCNDA.');return;}
   clearReadPreview();const current=revision;
   try{
-   const blob=await createNda(values,null,null,{draft:true,reference:'Unsigned preview',email:member.email,loadTemplate:async()=>{const result=await db.storage.from('nexora-documents').download('nda-template-v20261020.pdf');if(result.error)throw new Error('The MCNDA template could not be loaded. Please contact Nexora.');return result.data.arrayBuffer();}});
+   const blob=await createNda(values,null,null,{draft:true,reference:'Unsigned preview',email:member.email,loadTemplate:async()=>{const result=await db.storage.from('nexora-documents').download('nda-template-unsigned-v20261027.pdf');if(result.error)throw new Error('The MCNDA template could not be loaded. Please contact Nexora.');return result.data.arrayBuffer();}});
    if(current!==revision)return;
    readPreviewUrl=URL.createObjectURL(blob);$('nda-read-frame').src=readPreviewUrl;$('nda-read-download').href=readPreviewUrl;$('nda-read-download').download='Nexora_MCNDA_Unsigned_Preview.pdf';$('nda-read-result').hidden=false;$('nda-read-result').scrollIntoView({behavior:'smooth',block:'start'});
   }catch(error){message(error.message.includes('WinAnsi')?'A company detail contains a character that cannot be displayed in this PDF. Please use Latin characters.':error.message);}
@@ -69,7 +70,7 @@ export async function bindNda({db,member,check,action,message,onSubmitted,compan
   if(!form.reportValidity())return;if(savedAssetsVersion&&!$('nda-saved-assets-consent').checked){message('Please confirm use of your saved signature and stamp for this MCNDA.');return;}if(!signed){message('Please draw your signature or upload a signature image.');return;}if(stampLoading)return;
   invalidate();const current=revision,values=Object.fromEntries(specs.map(([k])=>[k,form.elements[k].value.trim()]));if(specs.some(([k,,,required])=>required&&!values[k])){message('Please complete all required company details.');return;}
   const id=crypto.randomUUID(),now=new Date();let blob;
-  try{blob=await createNda(values,signatureImage||canvas.toDataURL('image/png'),stamp,{now,reference:id,email:member.email,loadTemplate:async()=>{const result=await db.storage.from('nexora-documents').download('nda-template-v20261020.pdf');if(result.error)throw new Error('The private MCNDA template has not been enabled for your account. Please contact Nexora.');return result.data.arrayBuffer();}});}catch(error){message(error.message.includes('WinAnsi')?'A character cannot be included in the PDF. Please use Latin characters for the company details.':error.message);return;}
+  try{blob=await createNda(values,signatureImage||canvas.toDataURL('image/png'),stamp,{now,reference:id,email:member.email,loadTemplate:async()=>{const result=await db.storage.from('nexora-documents').download('nda-template-unsigned-v20261027.pdf');if(result.error)throw new Error('The private MCNDA template has not been enabled for your account. Please contact Nexora.');return result.data.arrayBuffer();}});}catch(error){message(error.message.includes('WinAnsi')?'A character cannot be included in the PDF. Please use Latin characters for the company details.':error.message);return;}
   if(current!==revision)return;const url=URL.createObjectURL(blob);review={id,blob,url,values,now,savedAssetsVersion,hasStamp:!!stamp,stampData:stamp,stampPath,profileVersion:company.getProfile()?.version||0,profileId:company.getProfile()?.id||''};$('nda-frame').src=url;$('nda-download').href=url;$('nda-download').download='Nexora_MCNDA_Review.pdf';$('nda-review').hidden=false;message('Review all pages of the PDF, then confirm and submit.');$('nda-review').scrollIntoView({behavior:'smooth'});
  });});
  $('nda-submit').addEventListener('click',()=>action($('nda-submit'),async()=>{
@@ -85,7 +86,7 @@ export async function bindNda({db,member,check,action,message,onSubmitted,compan
       const stampBlob=await (await fetch(current.stampData)).blob();
       check(await db.storage.from('nexora-company-assets').upload(newStampPath,stampBlob,{contentType:'image/png',upsert:false}));savedStampPath=newStampPath;
     }
-    const result=await db.rpc('submit_company_mcnda',{p_id:current.id,p_details:{...current.values,B_STAMP_PATH:savedStampPath||'',B_PROFILE_ID:current.profileId},p_expected_version:current.profileVersion,p_note:'Completed and electronically signed via the Nexora portal. Template 2026-10-20. Reference: '+current.id+'. Account: '+member.email+'. Submitted: '+current.now.toISOString()+'. Company stamp: '+(current.hasStamp?'included':'not supplied')+'. Representative confirmed authority and agreement.'+(current.savedAssetsVersion?' Saved signing images explicitly authorized for this MCNDA. Signing profile version: '+current.savedAssetsVersion+'.':'')});
+    const result=await db.rpc('submit_mcnda_for_approval',{p_pdf:await blobBase64(current.blob),p_attestation:{name:current.values.B_REPRESENTATIVE,authority:true,acceptance:true,assets_authorized:!!current.savedAssetsVersion,signing_version:current.savedAssetsVersion||null,reviewed_hash:Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await current.blob.arrayBuffer()))).map(x=>x.toString(16).padStart(2,'0')).join('')},p_id:current.id,p_details:{...current.values,B_STAMP_PATH:savedStampPath||'',B_PROFILE_ID:current.profileId},p_expected_version:current.profileVersion,p_note:'Completed and electronically signed via the Nexora portal. Awaiting explicit Nexora countersignature. Template NEX-2026-10-27. Reference: '+current.id+'. Account: '+member.email+'. Submitted: '+current.now.toISOString()+'. Company stamp: '+(current.hasStamp?'included':'not supplied')+'. Representative confirmed authority and agreement.'+(current.savedAssetsVersion?' Saved signing images explicitly authorized for this MCNDA. Signing profile version: '+current.savedAssetsVersion+'.':'')});
     check(result);
   } catch(error){
     await db.storage.from('nexora-client-uploads').remove([path]);
