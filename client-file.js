@@ -1,6 +1,6 @@
-import {loadJVClientSummary} from './jv-client-file.js?v=20261027-jv1';
-import {loadFCOClientSummary} from './fco-client-file.js?v=20261023-offers1';
-import {loadSPAClientSummary} from './spa-client-file.js?v=20261023-offers1';
+import {loadJVClientSummary} from './jv-client-file.js?v=20261027-jvreview1';
+import {loadFCOClientSummary} from './fco-client-file.js?v=20261027-jvreview1';
+import {loadSPAClientSummary} from './spa-client-file.js?v=20261027-jvreview1';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
 import {loadAssignedDocuments} from './shared-documents.js?v=20261022-viewrights1';
 const $=id=>document.getElementById(id);

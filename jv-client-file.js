@@ -1,9 +1,10 @@
 const checked=r=>{if(r.error)throw r.error;return r.data};
 const el=(t,s,c)=>{const n=document.createElement(t);if(s!==undefined)n.textContent=s;if(c)n.className=c;return n};
 const status={draft:'Draft',awaiting_client:'Awaiting Party B signature',awaiting_approval:'Awaiting Nexora final approval',completed:'Completed',cancelled:'Cancelled'};
-function card(a){const row=el('div',undefined,'file-row');row.append(el('strong',a.data.title||'Joint Venture Agreement'),el('span',a.transaction_code+' · Version '+a.version+' · '+(status[a.status]||a.status),'meta'));if(a.data.a_percent&&a.data.b_percent)row.append(el('span','Nexora '+a.data.a_percent+'% / Party B '+a.data.b_percent+'%','meta'));const link=el('a','Open Joint Venture','button secondary');link.href='jv-agreements.html?agreement='+encodeURIComponent(a.id);row.append(link);return row}
+function card(a){const row=el('div',undefined,'file-row');row.append(el('strong',a.data.title||'Joint Venture Agreement'),el('span',a.transaction_code+' · Version '+a.version+' · '+(a.status==='draft'&&a.data.draft_shared?'Draft assigned for review':status[a.status]||a.status),'meta'));if(a.data.a_percent&&a.data.b_percent)row.append(el('span','Nexora '+a.data.a_percent+'% / Party B '+a.data.b_percent+'%','meta'));const link=el('a',a.status==='draft'?'View draft JVA':'Open Joint Venture','button secondary');link.href='jv-agreements.html?agreement='+encodeURIComponent(a.id);row.append(link);return row}
 export async function loadJVClientSummary({db,member,tasks,list}){
- const rows=checked(await db.from('jv_agreements').select('id,transaction_code,status,version,data').eq('recipient',member.user_id).neq('status','draft').order('created_at',{ascending:false}));
+ const rows=checked(await db.from('jv_agreements').select('id,transaction_code,status,version,data').eq('recipient',member.user_id).order('created_at',{ascending:false}));
+ const drafts=rows.filter(a=>a.status==='draft').length;if(drafts)tasks.append(el('p',drafts+' draft JVA(s) available for review — no signature requested.'));
  const pending=rows.filter(a=>a.status==='awaiting_client').length;if(pending)tasks.append(el('p',pending+' Joint Venture Agreement(s) awaiting your signature.'));
  list.append(el('h3','Joint Venture Agreements'));for(const a of rows)list.append(card(a));if(!rows.length)list.append(el('p','No Joint Venture Agreement has been assigned to you.','file-empty'));
 }
