@@ -1,5 +1,5 @@
 export async function mountCounterpartyRole({db,userId,container,message}){
- const labels={introducer_broker:'Introducer / Broker',end_buyer_user:'End Buyer / End User'};
+ const labels={introducer_broker:'Introducer / Broker',end_buyer_user:'End Buyer / End User',jv_partner:'JV Partner'};
  const form=document.createElement('form');form.className='counterparty-role';
  const heading=document.createElement('h3');heading.textContent='Counterparty type';
  const label=document.createElement('label');label.textContent='Role in the transaction';

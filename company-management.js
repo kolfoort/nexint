@@ -1,4 +1,4 @@
-import {companyFields} from './company-profile.js?v=20261027-role1';
+import {companyFields} from './company-profile.js?v=20261027-role2';
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
 let savedSearch='',savedFilter='current';
 export async function loadCompanyAdmin({db,check,action,message,members}){

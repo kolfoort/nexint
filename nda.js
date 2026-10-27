@@ -1,5 +1,5 @@
 import { PDFDocument, StandardFonts, rgb } from './assets/vendor/pdf-lib.esm.min.js';
-import { companyFields } from './company-profile.js?v=20261027-role1';
+import { companyFields } from './company-profile.js?v=20261027-role2';
 import { layout } from './nda-layout.js';
 const $=id=>document.getElementById(id);
 const specs=companyFields;
