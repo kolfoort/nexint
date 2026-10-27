@@ -2,7 +2,7 @@ import {prepareDocumentPreview,setDocumentAccess} from './document-sharing.js?v=
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
 import {loadAssignedDocuments} from './shared-documents.js?v=20261022-viewrights1';
 import {initClientFile,loadClientFile} from './client-file.js?v=20261027-jv1';
-import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261022-saved-assets1';
+import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261027-role1';
 import { config } from './portal-config.js';
 
 const $ = id => document.getElementById(id);
