@@ -1,3 +1,4 @@
+import {loadJVClientSummary} from './jv-client-file.js?v=20261027-jv1';
 import {loadFCOClientSummary} from './fco-client-file.js?v=20261023-offers1';
 import {loadSPAClientSummary} from './spa-client-file.js?v=20261023-offers1';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
@@ -13,6 +14,7 @@ export async function loadClientFile({db,member,company}){
  const pending=nda.filter(r=>r.status==='assigned');const open=fees.filter(a=>a.status==='awaiting_client');tasks.append(el('p',pending.length+open.length?`${pending.length+open.length} agreement(s) awaiting your action.`:'No agreements currently require your signature.'));
  for(const a of fees){const row=el('div',undefined,'file-row');row.append(el('strong',a.data.title||'Commission agreement'),el('span',a.transaction_code+' · Version '+a.version+' · '+({awaiting_client:'Awaiting your signature',awaiting_approval:'Awaiting Nexora approval',completed:'Completed',cancelled:'Cancelled'}[a.status]||a.status),'meta'));const link=el('a','Open agreement','button secondary');link.href='commission-agreements.html';row.append(link);list.append(row)}
  await loadSPAClientSummary({db,member,tasks,list,basePending:pending.length+open.length});
+ await loadJVClientSummary({db,member,tasks,list});
 $('file-offer-list').replaceChildren();await loadFCOClientSummary({db,member,tasks,list:$('file-offer-list'),basePending:0});
  if(!fees.length)list.append(el('p','No commission agreements have been assigned to you.','file-empty'));
  if(!nda.length)list.append(el('p','No MCNDA has been assigned to you.','file-empty'));else{const row=el('p',`${pending.length?'MCNDA assigned — complete the form below.':'Your previous MCNDA is retained below and in your documents.'}`);list.prepend(row)}

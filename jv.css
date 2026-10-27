@@ -1,0 +1,1 @@
+.document-nav{grid-template-columns:repeat(4,minmax(0,1fr))}.check{grid-column:1 / -1}#allocation-total{font-weight:bold;color:var(--navy);padding:14px;background:var(--bg)}@media(max-width:700px){.document-nav{grid-template-columns:1fr}}
