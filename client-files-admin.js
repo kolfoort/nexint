@@ -1,10 +1,10 @@
-import {mountCounterpartyRole} from './counterparty-role.js?v=20261027-role2';
+import {mountCounterpartyRole} from './counterparty-role.js?v=20261027-role3';
 import {mountJVAdmin} from './jv-client-file.js?v=20261027-jv1';
 import {mountFCOAdmin} from './fco-client-file.js?v=20261023-offers1';
 import {mountSPAAdmin} from './spa-client-file.js?v=20261023-offers1';
 import {prepareDocumentPreview,setDocumentAccess} from './document-sharing.js?v=20261022-viewrights1';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
-import {companyFields} from './company-profile.js?v=20261027-role2';
+import {companyFields} from './company-profile.js?v=20261027-role3';
 import {config} from './portal-config.js';
 const $=id=>document.getElementById(id),escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const check=r=>{if(r.error)throw r.error;return r.data};let db,people=[],selected,version=0;
 function message(t){$('status').textContent=t;$('status').hidden=!t}function email(id){return people.find(p=>p.user_id===id)?.email||'Account unavailable'}
