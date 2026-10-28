@@ -44,3 +44,6 @@
 #teddy .nex-team-photo{height:88%;width:100%;top:44px;left:0;translate:none;object-fit:contain;object-position:center top;filter:grayscale(1)}
 #teddy{scroll-margin-top:100px}
 @media(min-width:1051px){.nex-team-grid .nex-team-card[aria-label="Emma Jansen"]{grid-column:1 / span 4}#teddy{grid-column:5 / span 4}.nex-team-grid .nex-team-card[aria-label="Rocky"]{grid-column:9 / span 4;width:100%}}
+
+/* Four people per desktop row throughout the team. */
+@media(min-width:1051px){.nex-team-grid .nex-team-card[aria-label],.nex-team-grid #teddy{grid-column:span 3;width:100%}}
