@@ -8,31 +8,26 @@ Deno.serve(async req=>{
  if(req.method!=='POST')return new Response('POST required',{status:405});
  let body;try{const raw=await req.text();if(raw.length>1000)return new Response('Too large',{status:413});body=JSON.parse(raw);}catch{return new Response('Invalid request',{status:400});}
  if(typeof body.id!=='string'||!/^[0-9a-f-]{36}$/i.test(body.id)||typeof body.token!=='string'||!/^[0-9a-f]{64}$/.test(body.token))return new Response('Unauthorized',{status:401});
+ if(body.kind==='delivery_check'){
+  const {data:checks,error:claimError}=await db.rpc('claim_mail_delivery_check',{p_id:body.id,p_token_hash:await hash(body.token)});if(claimError)return new Response('Check unavailable',{status:500});if(!checks?.length)return new Response('No pending check',{status:403});
+  const test=checks[0];let transport;
+  try{const password=Deno.env.get('NEXORA_SMTP_PASSWORD');if(!password)throw Error('SMTP unavailable');transport=nodemailer.createTransport({host:'smtp.transip.email',port:465,secure:true,auth:{user:'info@nexint.eu',pass:password},connectionTimeout:10000,greetingTimeout:10000,socketTimeout:15000,tls:{minVersion:'TLSv1.2',rejectUnauthorized:true}});
+   const title='Nexora notification delivery test';const description='This is the requested test of the Nexora document notification email service. No agreement has been created, released or signed by this test.';
+   await transport.sendMail({from:'Nexora International <info@nexint.eu>',to:test.recipient,subject:'Nexora | Test document notification',text:title+'\n\n'+description+'\n\nhttps://nexint.eu/documents.html',html:template(title,description,'Requested delivery test','https://nexint.eu/documents.html'),messageId:`<delivery-check-${test.id}@nexint.eu>`});
+   const {error}=await db.from('portal_mail_delivery_checks').update({sent_at:new Date().toISOString(),last_error:null}).eq('id',test.id);if(error)throw error;return new Response('Test notification sent');
+  }catch(error){const e=error as {code?:string,responseCode?:number};const detail=String(e.code||'UNKNOWN').replace(/[^A-Za-z0-9_]/g,'').slice(0,40)+':'+(Number(e.responseCode)||0);await db.from('portal_mail_delivery_checks').update({last_error:detail}).eq('id',test.id);console.error('delivery_check_failed',detail);return new Response('Test delivery failed',{status:502});}finally{transport?.close();}
+ }
  const {data,error}=await db.rpc('claim_document_notification',{p_id:body.id,p_token_hash:await hash(body.token)});if(error)return new Response('Queue unavailable',{status:500});if(!data?.length)return new Response('No pending notification');
  const n=data[0];const update=async(values:Record<string,unknown>)=>{const {error}=await db.from('portal_document_notifications').update(values).eq('id',n.id).eq('lease',n.lease);if(error)throw error;};
- let mail;
+ let mail;let stage="recipient";
  try{
-  const {data:m,error:me}=await db.from('portal_members').select('email,active,is_admin').eq('user_id',n.recipient).maybeSingle();if(me)throw me;
-  let visible=!!m?.active&&!m?.is_admin;
-  const {data:map,error:mapError}=await db.from('portal_company_members').select('company_id').eq('user_id',n.recipient).maybeSingle();if(mapError)throw mapError;
-  if(map){const {data:c,error}=await db.from('portal_companies').select('access_state').eq('id',map.company_id).single();if(error)throw error;visible=visible&&c.access_state==='active';}
-  let url='https://nexint.eu/documents.html',needsSignature=false;
-  if(n.kind==='document'){
-   const {data:grant,error:gerr}=await db.from('portal_document_access').select('document_id').eq('user_id',n.recipient).eq('document_id',n.entity_id).maybeSingle();if(gerr)throw gerr;
-   const {data:doc,error:derr}=await db.from('portal_documents').select('published,storage_path,version_date').eq('id',n.entity_id).maybeSingle();if(derr)throw derr;visible=visible&&!!grant&&!!doc?.published&&n.version_key===(doc.storage_path||'')+':'+(doc.version_date||'');
-  }else if(n.kind==='mcnda'){
-   const {data:a,error}=await db.from('portal_mcnda_assignments').select('status,user_id,template_version').eq('id',n.entity_id).maybeSingle();if(error)throw error;visible=visible&&a?.user_id===n.recipient&&a?.status==='assigned'&&a?.template_version===n.version_key;needsSignature=true;
-  }else{
-   const table={commission:'commission_agreements',spa:'spa_agreements',fco:'fco_agreements'}[n.kind as string];if(!table)throw Error('Unknown notification kind');
-   const {data:a,error}=await db.from(table).select('status,recipient,version').eq('id',n.entity_id).maybeSingle();if(error)throw error;visible=visible&&a?.recipient===n.recipient&&a?.status==='awaiting_client'&&String(a?.version)===n.version_key;
-   url='https://nexint.eu/'+({commission:'commission-agreements.html',spa:'spa-agreements.html',fco:'fco-agreements.html'}[n.kind as string])+'?agreement='+encodeURIComponent(n.entity_id);needsSignature=true;
-  }
+  stage='delivery_context';const {data:context,error:contextError}=await db.rpc('document_notification_context',{p_id:n.id,p_lease:n.lease});if(contextError)throw contextError;const visible=context?.allowed===true,url=context?.url||'https://nexint.eu/documents.html',needsSignature=context?.needs_signature===true;
   if(!visible){await update({skipped_at:new Date().toISOString(),leased_at:null,last_error:'Access withdrawn or item no longer awaits action'});return new Response('No longer applicable');}
-  const password=Deno.env.get('NEXORA_SMTP_PASSWORD');if(!password)throw Error('SMTP unavailable');
+  stage='smtp_configuration';const password=Deno.env.get('NEXORA_SMTP_PASSWORD');if(!password)throw Error('SMTP unavailable');
   mail=nodemailer.createTransport({host:'smtp.transip.email',port:465,secure:true,auth:{user:'info@nexint.eu',pass:password},connectionTimeout:10000,greetingTimeout:10000,socketTimeout:15000,tls:{minVersion:'TLSv1.2',rejectUnauthorized:true}});
   const title=needsSignature?'A document is ready for your review.':'A new document is available.';
   const intro=needsSignature?'Nexora International has assigned a document to your account. Please sign in to review the complete document and complete the requested acknowledgment or signature.':'Nexora International has shared a new document with your account. Please sign in to view it securely.';
-  await mail.sendMail({from:'Nexora International <info@nexint.eu>',to:m!.email,subject:'Nexora | '+(needsSignature?'Document ready for review':'New document in your portal'),text:title+'\n\n'+intro+'\n\n'+n.title+'\n\nOpen secure portal: '+url+'\n\nNo document is attached. This notification is not a signature or acceptance.\n\nNexora International\ninfo@nexint.eu',html:template(title,intro,n.title,url),messageId:`<document-${n.id}@nexint.eu>`});
-  await update({sent_at:new Date().toISOString(),leased_at:null,last_error:null});return new Response('Notification sent');
- }catch{await update({leased_at:null,last_error:'Delivery pending; retry scheduled',next_attempt_at:new Date(Date.now()+300000).toISOString()}).catch(()=>{});return new Response('Delivery pending',{status:502});}finally{mail?.close();}
+  stage='smtp_send';await mail.sendMail({from:'Nexora International <info@nexint.eu>',to:context.email,subject:'Nexora | '+(needsSignature?'Document ready for review':'New document in your portal'),text:title+'\n\n'+intro+'\n\n'+n.title+'\n\nOpen secure portal: '+url+'\n\nNo document is attached. This notification is not a signature or acceptance.\n\nNexora International\ninfo@nexint.eu',html:template(title,intro,n.title,url),messageId:`<document-${n.id}@nexint.eu>`});
+  stage='record_sent';await update({sent_at:new Date().toISOString(),leased_at:null,last_error:null});return new Response('Notification sent');
+ }catch(error){const e=error as {code?:string,responseCode?:number,command?:string};const detail=[stage,String(e.code||'UNKNOWN').replace(/[^A-Za-z0-9_]/g,'').slice(0,40),Number(e.responseCode)||0,String(e.command||'').replace(/[^A-Za-z0-9_ ]/g,'').slice(0,40)].join(':');console.error('document_notification_failed',detail);await update({leased_at:null,last_error:'Delivery pending; '+detail,next_attempt_at:new Date(Date.now()+300000).toISOString()}).catch(()=>{});return new Response('Delivery pending',{status:502});}finally{mail?.close();}
 });
