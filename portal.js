@@ -34,7 +34,7 @@ async function authorize() {
   $('account').textContent = member.email;
   const quoteClaim=await db.rpc('claim_my_quotes');if(quoteClaim.error)throw quoteClaim.error;
   $('protected').hidden = false;
-  if(member.is_admin||page!=='documents'){const requestsLink=document.createElement('a');requestsLink.href=member.is_admin?'/quote-requests.html':'/documents.html#requests';requestsLink.textContent=member.is_admin?'Requests':'My requests';document.querySelector('header .nav')?.append(requestsLink);}
+  if(!member.is_admin&&page!=='documents'){const requestsLink=document.createElement('a');requestsLink.href=member.is_admin?'/quote-requests.html':'/documents.html#requests';requestsLink.textContent=member.is_admin?'Requests':'My requests';document.querySelector('header .nav')?.append(requestsLink);}
   if(member.is_admin && $('admin-link')) $('admin-link').hidden = false;
   return true;
 }
@@ -292,7 +292,7 @@ async function start() {
     if($('refresh-submissions')) $('refresh-submissions').addEventListener('click',()=>action($('refresh-submissions'),loadSubmissions));
     if(page==='company') await initCompanyProfile({db,member,check,action,message});
     if(page==='documents') { initClientFile(); const company=await initCompanyProfile({db,member,check,action,message}); companyContext=company; company.subscribe(()=>loadClientFile({db,member,company})); const {bindNda}=await import('./nda.js?v=20261027-allreview2');await bindNda({db,member,check,action,message,onSubmitted:loadSubmissions,company}); $('search').addEventListener('input',renderDocuments);$('category').addEventListener('change',renderDocuments);bindClientUpload();await loadDocuments();await loadSubmissions(); }
-    if(page==='admin') {const {initAdminWorkspace}=await import('./admin-workspace.js?v=20261027-simplenav1');initAdminWorkspace();const {bindAccessAdmin}=await import('./access-requests.js?v=20261021-history1');await bindAccessAdmin({db,check,message,onInvited:async()=>{await loadAdmin();await loadCompanyAdmin({db,check,action,message,members});}});bindAdmin();await loadAdmin();await loadSubmissions();await loadCompanyAdmin({db,check,action,message,members});$('refresh-companies').addEventListener('click',()=>action($('refresh-companies'),()=>loadCompanyAdmin({db,check,action,message,members})));}
+    if(page==='admin') {const {initAdminWorkspace}=await import('./admin-workspace.js?v=20261028-adminnav2');initAdminWorkspace();const {bindAccessAdmin}=await import('./access-requests.js?v=20261021-history1');await bindAccessAdmin({db,check,message,onInvited:async()=>{await loadAdmin();await loadCompanyAdmin({db,check,action,message,members});}});bindAdmin();await loadAdmin();await loadSubmissions();await loadCompanyAdmin({db,check,action,message,members});$('refresh-companies').addEventListener('click',()=>action($('refresh-companies'),()=>loadCompanyAdmin({db,check,action,message,members})));}
   }
 }
 start().catch(fail);
