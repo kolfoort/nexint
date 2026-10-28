@@ -38,7 +38,8 @@ Deno.serve(async request => {
     const language=job.language||'en';
     const when = new Intl.DateTimeFormat(language,{timeZone:'Europe/Amsterdam',dateStyle:'long',timeStyle:'short'}).format(new Date(job.uploaded_at));
     const outgoing=localizedNotification(language,'upload',[['Client',job.client_email],['Document',job.document_title],['Received',when],['Reference',id]],'https://nexint.eu/document-admin.html',job.document_title);
-    await transporter.sendMail({from:'Nexora International <info@nexint.eu>',to:'info@nexint.eu',...outgoing,messageId:`<upload-${id}@nexint.eu>`});
+    const testResult=await admin.rpc('mail_route_test_recipient',{p_route:'upload',p_id:id});if(testResult.error)throw testResult.error;if(testResult.data)outgoing.subject='TEST ['+language.toUpperCase()+'] | '+outgoing.subject;
+    await transporter.sendMail({from:'Nexora International <info@nexint.eu>',to:testResult.data||'info@nexint.eu',...outgoing,messageId:`<upload-${id}@nexint.eu>`});
     const { error } = await admin.from('portal_upload_notifications').update({status:'sent',sent_at:new Date().toISOString(),last_error:null}).eq('submission_id',id).eq('lease_id',job.lease_id);
     if (error) return json(500, 'Email accepted; notification state requires review');
     return json(200, 'Notification sent');

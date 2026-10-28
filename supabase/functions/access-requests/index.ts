@@ -59,10 +59,11 @@ Deno.serve(async req=>{
   const update=async(values:Record<string,unknown>)=>{const {error}=await db.from('portal_access_requests').update(values).eq('id',r.id).eq('notify_lease',r.notify_lease);if(error)throw error;};
   try{
    if(!password)throw new Error('SMTP unavailable');
+   const testResult=await db.rpc('mail_route_test_recipient',{p_route:'access',p_id:r.id});if(testResult.error)throw testResult.error;const testRecipient=testResult.data;
    const adminLanguage=await db.rpc('mail_language_for_email',{p_email:'info@nexint.eu'});if(adminLanguage.error)throw adminLanguage.error;
    const rows:[string,string][]=[['Company',r.details.B_COMPANY],['Contact',r.details.B_REPRESENTATIVE],['Business email',r.details.B_EMAIL],['Country',r.details.B_COUNTRY]];
-   if(!r.admin_notified){const url='https://nexint.eu/document-admin.html#access-requests';const outgoing=localizedNotification(adminLanguage.data||'en','access_admin',rows,url);await mail.sendMail({from:'Nexora International <info@nexint.eu>',to:'info@nexint.eu',...outgoing,messageId:`<access-admin-${r.id}@nexint.eu>`});await update({admin_notified:true});}
-   if(!r.applicant_notified){const outgoing=localizedNotification(r.details.B_LANGUAGE||'en','access_receipt',rows.slice(0,2),'https://nexint.eu');await mail.sendMail({from:'Nexora International <info@nexint.eu>',to:r.details.B_EMAIL,...outgoing,messageId:`<access-applicant-${r.id}@nexint.eu>`});await update({applicant_notified:true});}
+   if(!r.admin_notified){const url='https://nexint.eu/document-admin.html#access-requests';const outgoing=localizedNotification(testRecipient?r.details.B_LANGUAGE:adminLanguage.data||'en','access_admin',rows,url);await mail.sendMail({from:'Nexora International <info@nexint.eu>',to:testRecipient||'info@nexint.eu',...outgoing,subject:(testRecipient?'TEST ['+r.details.B_LANGUAGE.toUpperCase()+'] | ':'')+outgoing.subject,messageId:`<access-admin-${r.id}@nexint.eu>`});await update({admin_notified:true});}
+   if(!r.applicant_notified){const outgoing=localizedNotification(r.details.B_LANGUAGE||'en','access_receipt',rows.slice(0,2),'https://nexint.eu');await mail.sendMail({from:'Nexora International <info@nexint.eu>',to:testRecipient||r.details.B_EMAIL,...outgoing,subject:(testRecipient?'TEST ['+r.details.B_LANGUAGE.toUpperCase()+'] | ':'')+outgoing.subject,messageId:`<access-applicant-${r.id}@nexint.eu>`});await update({applicant_notified:true});}
    await update({notify_leased_at:null});return response(200,'Notifications sent');
   }catch{await update({notify_leased_at:null,next_notification_at:new Date(Date.now()+300000).toISOString()}).catch(()=>{});return response(502,'Notification delivery pending');}finally{mail.close();}
  }

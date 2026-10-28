@@ -52,6 +52,7 @@ Deno.serve(async req=>{
    const rows:[string,string][]=[['Reference',q.reference],['Request type',category],[marine?'Vessel':'Product',q.transaction.product],['Company',q.details.B_COMPANY],['Status',words.statuses[q.status]||q.status]];
    const outgoing=localizedNotification(language,job.kind==='admin'?'quote_admin':job.kind==='receipt'?'quote_receipt':'quote_status',rows,url,'',job.kind==='receipt'&&!q.recipient);
    outgoing.subject='Nexora | '+q.reference+' | '+words.events[job.kind==='admin'?'quote_admin':job.kind==='receipt'?'quote_receipt':'quote_status'].title;
+   const testResult=await db.rpc('mail_route_test_recipient',{p_route:'quote',p_id:q.id});if(testResult.error)throw testResult.error;if(testResult.data){recipient=testResult.data;outgoing.subject='TEST ['+language.toUpperCase()+'] | '+outgoing.subject;}
    await transport.sendMail({from:'Nexora International <info@nexint.eu>',to:recipient,...outgoing,messageId:`<quote-${job.id}@nexint.eu>`});
    await update({sent_at:new Date().toISOString(),leased_at:null});return response(200,{message:'Notification sent'});
   }catch{await update({leased_at:null,next_at:new Date(Date.now()+300000).toISOString()}).catch(()=>{});return response(502,{message:'Notification delivery pending'});}finally{transport.close();}

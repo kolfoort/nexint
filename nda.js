@@ -1,7 +1,7 @@
-import {individualFields,isIndividual,individualParty} from './individual-profile.js?v=20261028-person2';
+import {individualFields,isIndividual,individualParty} from './individual-profile.js?v=20261028-privacy1';
 async function blobBase64(blob){const bytes=new Uint8Array(await blob.arrayBuffer());let s='';for(let i=0;i<bytes.length;i+=8192)s+=String.fromCharCode(...bytes.subarray(i,i+8192));return btoa(s)}
 import { PDFDocument, StandardFonts, rgb } from './assets/vendor/pdf-lib.esm.min.js';
-import { companyFields } from './company-profile.js?v=20261028-person2';
+import { companyFields } from './company-profile.js?v=20261028-privacy1';
 import { layout } from './nda-layout.js';
 const $=id=>document.getElementById(id);
 let specs=companyFields;

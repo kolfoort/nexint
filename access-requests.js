@@ -1,5 +1,5 @@
-import {mountIdentity} from './individual-profile.js?v=20261028-person2';
-import {languageSelect,setLanguage} from './portal-language.js?v=20261028-person2';
+import {mountIdentity} from './individual-profile.js?v=20261028-privacy1';
+import {languageSelect,setLanguage} from './portal-language.js?v=20261028-privacy1';
 import {config} from './portal-config.js';
 const fields=['B_COMPANY','B_REGISTRATION','B_ADDRESS','B_COUNTRY','B_REPRESENTATIVE','B_TITLE','B_PHONE','B_EMAIL','B_WEBSITE'];
 const el=(tag,text)=>{const node=document.createElement(tag);if(text!==undefined)node.textContent=text;return node;};
@@ -10,7 +10,7 @@ if(form){
  const typeWrap=el('div'),label=el('label','Applicant type'),type=el('select');type.id='applicant-type';type.name='ACCOUNT_TYPE';type.required=true;label.htmlFor=type.id;for(const [value,text]of [['','Select applicant type'],['company','Company'],['individual','Private individual']])type.add(new Option(text,value));type.options[0].disabled=true;typeWrap.append(label,type);form.children[0].after(typeWrap);
  const personal=el('div');personal.id='personal-application';personal.className='nda-fields';personal.hidden=true;
  for(const [key,text,max,autocomplete]of [['P_FIRST_NAME','First name',40,'given-name'],['P_LAST_NAME','Last name',39,'family-name'],['P_ADDRESS','Address',100,'street-address'],['P_POSTCODE','Postal code',16,'postal-code'],['P_CITY','City',30,'address-level2'],['P_COUNTRY','Country of residence',60,'country-name'],['P_EMAIL','Email',100,'email'],['P_PHONE','Telephone',50,'tel'],['P_PASSPORT','Passport number',30,'off']]){const wrap=el('div'),label=el('label',text),input=el('input');label.htmlFor=key;input.id=key;input.name=key;input.maxLength=max;input.autocomplete=autocomplete;input.type=key==='P_EMAIL'?'email':key==='P_PHONE'?'tel':'text';wrap.append(label,input);personal.append(wrap)}
- personal.append(el('p','Private individuals register as Introducer / Broker. After approval and sign-in, upload your signed passport copy in the portal and sign the English MCNDA.'));document.getElementById('company-application').before(personal);
+ personal.append(el('p','Private individuals register as Introducer / Broker. After approval and sign-in, upload your signed passport copy in the portal and sign the English MCNDA.'));personal.append(el('p','Enter the passport document number, not your BSN or national personal number. Read Privacy & Cookies for how identity information is used.'));document.getElementById('company-application').before(personal);
  // The former optional company fields are now part of the same visible form.
  const company=document.getElementById('company-application');while(company.nextElementSibling?.classList.contains('nda-fields'))company.append(...company.nextElementSibling.children),company.nextElementSibling.remove();
  const change=()=>{const individual=type.value==='individual';company.hidden=individual;personal.hidden=!individual;for(const input of company.querySelectorAll('input'))input.disabled=individual;for(const input of personal.querySelectorAll('input')){input.disabled=!individual;input.required=individual}};type.onchange=change;change();

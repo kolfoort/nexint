@@ -1,4 +1,4 @@
-import {catalog,fragments} from './portal-language-catalog.js?v=20261028-person2';
+import {catalog,fragments} from './portal-language-catalog.js?v=20261028-privacy1';
 export const portalLanguages=[['en','English'],['nl','Nederlands'],['de','Deutsch'],['es','Español'],['ar','العربية']];
 const supported=new Set(portalLanguages.map(x=>x[0])),storageKey='nexora-portal-language';
 let current=null;try{const p=new URL(location.href).searchParams.get('lang')||localStorage.getItem(storageKey);if(supported.has(p))current=p}catch{}
@@ -30,6 +30,7 @@ export function applyPortalLanguage(){
  if(!document.body)return;
  // Document and agreement workspaces remain canonical English, including controls inside them.
  if(/\/(?:commission|spa|jv|fco)-agreements\.html$/.test(location.pathname)){const main=document.querySelector('main');if(main){main.dataset.contractContent='';main.lang='en';main.dir='ltr'}}
+ for(const link of document.querySelectorAll('a[href*="privacy-policy"]')){try{const url=new URL(link.getAttribute('href'),location.href);if(url.origin===location.origin&&/\/privacy-policy(?:-(?:nl|de|es|ar))?\.html$/.test(url.pathname)){url.pathname='/privacy-policy'+(getLanguage()==='en'?'':'-'+getLanguage())+'.html';if(link.href!==url.href)link.href=url.href;}}catch{}}
  document.querySelectorAll('option').forEach(o=>{if(!o.hasAttribute('value'))o.value=originals.get(o.firstChild)?.source||o.textContent});
  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;while(n=walker.nextNode())textTranslation(n);
  for(const el of document.querySelectorAll('[placeholder],[aria-label],[title],[alt]')){
