@@ -1,4 +1,4 @@
-import {initializeAccountLanguage} from './portal-language.js?v=20261028-lang1';
+import {initializeAccountLanguage} from './portal-language.js?v=20261028-person1';
 import {initSigningImages} from './signing-images.js?v=20261022-live2';
 import {createCommissionPDF} from "./commission-pdf.js?v=20261027-allreview2";
 import {config} from "./portal-config.js";

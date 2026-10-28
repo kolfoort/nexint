@@ -30,15 +30,33 @@ Deno.serve(async req=>{
   if(body.website_trap)return received();
   const details=body.details;if(!details||typeof details!=='object'||Array.isArray(details))return response(400,'Please complete the form.');
   if(!['en','nl','de','es','ar'].includes(details.B_LANGUAGE))return response(400,'Select a supported language');
+  const individual=details.ACCOUNT_TYPE==='individual';
+  if(!['company','individual'].includes(details.ACCOUNT_TYPE))return response(400,'Select applicant type');
+  const identity=body.identity;
+  if(individual){
+   const limits={P_FIRST_NAME:40,P_LAST_NAME:39,P_ADDRESS:100,P_POSTCODE:16,P_CITY:30,P_COUNTRY:60};
+   for(const [key,max]of Object.entries(limits))if(typeof details[key]!=='string'||!details[key].trim()||details[key].length>max)return response(400,'Please complete all required personal details.');
+   details.B_COMPANY=(details.P_FIRST_NAME.trim()+' '+details.P_LAST_NAME.trim());details.B_REPRESENTATIVE=details.B_COMPANY;details.B_ADDRESS=[details.P_ADDRESS.trim(),details.P_POSTCODE.trim()+' '+details.P_CITY.trim()].join(', ');details.B_COUNTRY=details.P_COUNTRY;details.B_REGISTRATION='';details.B_TITLE='';details.B_WEBSITE='';
+   if(!identity||identity.signed!==true||typeof identity.passport_number!=='string'||identity.passport_number.trim().length<3||identity.passport_number.length>30||typeof identity.copy_base64!=='string'||identity.copy_base64.length>5592408||!['application/pdf','image/jpeg','image/png'].includes(identity.copy_type))return response(400,'A passport number and signed passport copy are required.');
+  }
   const limits:Record<string,number>={B_COMPANY:100,B_REGISTRATION:60,B_ADDRESS:150,B_COUNTRY:60,B_REPRESENTATIVE:80,B_TITLE:80,B_PHONE:50,B_EMAIL:100,B_WEBSITE:100};
   for(const [key,max] of Object.entries(limits)){if(typeof details[key]!=='string'||details[key].length>max)return response(400,'Please check the company details.');}
-  if(['B_COMPANY','B_COUNTRY','B_REPRESENTATIVE','B_EMAIL'].some(k=>!details[k].trim())||!/^\S+@[^\s@]+\.[^\s@]+$/.test(details.B_EMAIL)||typeof body.message!=='string'||body.message.length>2000||body.privacy!==true)return response(400,'Please complete the required fields and acknowledge the privacy notice.');
+  if((individual?['B_COMPANY','B_COUNTRY','B_REPRESENTATIVE','B_EMAIL','B_ADDRESS','B_PHONE']:['B_COMPANY','B_COUNTRY','B_REPRESENTATIVE','B_EMAIL','B_ADDRESS','B_PHONE','B_REGISTRATION','B_TITLE']).some(k=>!details[k].trim())||!/^\S+@[^\s@]+\.[^\s@]+$/.test(details.B_EMAIL)||typeof body.message!=='string'||!body.message.trim()||body.message.length>2000||body.privacy!==true)return response(400,'Please complete the required fields and acknowledge the privacy notice.');
   // A keyed hash stores a pseudonymous abuse-control identifier, never the raw IP address.
   const ip=req.headers.get('x-forwarded-for')?.split(',')[0].trim()||req.headers.get('x-real-ip')||'unknown';
   const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);
   const sourceKey=Array.from(new Uint8Array(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(ip)))).map(b=>b.toString(16).padStart(2,'0')).join('');
-  const {error}=await db.rpc('register_access_request',{p_details:details,p_message:body.message.trim(),p_source_key:sourceKey});
-  if(error)return response(503,'Your request could not be saved. Please try again shortly.');
+  let copyPath='';
+  try{
+   if(individual){let bytes:Uint8Array;try{bytes=Uint8Array.from(atob(identity.copy_base64),c=>c.charCodeAt(0));}catch{return response(400,'Choose a valid passport copy.');}
+    const type=identity.copy_type,isPdf=bytes[0]===37&&bytes[1]===80&&bytes[2]===68&&bytes[3]===70&&bytes[4]===45,isJpg=bytes[0]===255&&bytes[1]===216&&bytes[2]===255,isPng=[137,80,78,71,13,10,26,10].every((b,i)=>bytes[i]===b);
+    if(!bytes.length||bytes.length>4194304||!(type==='application/pdf'?isPdf:type==='image/jpeg'?isJpg:isPng))return response(400,'Choose a valid PDF, JPG or PNG passport copy smaller than 4 MB.');
+    copyPath=crypto.randomUUID()+(type==='application/pdf'?'.pdf':type==='image/jpeg'?'.jpg':'.png');const uploaded=await db.storage.from('nexora-private-identity').upload(copyPath,bytes,{contentType:type,upsert:false});if(uploaded.error)throw uploaded.error;
+   }
+   const saved=await db.rpc(individual?'register_individual_access':'register_access_request',individual?{p_details:details,p_message:body.message.trim(),p_source_key:sourceKey,p_passport:identity.passport_number.trim(),p_copy_path:copyPath}:{p_details:details,p_message:body.message.trim(),p_source_key:sourceKey});
+   if(saved.error)throw saved.error;if(copyPath&&!saved.data)await db.storage.from('nexora-private-identity').remove([copyPath]);
+  }catch{if(copyPath)await db.storage.from('nexora-private-identity').remove([copyPath]);return response(503,'Your request could not be saved. Please try again shortly.');}
+
   return received();
  }
  if(body.action==='notify'){

@@ -1,9 +1,10 @@
+import {individualFields,isIndividual,individualParty} from './individual-profile.js?v=20261028-person1';
 async function blobBase64(blob){const bytes=new Uint8Array(await blob.arrayBuffer());let s='';for(let i=0;i<bytes.length;i+=8192)s+=String.fromCharCode(...bytes.subarray(i,i+8192));return btoa(s)}
 import { PDFDocument, StandardFonts, rgb } from './assets/vendor/pdf-lib.esm.min.js';
-import { companyFields } from './company-profile.js?v=20261027-role3';
+import { companyFields } from './company-profile.js?v=20261028-person1';
 import { layout } from './nda-layout.js';
 const $=id=>document.getElementById(id);
-const specs=companyFields;
+let specs=companyFields;
 const dateText=d=>new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Amsterdam',day:'numeric',month:'long',year:'numeric'}).format(d);
 function fit(page,text,font,rect,size=9){let [x,y,r,t]=rect;while(font.widthOfTextAtSize(text,size)>r-x && size>6)size-=.25;if(font.widthOfTextAtSize(text,size)>r-x)throw new Error('A company detail is too long to fit. Please shorten the address or company name.');font.encodeText(text);page.drawText(text,{x,y:y+2,size,font,color:rgb(0,.125,.25)});}
 export async function createNda(values,signature,stamp,{now=new Date(),reference='',email='',loadTemplate,draft=false}={}){
@@ -12,21 +13,21 @@ export async function createNda(values,signature,stamp,{now=new Date(),reference
  const day=dateText(now),bold=await pdf.embedFont(StandardFonts.HelveticaBold);
  // Fixed label and value columns, with a shared baseline on every row.
  const first=pages[1];first.drawRectangle({x:42,y:482,width:246,height:99,color:rgb(1,1,1)});
- const rows=[['B_COMPANY','Company'],['B_REGISTRATION','Registration'],['B_ADDRESS','Registered office'],['B_COUNTRY','Country'],['B_REPRESENTATIVE','Representative'],['B_TITLE','Title'],['B_PHONE','Telephone'],['B_EMAIL','Email'],['B_WEBSITE','Website']];
- rows.forEach(([key,label],i)=>{const y=572.239-i*10.85;first.drawText(label,{x:42.6,y,size:7.5,font:bold,color:rgb(0,.125,.25)});fit(first,values[key]||'',font,[122.6,y-2,287,y+8],8);});
- for(const d of layout.dates){const dateFont=d.page===1?bold:font;let size=d.size;while(dateFont.widthOfTextAtSize(day,size)>d.width)size-=.1;pages[d.page].drawText(day,{x:d.x,y:d.y+1,size,font:dateFont,color:rgb(0,32/255,64/255)});}
+ const rows=isIndividual(values)?[['B_COMPANY','Full name'],['PASSPORT_NUMBER','Passport number'],['B_ADDRESS','Home address'],['B_COUNTRY','Country'],['P_POSTCODE','Postal code'],['P_CITY','City'],['B_PHONE','Telephone'],['B_EMAIL','Email'],['ACCOUNT_TYPE','Capacity']]:[['B_COMPANY','Company'],['B_REGISTRATION','Registration'],['B_ADDRESS','Registered office'],['B_COUNTRY','Country'],['B_REPRESENTATIVE','Representative'],['B_TITLE','Title'],['B_PHONE','Telephone'],['B_EMAIL','Email'],['B_WEBSITE','Website']];
+ rows.forEach(([key,label],i)=>{const y=572.239-i*10.85;first.drawText(label,{x:42.6,y,size:7.5,font:bold,color:rgb(0,.125,.25)});fit(first,key==='ACCOUNT_TYPE'?'Private individual / Broker':values[key]||'',font,[122.6,y-2,287,y+8],8);});
+ for(const d of layout.dates){pages[d.page].drawRectangle({x:d.x,y:d.y-1,width:d.width,height:d.size+4,color:rgb(1,1,1)});const dateFont=d.page===1?bold:font;let size=d.size;while(dateFont.widthOfTextAtSize(day,size)>d.width)size-=.1;pages[d.page].drawText(day,{x:d.x,y:d.y+1,size,font:dateFont,color:rgb(0,32/255,64/255)});}
  const last=pages[7];
  // Rebuild Party B as a table with equal signature/stamp boxes.
  last.drawRectangle({x:35,y:222,width:510,height:293,color:rgb(1,1,1)});
  last.drawRectangle({x:42.6,y:490,width:488,height:20,color:rgb(0,.125,.25)});
  last.drawText('PARTY B',{x:52.6,y:496,size:9,font:bold,color:rgb(1,1,1)});
- const partyRows=[['Company name','B_COMPANY'],['Registered address','B_ADDRESS'],['Represented by','B_REPRESENTATIVE'],['Title','B_TITLE']];
- partyRows.forEach(([label,key],i)=>{const y=473-i*18;last.drawText(label,{x:42.6,y,size:9,font:bold,color:rgb(0,.125,.25)});fit(last,values[key]||'',font,[158,y-2,530,y+10],9);});
- const boxes=[{x:42.6,y:289,w:235,h:95,label:'Authorized signature'},{x:295.6,y:289,w:235,h:95,label:'Company stamp'}];
+ const partyRows=isIndividual(values)?[['Full name','B_COMPANY'],['Home address','B_ADDRESS'],['Passport number','PASSPORT_NUMBER'],['Capacity','PERSONAL_CAPACITY']]:[['Company name','B_COMPANY'],['Registered address','B_ADDRESS'],['Represented by','B_REPRESENTATIVE'],['Title','B_TITLE']];
+ partyRows.forEach(([label,key],i)=>{const y=473-i*18;last.drawText(label,{x:42.6,y,size:9,font:bold,color:rgb(0,.125,.25)});fit(last,key==='PERSONAL_CAPACITY'?'Private individual - signing personally':values[key]||'',font,[158,y-2,530,y+10],9);});
+ const boxes=isIndividual(values)?[{x:42.6,y:289,w:488,h:95,label:'Personal signature - signing in own capacity'}]:[{x:42.6,y:289,w:235,h:95,label:'Authorized signature'},{x:295.6,y:289,w:235,h:95,label:'Company stamp'}];
  boxes.forEach(box=>{last.drawText(box.label,{x:box.x,y:394,size:8,font:bold,color:rgb(0,.125,.25)});last.drawRectangle({x:box.x,y:box.y,width:box.w,height:box.h,borderWidth:.5,borderColor:rgb(.82,.85,.88)});});
  async function imageIn(data,box){const img=await pdf.embedPng(data),scale=Math.min((box.w-20)/img.width,(box.h-16)/img.height);last.drawImage(img,{x:box.x+(box.w-img.width*scale)/2,y:box.y+(box.h-img.height*scale)/2,width:img.width*scale,height:img.height*scale});}
  if(signature)await imageIn(signature,boxes[0]);
- if(stamp)await imageIn(stamp,boxes[1]);
+ if(stamp&&boxes[1])await imageIn(stamp,boxes[1]);
  last.drawText('Date',{x:42.6,y:273,size:9,font:bold,color:rgb(0,.125,.25)});
  last.drawText(day,{x:158,y:273,size:9,font,color:rgb(0,.125,.25)});
  last.drawText('Portal reference: '+reference,{x:42.6,y:248,size:7,font,color:rgb(.4,.45,.5)});
@@ -43,11 +44,11 @@ async function imageFile(file){
 export async function bindNda({db,member,check,action,message,onSubmitted,company}){
  const form=$('nda-form'),container=$('nda-fields');let signed=false,stamp=null,signatureImage=null,review=null,revision=0,stampLoading=false,stampRevision=0,stampPath='',savedAssetsVersion=null;
  const savedConsent=document.createElement('label');savedConsent.hidden=true;savedConsent.innerHTML='<input type="checkbox" id="nda-saved-assets-consent"> I authorize use of my saved signature and company stamp on this MCNDA.';form.insertBefore(savedConsent,$('nda-preview'));
- for(const [key,label,max,required] of specs){const wrap=document.createElement('div'),l=document.createElement('label'),input=document.createElement('input');l.htmlFor=key;l.textContent=label+(required?'':' (optional)');input.id=key;input.name=key;input.maxLength=max;input.required=required;if(key==='B_EMAIL'){input.type='email';input.value=member.email;}wrap.append(l,input);container.append(wrap);}
+ function renderFields(details={}){container.replaceChildren();specs=isIndividual(details)?[...individualFields,['PASSPORT_NUMBER','Passport number',30,true]]:companyFields;for(const [key,label,max,required] of specs){const wrap=document.createElement('div'),l=document.createElement('label'),input=document.createElement('input');l.htmlFor=key;l.textContent=label+(required?'':' (optional)');input.id=key;input.name=key;input.maxLength=max;input.required=required;if(key==='B_EMAIL'){input.type='email';input.value=member.email;}if(key==='PASSPORT_NUMBER')input.readOnly=true;wrap.append(l,input);container.append(wrap);}}renderFields();
  let readPreviewUrl=null;
  function clearReadPreview(){if(readPreviewUrl)URL.revokeObjectURL(readPreviewUrl);readPreviewUrl=null;if($('nda-read-result'))$('nda-read-result').hidden=true;if($('nda-read-frame'))$('nda-read-frame').src='about:blank';}
  if($('nda-read-button'))$('nda-read-button').addEventListener('click',()=>action($('nda-read-button'),async()=>{
-  const profile=company.getProfile(),values=profile?.details;
+  const profile=company.getProfile(),values=profile?.details?individualParty({...profile.details,...(isIndividual(profile.details)?{PASSPORT_NUMBER:form.elements.PASSPORT_NUMBER?.value||''}:{})}):null;
   if(!values||specs.some(([key,,,required])=>required&&!String(values[key]||'').trim())){message('Complete and save all required company profile details before previewing the MCNDA.');return;}
   clearReadPreview();const current=revision;
   try{
@@ -68,7 +69,7 @@ export async function bindNda({db,member,check,action,message,onSubmitted,compan
  $('nda-stamp').addEventListener('change',async()=>{invalidate();stamp=null;stampPath='';$('nda-stamp-preview').hidden=true;const f=$('nda-stamp').files[0];if(!f)return;const current=++stampRevision;stampLoading=true;$('nda-preview').disabled=true;try{const data=await imageFile(f);if(current!==stampRevision)return;stamp=data;$('nda-stamp-preview').src=data;$('nda-stamp-preview').hidden=false;}catch(e){message(e.message);$('nda-stamp').value='';}finally{stampLoading=false;$('nda-preview').disabled=false;}});
  form.addEventListener('submit',e=>{e.preventDefault();action($('nda-preview'),async()=>{
   if(!form.reportValidity())return;if(savedAssetsVersion&&!$('nda-saved-assets-consent').checked){message('Please confirm use of your saved signature and stamp for this MCNDA.');return;}if(!signed){message('Please draw your signature or upload a signature image.');return;}if(stampLoading)return;
-  invalidate();const current=revision,values=Object.fromEntries(specs.map(([k])=>[k,form.elements[k].value.trim()]));if(specs.some(([k,,,required])=>required&&!values[k])){message('Please complete all required company details.');return;}
+  invalidate();const current=revision,values=individualParty({...company.getProfile()?.details,...Object.fromEntries(specs.map(([k])=>[k,form.elements[k].value.trim()]))});if(specs.some(([k,,,required])=>required&&!values[k])){message('Please complete all required company details.');return;}
   const id=crypto.randomUUID(),now=new Date();let blob;
   try{blob=await createNda(values,signatureImage||canvas.toDataURL('image/png'),stamp,{now,reference:id,email:member.email,loadTemplate:async()=>{const result=await db.storage.from('nexora-documents').download('nda-template-unsigned-v20261027.pdf');if(result.error)throw new Error('The private MCNDA template has not been enabled for your account. Please contact Nexora.');return result.data.arrayBuffer();}});}catch(error){message(error.message.includes('WinAnsi')?'A character cannot be included in the PDF. Please use Latin characters for the company details.':error.message);return;}
   if(current!==revision)return;const url=URL.createObjectURL(blob);review={id,blob,url,values,now,savedAssetsVersion,hasStamp:!!stamp,stampData:stamp,stampPath,profileVersion:company.getProfile()?.version||0,profileId:company.getProfile()?.id||''};$('nda-frame').src=url;$('nda-download').href=url;$('nda-download').download='Nexora_MCNDA_Review.pdf';$('nda-review').hidden=false;message('Review all pages of the PDF, then confirm and submit.');$('nda-review').scrollIntoView({behavior:'smooth'});
@@ -99,12 +100,14 @@ export async function bindNda({db,member,check,action,message,onSubmitted,compan
  async function applyProfile(profile){
   const current=++stampRevision;clearReadPreview();invalidate();ctx.clearRect(0,0,canvas.width,canvas.height);signed=false;signatureImage=null;stamp=null;stampPath='';savedAssetsVersion=null;savedConsent.hidden=true;$('nda-saved-assets-consent').checked=false;
   $('nda-signature-file').value='';$('nda-stamp').value='';
-  for(const [key] of specs)form.elements[key].value=profile?.details[key]||(key==='B_EMAIL'?member.email:'');
+  const personal=isIndividual(profile?.details);const stampInput=$('nda-stamp');for(const el of [stampInput,stampInput.previousElementSibling,stampInput.previousElementSibling?.previousElementSibling,stampInput.nextElementSibling])if(el)el.hidden=personal;form.querySelector('h3').textContent=personal?'1. Personal details':'1. Company details';form.querySelectorAll('h3')[2].textContent=personal?'2. Personal signature':'3. Authorized signature';savedConsent.lastChild.textContent=personal?' I authorize use of my saved signature on this MCNDA.':' I authorize use of my saved signature and company stamp on this MCNDA.';
+  renderFields(profile?.details||{});for(const [key] of specs)form.elements[key].value=profile?.details[key]||(key==='B_EMAIL'?member.email:'');
   $('nda-stamp-preview').hidden=true;stampLoading=true;$('nda-preview').disabled=true;
   try{
+   if(isIndividual(profile?.details)){const identity=check(await db.rpc('individual_identity',{p_user_id:member.user_id,p_request_id:null}));if(current!==stampRevision)return;if(!identity?.passport_number)throw Error('Passport details are unavailable. Contact Nexora.');form.elements.PASSPORT_NUMBER.value=identity.passport_number;}
    const assets=check(await db.from('portal_signing_profiles').select('signature,stamp,version').eq('user_id',member.user_id).maybeSingle());if(current!==stampRevision)return;
    if(assets?.signature){const img=new Image();img.src=assets.signature;await img.decode();if(current!==stampRevision)return;const scale=Math.min(canvas.width/img.width,canvas.height/img.height);ctx.drawImage(img,(canvas.width-img.width*scale)/2,(canvas.height-img.height*scale)/2,img.width*scale,img.height*scale);signatureImage=assets.signature;signed=true;}
-   if(assets?.stamp)stamp=assets.stamp;
+   if(assets?.stamp&&!personal)stamp=assets.stamp;
    if(assets?.signature||assets?.stamp){savedAssetsVersion=assets.version;savedConsent.hidden=false;}
    const saved=profile?.details.B_STAMP_PATH;
    if(!stamp&&saved){const blob=check(await db.storage.from('nexora-company-assets').download(saved));const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);});if(current!==stampRevision)return;stamp=data;stampPath=saved;}
