@@ -1,0 +1,1 @@
+Nexora | {{if eq .Data.language "nl"}}Wachtwoordherstel{{else if eq .Data.language "de"}}Passwort{{else if eq .Data.language "es"}}Contraseña{{else if eq .Data.language "ar"}}كلمة المرور{{else}}Password reset{{end}}

@@ -1,8 +1,9 @@
+import {initializeAccountLanguage,setLanguage} from './portal-language.js?v=20261028-lang1';
 import {prepareDocumentPreview,setDocumentAccess} from './document-sharing.js?v=20261022-viewrights1';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
 import {loadAssignedDocuments} from './shared-documents.js?v=20261022-viewrights1';
 import {initClientFile,loadClientFile} from './client-file.js?v=20261028-companytitle1';
-import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261027-role3';
+import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261028-lang1';
 import { config } from './portal-config.js';
 
 const $ = id => document.getElementById(id);
@@ -20,7 +21,7 @@ function resetPrivateView() { closePdfPreview();generation++; documents = []; me
 function date(value) { return value ? new Date(value+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—'; }
 async function action(button, work) { button.disabled = true; try { await work(); } catch(error) { fail(error); } finally { button.disabled = false; } }
 async function authorize() {
-  const {user} = check(await db.auth.getUser());
+  const authResult=await db.auth.getUser();const user=authResult.data?.user;
   if(!user) { location.replace('client-login.html'); return false; }
   member = check(await db.from('portal_members').select('user_id,email,is_admin,active').eq('user_id',user.id).maybeSingle());
   if(!member?.active) { resetPrivateView(); message('Your access has not been enabled. Please contact Nexora International.'); return false; }
@@ -29,6 +30,7 @@ async function authorize() {
   if(member.is_admin){document.querySelectorAll('header .nav a[href^="company-profile.html"]').forEach(link=>link.remove());if(page==='company'){location.replace('document-admin.html');return false;}}
   if(page==='documents'&&member.is_admin){location.replace('client-files.html');return false;}
   member.company_name=typeof user.user_metadata?.company_name==='string'?user.user_metadata.company_name.trim():'';
+  await initializeAccountLanguage(db);
   $('account').textContent = member.email;
   const quoteClaim=await db.rpc('claim_my_quotes');if(quoteClaim.error)throw quoteClaim.error;
   $('protected').hidden = false;
@@ -257,6 +259,7 @@ async function start() {
   db=createClient(config.url,config.publishableKey,{auth:{storage:window.sessionStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'implicit'}});
   db.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT'){resetPrivateView();if(page!=='login')location.replace('client-login.html');}});
   const {session}=check(await db.auth.getSession());
+  if(['en','nl','de','es','ar'].includes(session?.user?.user_metadata?.language))setLanguage(session.user.user_metadata.language);
   if($('logout')) $('logout').addEventListener('click',()=>action($('logout'),async()=>{check(await db.auth.signOut());location.replace('client-login.html');}));
   if(page==='login') {
     $('login-form').hidden=false;

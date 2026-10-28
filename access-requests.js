@@ -1,15 +1,18 @@
+import {languageSelect,setLanguage} from './portal-language.js?v=20261028-lang1';
 import {config} from './portal-config.js';
 const fields=['B_COMPANY','B_REGISTRATION','B_ADDRESS','B_COUNTRY','B_REPRESENTATIVE','B_TITLE','B_PHONE','B_EMAIL','B_WEBSITE'];
 const el=(tag,text)=>{const node=document.createElement(tag);if(text!==undefined)node.textContent=text;return node;};
 const form=document.getElementById('access-form');
+if(form){const wrap=document.createElement('div'),label=document.createElement('label'),select=languageSelect('','access-language');select.name='B_LANGUAGE';label.htmlFor=select.id;label.textContent='Portal & email language';const note=document.createElement('p');note.className='language-policy';note.textContent='All documents, agreements, offers and SPAs remain in English. English is the working language of Nexora International.';wrap.append(label,select,note);form.prepend(wrap);select.onchange=()=>setLanguage(select.value)}
+
 if(form)form.addEventListener('submit',async event=>{
  event.preventDefault();if(!form.reportValidity())return;
  const button=document.getElementById('request-submit'),result=document.getElementById('request-result');button.disabled=true;result.hidden=false;result.textContent='Submitting your request…';
  try{
-  const details=Object.fromEntries(fields.map(key=>[key,form.elements[key].value.trim()]));
+  const details=Object.fromEntries(fields.map(key=>[key,form.elements[key].value.trim()]));details.B_LANGUAGE=form.elements.B_LANGUAGE.value;
   const response=await fetch(config.url+'/functions/v1/access-requests',{method:'POST',headers:{'Content-Type':'application/json',apikey:config.publishableKey},body:JSON.stringify({action:'request',details,message:form.elements.message.value.trim(),privacy:form.elements.privacy.checked,website_trap:form.elements.website_trap.value})});
   const data=await response.json();if(!response.ok)throw new Error(data.message||'Unable to submit your request. Please try again shortly.');
-  result.textContent=data.message;for(const input of form.querySelectorAll('input,textarea,button'))input.disabled=true;result.scrollIntoView({block:'nearest',behavior:'smooth'});
+  result.textContent=data.message;for(const input of form.querySelectorAll('input,textarea,select,button'))input.disabled=true;result.scrollIntoView({block:'nearest',behavior:'smooth'});
  }catch(error){result.textContent=error.message||'Unable to submit your request. Please try again shortly.';button.disabled=false;}
 });
 export async function bindAccessAdmin({db,check,message,onInvited}){

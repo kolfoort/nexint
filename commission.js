@@ -1,3 +1,4 @@
+import {initializeAccountLanguage} from './portal-language.js?v=20261028-lang1';
 import {initSigningImages} from './signing-images.js?v=20261022-live2';
 import {createCommissionPDF} from "./commission-pdf.js?v=20261027-allreview2";
 import {config} from "./portal-config.js";
@@ -49,6 +50,7 @@ async function init(){
  const {session}=checked(await db.auth.getSession());if(!session){location.replace('client-login.html');return}
  const member=checked(await db.from('portal_members').select('user_id,email,is_admin,active').eq('user_id',session.user.id).single());
  if(!member.active||!checked(await db.rpc('my_portal_access_allowed')))throw Error('Your portal access is not active. Contact info@nexint.eu.');
+ await initializeAccountLanguage(db);
  me={id:member.user_id,email:member.email,role:member.is_admin?'admin':'client'};
  const members=member.is_admin?checked(await db.from('portal_members').select('user_id,email,is_admin,active').eq('active',true)):[member];
  accounts=members.map(m=>({id:m.user_id,email:m.email,name:m.email,role:m.is_admin?'admin':'client'}));

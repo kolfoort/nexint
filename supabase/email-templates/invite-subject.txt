@@ -1,0 +1,1 @@
+Nexora | {{if eq .Data.language "nl"}}Uitnodiging{{else if eq .Data.language "de"}}Einladung{{else if eq .Data.language "es"}}Invitación{{else if eq .Data.language "ar"}}دعوة{{else}}Invitation{{end}}
