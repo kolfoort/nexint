@@ -1,3 +1,4 @@
+import {loadClientRequests} from './client-requests.js?v=20261028-clientnav1';
 import {mountMCNDAApprovals} from './mcnda-approval.js?v=20261027-mcndafinal1';
 import {loadJVClientSummary} from './jv-client-file.js?v=20261027-allreview2';
 import {loadFCOClientSummary} from './fco-client-file.js?v=20261027-allreview2';
@@ -7,8 +8,14 @@ import {loadAssignedDocuments} from './shared-documents.js?v=20261022-viewrights
 const $=id=>document.getElementById(id);
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n}
 const check=r=>{if(r.error)throw r.error;return r.data};
-export function initClientFile(){const choose=name=>{document.querySelectorAll('[data-file-view]').forEach(x=>x.hidden=x.dataset.fileView!==name);document.querySelectorAll('[data-file-tab]').forEach(x=>{x.classList.toggle('active',x.dataset.fileTab===name);x.setAttribute('aria-selected',String(x.dataset.fileTab===name))})};document.querySelectorAll('[data-file-tab],[data-open-tab]').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.fileTab||b.dataset.openTab)))}
+export function initClientFile(){
+ const tabs=[...document.querySelectorAll('[data-file-tab]')],names=new Set(tabs.map(x=>x.dataset.fileTab));
+ const choose=(name,remember=false)=>{if(!names.has(name))return;document.querySelectorAll('[data-file-view]').forEach(x=>x.hidden=x.dataset.fileView!==name);tabs.forEach(x=>{x.classList.toggle('active',x.dataset.fileTab===name);x.setAttribute('aria-selected',String(x.dataset.fileTab===name))});if(remember)history.replaceState(null,'','#'+name)};
+ document.querySelectorAll('[data-file-tab],[data-open-tab]').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.fileTab||b.dataset.openTab,true)));
+ const fromHash=()=>choose(location.hash.slice(1)||'overview');window.addEventListener('hashchange',fromHash);fromHash();
+}
 export async function loadClientFile({db,member,company}){
+ await loadClientRequests({db,member});
  const profile=company?.getProfile();$('file-company-name').textContent=profile?.details.B_COMPANY||'Company profile';$('file-company-status').textContent=profile?(profile.status==='approved'?'Approved':'Pending review')+' · Version '+profile.version:'Complete your company details before signing assigned agreements.';
  const [requests,commissions,uploads,shared]=await Promise.all([db.from('portal_mcnda_assignments').select('*').eq('user_id',member.user_id).order('assigned_at',{ascending:false}),db.from('commission_agreements').select('id,status,transaction_code,data,version').eq('recipient',member.user_id).order('created_at',{ascending:false}),db.from('portal_submissions').select('id,title,status,storage_path,created_at').eq('user_id',member.user_id).order('created_at',{ascending:false}),loadAssignedDocuments(db,member.user_id,'id,title,storage_path')]);
  const nda=check(requests),fees=check(commissions),files=check(uploads),docs=shared;const tasks=$('file-tasks'),list=$('file-commission-list');tasks.replaceChildren();list.replaceChildren();

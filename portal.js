@@ -1,7 +1,7 @@
 import {prepareDocumentPreview,setDocumentAccess} from './document-sharing.js?v=20261022-viewrights1';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
 import {loadAssignedDocuments} from './shared-documents.js?v=20261022-viewrights1';
-import {initClientFile,loadClientFile} from './client-file.js?v=20261027-allreview2';
+import {initClientFile,loadClientFile} from './client-file.js?v=20261028-clientnav1';
 import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261027-role3';
 import { config } from './portal-config.js';
 
@@ -31,7 +31,7 @@ async function authorize() {
   $('account').textContent = member.email;
   const quoteClaim=await db.rpc('claim_my_quotes');if(quoteClaim.error)throw quoteClaim.error;
   $('protected').hidden = false;
-  const requestsLink=document.createElement('a');requestsLink.href='/quote-requests.html';requestsLink.textContent=member.is_admin?'Requests':'My requests';document.querySelector('header .nav')?.append(requestsLink);
+  if(member.is_admin||page!=='documents'){const requestsLink=document.createElement('a');requestsLink.href=member.is_admin?'/quote-requests.html':'/documents.html#requests';requestsLink.textContent=member.is_admin?'Requests':'My requests';document.querySelector('header .nav')?.append(requestsLink);}
   if(member.is_admin && $('admin-link')) $('admin-link').hidden = false;
   return true;
 }
