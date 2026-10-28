@@ -15,8 +15,11 @@ export function initClientFile(){
  const fromHash=()=>choose(location.hash.slice(1)||'overview');window.addEventListener('hashchange',fromHash);fromHash();
 }
 export async function loadClientFile({db,member,company}){
+ const profile=company?.getProfile();
+ const companyName=profile?.details?.B_COMPANY?.trim()||member.company_name||'Your client file.';
+ $('client-file-title').textContent=companyName;document.title=companyName+' | Nexora International';
  await loadClientRequests({db,member});
- const profile=company?.getProfile();$('file-company-name').textContent=profile?.details.B_COMPANY||'Company profile';$('file-company-status').textContent=profile?(profile.status==='approved'?'Approved':'Pending review')+' · Version '+profile.version:'Complete your company details before signing assigned agreements.';
+ $('file-company-name').textContent=profile?.details.B_COMPANY||'Company profile';$('file-company-status').textContent=profile?(profile.status==='approved'?'Approved':'Pending review')+' · Version '+profile.version:'Complete your company details before signing assigned agreements.';
  const [requests,commissions,uploads,shared]=await Promise.all([db.from('portal_mcnda_assignments').select('*').eq('user_id',member.user_id).order('assigned_at',{ascending:false}),db.from('commission_agreements').select('id,status,transaction_code,data,version').eq('recipient',member.user_id).order('created_at',{ascending:false}),db.from('portal_submissions').select('id,title,status,storage_path,created_at').eq('user_id',member.user_id).order('created_at',{ascending:false}),loadAssignedDocuments(db,member.user_id,'id,title,storage_path')]);
  const nda=check(requests),fees=check(commissions),files=check(uploads),docs=shared;const tasks=$('file-tasks'),list=$('file-commission-list');tasks.replaceChildren();list.replaceChildren();
  const pending=nda.filter(r=>r.status==='assigned');const open=fees.filter(a=>a.status==='awaiting_client');tasks.append(el('p',pending.length+open.length?`${pending.length+open.length} agreement(s) awaiting your action.`:'No agreements currently require your signature.'));

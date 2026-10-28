@@ -1,7 +1,7 @@
 import {prepareDocumentPreview,setDocumentAccess} from './document-sharing.js?v=20261022-viewrights1';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
 import {loadAssignedDocuments} from './shared-documents.js?v=20261022-viewrights1';
-import {initClientFile,loadClientFile} from './client-file.js?v=20261028-clientnav1';
+import {initClientFile,loadClientFile} from './client-file.js?v=20261028-companytitle1';
 import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261027-role3';
 import { config } from './portal-config.js';
 
@@ -28,6 +28,7 @@ async function authorize() {
   if(page === 'admin' && !member.is_admin) { resetPrivateView(); message('This page is reserved for Nexora administrators.'); return false; }
   if(member.is_admin){document.querySelectorAll('header .nav a[href^="company-profile.html"]').forEach(link=>link.remove());if(page==='company'){location.replace('document-admin.html');return false;}}
   if(page==='documents'&&member.is_admin){location.replace('client-files.html');return false;}
+  member.company_name=typeof user.user_metadata?.company_name==='string'?user.user_metadata.company_name.trim():'';
   $('account').textContent = member.email;
   const quoteClaim=await db.rpc('claim_my_quotes');if(quoteClaim.error)throw quoteClaim.error;
   $('protected').hidden = false;
