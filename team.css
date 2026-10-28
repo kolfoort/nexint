@@ -57,3 +57,5 @@
 
 /* Keep four-column portrait cards proportional instead of tall and narrow. */
 @media(min-width:1051px){.nex-team-grid .nex-team-card{height:auto;aspect-ratio:3 / 4}.nex-team-grid .nex-team-card .nex-team-photo{object-fit:contain}.nex-team-grid #teddy .nex-team-photo{height:88%;top:10.5%;width:100%;object-fit:contain}}
+
+@media(min-width:651px){.nex-team-grid .nex-team-card[aria-label="Samuel Carter"] .nex-team-photo{transform:scale(1.22);transform-origin:center bottom}.nex-team-grid .nex-team-card[aria-label="Samuel Carter"]:hover .nex-team-photo,.nex-team-grid .nex-team-card[aria-label="Samuel Carter"]:focus-within .nex-team-photo{transform:scale(1.24)}}
