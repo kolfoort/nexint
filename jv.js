@@ -1,4 +1,4 @@
-import {initializeAccountLanguage} from './portal-language.js?v=20261028-person1';
+import {initializeAccountLanguage} from './portal-language.js?v=20261028-person2';
 import {config as portalConfig} from './portal-config.js';
 import {initSigningImages} from './signing-images.js?v=20261022-live2';
 import {fields} from './jv-fields.js?v=20261027-jv1';

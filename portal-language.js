@@ -1,4 +1,4 @@
-import {catalog,fragments} from './portal-language-catalog.js?v=20261028-person1';
+import {catalog,fragments} from './portal-language-catalog.js?v=20261028-person2';
 export const portalLanguages=[['en','English'],['nl','Nederlands'],['de','Deutsch'],['es','Español'],['ar','العربية']];
 const supported=new Set(portalLanguages.map(x=>x[0])),storageKey='nexora-portal-language';
 let current=null;try{const p=new URL(location.href).searchParams.get('lang')||localStorage.getItem(storageKey);if(supported.has(p))current=p}catch{}

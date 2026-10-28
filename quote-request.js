@@ -1,4 +1,4 @@
-import {languageSelect,setLanguage,getLanguage,initializeAccountLanguage} from './portal-language.js?v=20261028-person1';
+import {languageSelect,setLanguage,getLanguage,initializeAccountLanguage} from './portal-language.js?v=20261028-person2';
 import {config} from '/portal-config.js';
 const $=s=>document.querySelector(s),form=$('#request'),kind=document.documentElement.dataset.requestKind||'product',marine=kind==='marine';
 const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2.102.0');

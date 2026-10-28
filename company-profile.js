@@ -1,6 +1,6 @@
-import {individualFields,isIndividual,individualParty,mountIdentity} from './individual-profile.js?v=20261028-person1';
-import {mountLanguagePreference} from './portal-language.js?v=20261028-person1';
-import {mountCounterpartyRole} from './counterparty-role.js?v=20261028-person1';
+import {individualFields,isIndividual,individualParty,mountIdentity} from './individual-profile.js?v=20261028-person2';
+import {mountLanguagePreference} from './portal-language.js?v=20261028-person2';
+import {mountCounterpartyRole} from './counterparty-role.js?v=20261028-person2';
 import {initSigningImages} from './signing-images.js?v=20261022-live2';
 export const companyFields=[['B_COMPANY','Legal company name',100,true],['B_REGISTRATION','Company registration number',60,true],['B_ADDRESS','Registered address',150,true],['B_COUNTRY','Country of incorporation',60,true],['B_REPRESENTATIVE','Authorized representative',80,true],['B_TITLE','Position / title',80,true],['B_PHONE','Telephone',50,true],['B_EMAIL','Business email',100,true],['B_WEBSITE','Website',100,false]];
 const $=id=>document.getElementById(id);

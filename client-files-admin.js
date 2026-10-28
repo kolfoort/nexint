@@ -1,14 +1,14 @@
-import {individualFields,isIndividual,individualParty,mountIdentity} from './individual-profile.js?v=20261028-person1';
+import {individualFields,isIndividual,individualParty,mountIdentity} from './individual-profile.js?v=20261028-person2';
 import {loadClientRequests} from './client-requests.js?v=20261028-adminnav2';
-import {initializeAccountLanguage,languageSelect} from './portal-language.js?v=20261028-person1';
+import {initializeAccountLanguage,languageSelect} from './portal-language.js?v=20261028-person2';
 import {mountMCNDAApprovals} from './mcnda-approval.js?v=20261027-mcndafinal1';
-import {mountCounterpartyRole} from './counterparty-role.js?v=20261028-person1';
+import {mountCounterpartyRole} from './counterparty-role.js?v=20261028-person2';
 import {mountJVAdmin} from './jv-client-file.js?v=20261027-allreview2';
 import {mountFCOAdmin} from './fco-client-file.js?v=20261027-allreview2';
 import {mountSPAAdmin} from './spa-client-file.js?v=20261027-allreview2';
 import {prepareDocumentPreview,setDocumentAccess} from './document-sharing.js?v=20261022-viewrights1';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
-import {companyFields} from './company-profile.js?v=20261028-person1';
+import {companyFields} from './company-profile.js?v=20261028-person2';
 import {config} from './portal-config.js';
 const $=id=>document.getElementById(id),escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const check=r=>{if(r.error)throw r.error;return r.data};let db,people=[],selected,version=0,companyNameByUser=new Map();
 function message(t){$('status').textContent=t;$('status').hidden=!t}function email(id){return people.find(p=>p.user_id===id)?.email||'Account unavailable'}
