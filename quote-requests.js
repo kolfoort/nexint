@@ -1,4 +1,4 @@
-import {initializeAccountLanguage} from './portal-language.js?v=20261028-privacy1';
+import {initializeAccountLanguage} from './portal-language.js?v=20261028-auth-flags';
 import {config} from '/portal-config.js';
 const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2.102.0');
 const db=createClient(config.url,config.publishableKey,{auth:{storage:sessionStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'implicit'}});

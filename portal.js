@@ -1,4 +1,4 @@
-import {initializeAccountLanguage,setLanguage} from './portal-language.js?v=20261028-privacy1';
+import {initializeAccountLanguage,setLanguage} from './portal-language.js?v=20261028-auth-flags';
 import {prepareDocumentPreview,setDocumentAccess} from './document-sharing.js?v=20261022-viewrights1';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
 import {loadAssignedDocuments} from './shared-documents.js?v=20261022-viewrights1';

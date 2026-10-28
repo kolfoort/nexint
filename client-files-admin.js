@@ -1,6 +1,6 @@
 import {individualFields,isIndividual,individualParty,mountIdentity} from './individual-profile.js?v=20261028-privacy1';
 import {loadClientRequests} from './client-requests.js?v=20261028-adminnav2';
-import {initializeAccountLanguage,languageSelect} from './portal-language.js?v=20261028-privacy1';
+import {initializeAccountLanguage,languageSelect} from './portal-language.js?v=20261028-auth-flags';
 import {mountMCNDAApprovals} from './mcnda-approval.js?v=20261027-mcndafinal1';
 import {mountCounterpartyRole} from './counterparty-role.js?v=20261028-privacy1';
 import {mountJVAdmin} from './jv-client-file.js?v=20261027-allreview2';

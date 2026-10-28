@@ -1,4 +1,4 @@
-import {initializeAccountLanguage} from './portal-language.js?v=20261028-privacy1';
+import {initializeAccountLanguage} from './portal-language.js?v=20261028-auth-flags';
 import {config as portalConfig} from './portal-config.js';
 import {initSigningImages} from './signing-images.js?v=20261022-live2';
 import {products} from './spa-products.js?v=20261023-offers1';
