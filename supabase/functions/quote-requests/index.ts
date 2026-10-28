@@ -27,7 +27,7 @@ Deno.serve(async req=>{
    if(!password)throw new Error('SMTP unavailable');
    const loaded=await db.from('portal_quote_requests').select('*').eq('id',job.quote_id).single();if(loaded.error)throw loaded.error;const q=loaded.data;
    if(job.kind==='status'&&job.revision!==q.revision){await update({sent_at:new Date().toISOString(),leased_at:null});return response(200,{message:'Superseded notification skipped'});}
-   const marine=q.transaction.kind==='marine',category=marine?'Marine Chartering':q.transaction.kind==='crude'?'Crude Oils':'Performance Fluids',type=category+' request';
+   const marine=q.transaction.kind==='marine',category=products.slice(9,18).includes(q.transaction.product)?'Fertilizers & Feedstocks':marine?'Marine Chartering':q.transaction.kind==='crude'?'Crude Oils':'Performance Fluids',type=category+' request';
    let title=job.kind==='admin'?'New '+type:job.kind==='receipt'?'Your request has been received.':'An update on your request.';
    let intro=job.kind==='admin'?'Review the new request in Nexora administration.':job.kind==='receipt'?'Thank you for your interest in Nexora International. Our team will review your requirements and contact you.':'The status of your request has changed. Sign in to your Client Portal for details.';
    let url='https://nexint.eu/quote-requests.html',label='View request',recipient=q.email;
