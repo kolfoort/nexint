@@ -54,3 +54,6 @@
 .nex-rocky-spot .nex-rocky-card{width:100%;height:420px;border:1px solid #d9a92d66;box-shadow:10px 12px 0 #0003}
 .nex-rocky-spot .nex-team-caption{opacity:1;transform:none}
 @media(max-width:650px){.nex-rocky-spot{max-width:300px;margin-top:45px}}
+
+/* Keep four-column portrait cards proportional instead of tall and narrow. */
+@media(min-width:1051px){.nex-team-grid .nex-team-card{height:auto;aspect-ratio:3 / 4}.nex-team-grid .nex-team-card .nex-team-photo{object-fit:contain}.nex-team-grid #teddy .nex-team-photo{height:88%;top:10.5%;width:100%;object-fit:contain}}
