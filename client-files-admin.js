@@ -1,5 +1,5 @@
 import {loadClientRequests} from './client-requests.js?v=20261028-adminnav2';
-import {initializeAccountLanguage} from './portal-language.js?v=20261028-lang1';
+import {initializeAccountLanguage,languageSelect} from './portal-language.js?v=20261028-lang1';
 import {mountMCNDAApprovals} from './mcnda-approval.js?v=20261027-mcndafinal1';
 import {mountCounterpartyRole} from './counterparty-role.js?v=20261027-role3';
 import {mountJVAdmin} from './jv-client-file.js?v=20261027-allreview2';
@@ -32,6 +32,10 @@ async function refresh(){closePdfPreview();const tick=++version,id=selected;$('c
  function viewFile(view){requestsSection.hidden=view!=='requests';offersSection.hidden=view!=='offers';overview.hidden=view!=='overview';sections.forEach((section,i)=>section.hidden=!(view==='company'?[0,1].includes(i):view==='agreements'?[2,3].includes(i):view==='documents'?i===4:false));for(const b of tabs.children){b.classList.toggle('active',b.dataset.view===view);b.setAttribute('aria-selected',String(b.dataset.view===view))}}
  for(const [key,label] of [['overview','Overview'],['company','Company profile'],['documents','Documents'],['agreements','Agreements'],['offers','Offers'],['requests','Requests']]){const b=document.createElement('button');b.type='button';b.dataset.view=key;b.textContent=label;b.onclick=()=>viewFile(key);tabs.append(b)}file.prepend(tabs,overview);overview.querySelectorAll('[data-dossier-go]').forEach(b=>b.onclick=()=>viewFile(b.dataset.dossierGo));viewFile('overview');
  await loadClientRequests({db,member:{user_id:id},admin:true,isCurrent:()=>tick===version});if(tick!==version)return;
+ const languageResult=await db.rpc('admin_client_language',{p_user_id:id});const clientLanguage=check(languageResult);if(tick!==version)return;
+ const languagePanel=document.createElement('section');languagePanel.className='language-preference';languagePanel.innerHTML='<h3>Portal &amp; email language</h3><p>Language changes apply to the portal and future emails. Existing documents and signatures remain unchanged.</p><form><label for="admin-client-language">Portal &amp; email language</label><div class="language-select-slot"></div><p>All documents, agreements, offers and SPAs remain in English. English is the working language of Nexora International.</p><button type="submit" class="secondary">Save language</button></form>';
+ const clientLanguageSelect=languageSelect(clientLanguage||'','admin-client-language');languagePanel.querySelector('.language-select-slot').append(clientLanguageSelect);sections[0].append(languagePanel);
+ languagePanel.querySelector('form').onsubmit=e=>{e.preventDefault();if(!clientLanguageSelect.reportValidity())return;action(e.target.querySelector('button'),async()=>{check(await db.rpc('admin_save_client_language',{p_user_id:id,p_language:clientLanguageSelect.value,p_expected_language:clientLanguage}));await refresh();viewFile('company');message('Language saved.');})};
  await mountCounterpartyRole({db,userId:id,container:sections[0],message});
  for(const recipient of signers)await mountMCNDAApprovals({db,recipient,container:sections[3],admin:true,message});
  await mountSPAAdmin({db,clientId:id,section:sections[3],overview,createAfter:$('create-fee')});
