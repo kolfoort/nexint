@@ -59,3 +59,30 @@
 @media(min-width:1051px){.nex-team-grid .nex-team-card{height:auto;aspect-ratio:3 / 4}.nex-team-grid .nex-team-card .nex-team-photo{object-fit:contain}.nex-team-grid #teddy .nex-team-photo{height:88%;top:10.5%;width:100%;object-fit:contain}}
 
 @media(min-width:651px){.nex-team-grid .nex-team-card[aria-label="Samuel Carter"] .nex-team-photo{transform:scale(1.22);transform-origin:center bottom}.nex-team-grid .nex-team-card[aria-label="Samuel Carter"]:hover .nex-team-photo,.nex-team-grid .nex-team-card[aria-label="Samuel Carter"]:focus-within .nex-team-photo{transform:scale(1.24)}}
+
+/* Preview: separate calibrated portraits from always-visible contact details. */
+.nex-team-page .nex-team-grid{grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch}
+.nex-team-page .nex-team-grid .nex-team-card[aria-label],.nex-team-page .nex-team-grid #teddy{display:flex;flex-direction:column;grid-column:auto;width:100%;height:auto;aspect-ratio:auto;max-height:none}
+.nex-team-page .nex-team-grid .nex-team-card:after{display:none}
+.portrait-window{position:relative;width:100%;aspect-ratio:1 / 1.1;overflow:hidden;background:#001c37}
+.nex-team-page .nex-team-grid .nex-team-card[aria-label] .portrait-window .nex-team-photo{position:absolute;width:var(--portrait-width)!important;height:auto!important;max-width:none;padding:0!important;left:var(--portrait-left)!important;top:var(--portrait-top)!important;translate:none!important;transform:none!important;object-fit:contain;filter:grayscale(1) brightness(.95);mask-image:linear-gradient(#000 82%,transparent 99%);-webkit-mask-image:linear-gradient(#000 82%,transparent 99%)}
+.nex-team-page .nex-team-grid .nex-team-caption{position:relative;inset:auto;opacity:1;transform:none;padding:20px;flex:1;display:flex;flex-direction:column;gap:10px}
+.nex-team-page .nex-team-grid .nex-team-caption h3{font-size:20px;line-height:1.25;margin:0;min-height:25px}
+.nex-team-page .nex-team-grid .nex-team-role{margin:0;min-height:36px}
+.nex-team-page .nex-team-grid .nex-team-quote{margin:0 0 8px;min-height:63px}
+.nex-team-page .nex-team-grid .nex-team-contact{margin-top:auto;font-size:12px}
+@media(max-width:1050px){.nex-team-page .nex-team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.nex-team-page .nex-team-grid{grid-template-columns:1fr}.nex-team-page .nex-team-grid .nex-team-caption{padding:24px}.nex-team-page .nex-team-grid .nex-team-role,.nex-team-page .nex-team-grid .nex-team-quote{min-height:0}}
+.portrait-window:has(img[src$="jp-current-quarterzip.png"]){--portrait-width:98.490%;--portrait-left:4.328%;--portrait-top:-5.578%}
+.portrait-window:has(img[src$="jeremy-green-suit.png"]){--portrait-width:146.826%;--portrait-left:-22.462%;--portrait-top:-7.797%}
+.portrait-window:has(img[src$="john-szabo-forward.png"]){--portrait-width:134.765%;--portrait-left:-16.327%;--portrait-top:3.385%}
+.portrait-window:has(img[src$="kerstin-mature-v2.png"]){--portrait-width:122.013%;--portrait-left:-17.518%;--portrait-top:-7.556%}
+.portrait-window:has(img[src$="team-01.png"]){--portrait-width:161.201%;--portrait-left:-40.818%;--portrait-top:-9.728%}
+.portrait-window:has(img[src$="team-02.png"]){--portrait-width:157.709%;--portrait-left:-33.650%;--portrait-top:-8.997%}
+.portrait-window:has(img[src$="alexander-v2.png"]){--portrait-width:171.626%;--portrait-left:-37.124%;--portrait-top:-4.775%}
+.portrait-window:has(img[src$="team-05.png"]){--portrait-width:144.070%;--portrait-left:-20.323%;--portrait-top:-0.944%}
+.portrait-window:has(img[src$="teddy-pikramenos.png"]){--portrait-width:109.773%;--portrait-left:0.268%;--portrait-top:-6.051%}
+.portrait-window:has(img[src$="team-07.png"]){--portrait-width:138.620%;--portrait-left:-18.155%;--portrait-top:-6.010%}
+.portrait-window:has(img[src$="team-08.png"]){--portrait-width:156.332%;--portrait-left:-23.268%;--portrait-top:-3.785%}
+.portrait-window:has(img[src$="emma-westbrook-v2.png"]){--portrait-width:153.056%;--portrait-left:-26.450%;--portrait-top:-9.312%}
+.portrait-window:after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 74%,#001c37 100%);pointer-events:none}
