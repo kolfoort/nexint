@@ -9,7 +9,7 @@ const copy={
  ar:['تأكيد توقيع اتفاقية MCNDA','أرسل رمز استخدام واحد إلى بريدك الإلكتروني المسجّل. يؤكد الرمز المستند المحدد الذي راجعته فقط.','إرسال رمز التأكيد','رمز التأكيد','تأكيد ومتابعة','إلغاء','تم إرسال الرمز وهو صالح لمدة 10 دقائق.','الرمز غير صحيح أو منتهي الصلاحية أو مستخدم بالفعل. اطلب رمزًا جديدًا عند الحاجة.','انتظر دقيقة واحدة على الأقل بين الطلبات. يُسمح بخمسة رموز لكل مستند كحد أقصى في الساعة.','تعذّر إرسال الرمز. يُرجى المحاولة لاحقًا.','إرسال رمز جديد','مرجع المستند','هذا التأكيد بالبريد الإلكتروني ليس توقيعًا إلكترونيًا مؤهلًا.']
 };
 const make=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n};
-export async function confirmSigning({db,purpose,documentId,pdfHash,revision,reviewToken,documentName='MCNDA',pdfBytes}){
+export async function confirmSigning({db,purpose,documentId,pdfHash,revision,reviewToken,documentName='MCNDA',pdfBytes,autoSend=false}){
  const language=getLanguage(),t=(copy[language]||copy.en).map(value=>value.replaceAll('MCNDA',documentName));
  const dialog=make('dialog');dialog.dataset.i18nSkip='';dialog.lang=language;dialog.dir=language==='ar'?'rtl':'ltr';dialog.style.cssText='max-width:560px;width:calc(100% - 40px);box-sizing:border-box;border:1px solid #bd9a45;border-top:4px solid #bd9a45;padding:28px;color:#002040;background:#fff;max-height:90vh;overflow:auto';
  const heading=make('h2',t[0]);heading.id='signing-confirmation-heading';dialog.setAttribute('aria-labelledby',heading.id);
@@ -42,6 +42,7 @@ export async function confirmSigning({db,purpose,documentId,pdfHash,revision,rev
    try{const r=await db.rpc(purpose==='mcnda_multi'?'verify_multi_mcnda_confirmation':'verify_signing_confirmation',{p_id:challenge,p_code:input.value.trim()});input.value='';if(r.error||!r.data?.verified){status.textContent=t[7];return}close(r.data)}
    catch{status.textContent=t[7]}finally{busy=false;verify.disabled=false;cancel.disabled=false;send.disabled=Date.now()<retryAt||!!(reviewed&&!reviewed.checked);if(!closed)input.focus()}
   };
+  if(autoSend&&!reviewed)send.click();
  });
 }
 
