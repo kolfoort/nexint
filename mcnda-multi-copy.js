@@ -8,3 +8,5 @@ ar:{title:'اتفاقية MCNDA واحدة. أطراف متعددة.',warning:'�
 export {C};
 
 export const parisPolicy=Object.fromEntries(Object.entries(C).map(([lang,copy])=>[lang,copy.policy.replace('Amsterdam',({nl:'Parijs (Frankrijk)',en:'Paris, France',de:'Paris, Frankreich',es:'París, Francia'})[lang]||'Paris, France').replace('Ámsterdam','París, Francia').replace('أمستردام','باريس، فرنسا')]));
+
+export const eurParisPolicy=Object.fromEntries(Object.entries(parisPolicy).map(([lang,policy])=>[lang,policy.replaceAll("USD","EUR").replace("مليون دولار","مليون يورو")]));
