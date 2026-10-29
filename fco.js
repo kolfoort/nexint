@@ -1,3 +1,4 @@
+import {mountAgreementCopyActions} from './agreement-copy-actions.js?v=20261029-copies1';
 import {ensurePortalSecurity} from './portal-security.js?v=20261029-whatsapp1';
 import {confirmAgreement,hashPDF} from './signing-confirmation.js?v=20261029-whatsapp1';
 import {initializeAccountLanguage} from './portal-language.js?v=20261029-whatsapp1';
@@ -65,7 +66,7 @@ async function render(){let list=$('list');list.replaceChildren();for(let a of i
  actions.append(button(current.status==='completed'?'View final signed PDF':'Preview FCO',async()=>{if(dirty){if(!editable)throw Error('Reload the offer');await save()}await previewFCO()},true));
  if(me.role==='admin'&&!['completed','cancelled'].includes(current.status))actions.append(button('Cancel FCO',async()=>{if(confirm('Cancel this unsigned FCO? Its audit history will be retained.'))await operation('cancel')},true));
  if(me.role==='admin'&&current.status!=='draft')actions.append(button('Create new version',async()=>{let v=await api('/api/agreements/'+current.id+'/action',{action:'revise',revision:current.revision});closePreview();await load(v.id);tab='parties';render();message('New draft version created. Previous version preserved; new acceptance is required.')},true));
- content.append(actions);if(current.status==='completed')content.append(E('p','Final PDF SHA256: '+current.data.pdf_sha256,'meta')); 
+ content.append(actions);if(current.status==='completed')mountAgreementCopyActions({db,kind:'fco',id:current.id,container:content,message});if(current.status==='completed')content.append(E('p','Final PDF SHA256: '+current.data.pdf_sha256,'meta')); 
 }
 async function save(){let id=current.id;await api('/api/agreements/'+id+'/action',{action:'save',revision:current.revision,data:current.data});await load(id);message('Draft saved privately. Assign it for review again to share the revised draft. The PDF uses these saved values.')}
 async function operation(action,extra={}){let id=current.id;let v=await api('/api/agreements/'+id+'/action',{action,revision:current.revision,...extra});closePreview();await load(v.id||id)}
