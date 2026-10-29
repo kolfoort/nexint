@@ -1,4 +1,5 @@
-import {initializeAccountLanguage} from './portal-language.js?v=20261028-auth-flags';
+import {ensurePortalSecurity} from './portal-security.js?v=20261029-mfa1';
+import {initializeAccountLanguage} from './portal-language.js?v=20261029-mfa1';
 import {config} from '/portal-config.js';
 const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2.102.0');
 const db=createClient(config.url,config.publishableKey,{auth:{storage:sessionStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'implicit'}});
@@ -6,7 +7,7 @@ const $=id=>document.getElementById(id),node=(tag,text)=>{const n=document.creat
 const statuses={received:'Received',in_review:'Under review',information_required:'Additional information required',quoted:'Quote available',closed:'Closed'};
 let member=null;
 async function load(){const auth=await db.auth.getUser();if(!auth.data.user){$('auth').hidden=false;$('requests').hidden=true;$('status').textContent='';return;}
-const result=await db.from('portal_members').select('active,is_admin,email').eq('user_id',auth.data.user.id).single();if(result.error||!result.data.active)throw new Error('Your portal access is not active. Please contact Nexora.');member=result.data;const permission=await db.rpc('my_portal_access_allowed');if(permission.error||!permission.data)throw new Error('Please contact Nexora about your portal access.');
+if(!await ensurePortalSecurity(db))return;const result=await db.from('portal_members').select('active,is_admin,email').eq('user_id',auth.data.user.id).single();if(result.error||!result.data.active)throw new Error('Your portal access is not active. Please contact Nexora.');member=result.data;const permission=await db.rpc('my_portal_access_allowed');if(permission.error||!permission.data)throw new Error('Please contact Nexora about your portal access.');
 await initializeAccountLanguage(db);
 if(!member.is_admin){location.replace('/documents.html#requests');return;}
 const claim=await db.rpc('claim_my_quotes');if(claim.error)throw claim.error;$('account').textContent=member.email;$('title').textContent=member.is_admin?'Incoming requests':'My requests';$('auth').hidden=true;$('requests').hidden=false;

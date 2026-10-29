@@ -1,5 +1,6 @@
+import {ensurePortalSecurity} from './portal-security.js?v=20261029-mfa1';
 import {confirmAgreement,hashPDF} from './signing-confirmation.js?v=20261029-all-signatures2';
-import {initializeAccountLanguage} from './portal-language.js?v=20261028-auth-flags';
+import {initializeAccountLanguage} from './portal-language.js?v=20261029-mfa1';
 import {config as portalConfig} from './portal-config.js';
 import {initSigningImages} from './signing-images.js?v=20261022-live2';
 import {products} from './spa-products.js?v=20261023-offers1';
@@ -101,7 +102,7 @@ $('blank-view').onclick=()=>act(()=>blankPDF());$('blank-download').onclick=()=>
 $('new').onclick=()=>act(async()=>{const recipient=$('new-recipient').value;if(!recipient)throw Error('Select a registered client with a company profile.');const a=await api('/api/agreements',{recipient});tab='parties';closePreview();await load(a.id);message('Private draft created from the selected company profile.')});
 $('close-preview').onclick=closePreview;
 async function init(){
- const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2.102.0');db=createClient(portalConfig.url,portalConfig.publishableKey,{auth:{storage:sessionStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+ const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2.102.0');db=createClient(portalConfig.url,portalConfig.publishableKey,{auth:{storage:sessionStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});if(!await ensurePortalSecurity(db))return;
  const {session}=checked(await db.auth.getSession());if(!session){location.replace('client-login.html');return}
  const member=checked(await db.from('portal_members').select('user_id,email,is_admin,active').eq('user_id',session.user.id).single());if(!member.active||!checked(await db.rpc('my_portal_access_allowed')))throw Error('Your portal access is not active.');await initializeAccountLanguage(db);me={id:member.user_id,email:member.email,role:member.is_admin?'admin':'client'};
  const members=member.is_admin?checked(await db.from('portal_members').select('user_id,email,is_admin,active').eq('active',true)):[member];config={products,users:members.map(m=>({id:m.user_id,email:m.email,role:m.is_admin?'admin':'client'}))};profiles=await api('/api/profiles');
