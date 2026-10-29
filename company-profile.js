@@ -1,6 +1,6 @@
 import {individualFields,isIndividual,individualParty,mountIdentity} from './individual-profile.js?v=20261029-whatsapp1';
 import {mountLanguagePreference} from './portal-language.js?v=20261029-whatsapp1';
-import {mountCounterpartyRole} from './counterparty-role.js?v=20261028-privacy1';
+import {mountCounterpartyRole} from './counterparty-role.js?v=20261029-reps1';
 import {initSigningImages} from './signing-images.js?v=20261022-live2';
 export const companyFields=[['B_COMPANY','Legal company name',100,true],['B_REGISTRATION','Company registration number',60,true],['B_ADDRESS','Registered address',150,true],['B_COUNTRY','Country of incorporation',60,true],['B_REPRESENTATIVE','Authorized representative',80,true],['B_TITLE','Position / title',80,true],['B_PHONE','Telephone',50,true],['B_WHATSAPP','WhatsApp number with country code',32,false],['B_EMAIL','Business email',100,true],['B_WEBSITE','Website',100,false]];
 const $=id=>document.getElementById(id);
@@ -27,10 +27,15 @@ export async function initCompanyProfile({db,member,check,action,message}){
  });});
  $('company-profile-refresh').addEventListener('click',()=>action($('company-profile-refresh'),()=>refresh(true)));
  await refresh();
+ const repPanel=element('section'),repHeading=element('h3','Company representatives & signing authority'),repLink=element('a','Manage representatives & signing authority');repLink.href='company-representatives.html';repLink.className='button secondary';repPanel.append(repHeading,repLink);form.parentElement.append(repPanel);
+ const repContext=check(await db.rpc('company_representation_context'));
+ for(const company of repContext.companies.filter(c=>c.representatives.some(r=>r.user_id===member.user_id&&r.active))){const item=element('p',company.details.B_COMPANY+' — '+company.representatives.filter(r=>r.active).map(r=>r.name+' ('+r.title+')').join(' · '));repPanel.prepend(item)}
+ if(profile&&repContext.companies.some(c=>c.id===profile.id&&c.rule)){for(const control of form.elements)control.disabled=true;repPanel.prepend(element('p','Manage this shared company profile and its representatives in the workspace below. Personal signatures and login addresses remain separate.'));}
+
  if(isIndividual(profile?.details))await mountIdentity({db,container:form.parentElement,userId:member.user_id,message});
  mountLanguagePreference({db,container:form.parentElement,message});
  await mountCounterpartyRole({db,userId:member.user_id,container:form.parentElement,message,individual:isIndividual(profile?.details)});
  await initSigningImages({db,container:form.parentElement,message,onChange:()=>refresh(true)});
  return {getProfile:()=>profile,refresh,subscribe:listener=>listeners.push(listener)};
 }
-export {loadCompanyAdmin} from './company-management.js?v=20261029-whatsapp1';
+export {loadCompanyAdmin} from './company-management.js?v=20261029-reps1';

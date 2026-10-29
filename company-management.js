@@ -1,4 +1,4 @@
-import {companyFields} from './company-profile.js?v=20261029-whatsapp1';
+import {companyFields} from './company-profile.js?v=20261029-reps1';
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
 let savedSearch='',savedFilter='current';
 export async function loadCompanyAdmin({db,check,action,message,members}){
@@ -27,6 +27,7 @@ export async function loadCompanyAdmin({db,check,action,message,members}){
     try{const result=await work();await reload();announce(result);}catch(error){feedback.textContent=error.message||'Unable to save. Refresh the company list and try again.';button.disabled=false;}
    }
    function button(label,handler,cls='secondary'){const b=el('button',label,cls);b.type='button';b.addEventListener('click',()=>handler(b));buttons.append(b);return b;}
+   const repLink=el('a','Manage representatives & signing authority','button secondary');repLink.href='company-representatives.html?company='+c.id;if(c.details.ACCOUNT_TYPE!=='individual')panel.append(repLink);
    const edit=el('details',undefined,'company-editor');edit.hidden=state==='archived';edit.append(el('summary','Edit company details'));
    const form=el('form'),grid=el('div',undefined,'nda-fields');
    for(const [key,label,max,required] of companyFields){const wrap=el('div'),l=el('label',label+(required?'':' (optional)')),input=el('input');input.id='admin-'+c.id+'-'+key;input.name=key;l.htmlFor=input.id;input.maxLength=max;input.required=required;input.value=c.details[key]||'';if(key==='B_EMAIL')input.type='email';if(key==='B_WHATSAPP'){input.type='tel';input.dir='ltr';input.placeholder='+31 …';input.pattern=String.raw`[+][0-9\x20\x28\x29\x2d]{5,31}`;}wrap.append(l,input);grid.append(wrap);}
@@ -46,7 +47,7 @@ export async function loadCompanyAdmin({db,check,action,message,members}){
  }
  search.addEventListener('input',()=>{savedSearch=search.value;render();});filter.addEventListener('change',()=>{savedFilter=filter.value;render();});render();
  if(companies.length){
-  const links=el('details',undefined,'company-links');links.append(el('summary','Manage company users'));links.append(el('p','Link existing portal users to a company. Paused and archived companies block linked client access. Changing a company link can change access to its profile and saved stamp.'));
+  const links=el('details',undefined,'company-links');links.append(el('summary','Advanced: primary profile links'));links.append(el('p','For company representatives, use Manage representatives & signing authority above. This separate setting changes the primary company profile of an account and is not a representative relationship. Paused and archived companies block linked client access.'));
   for(const person of members.filter(m=>!m.is_admin)){
    const row=el('div',undefined,'member'),label=el('label',person.email),select=el('select');select.setAttribute('aria-label','Company for '+person.email);const blank=el('option','No company linked');blank.value='';select.append(blank);const current=mappings.find(m=>m.user_id===person.user_id)?.company_id||'';
    for(const c of companies.filter(c=>c.access_state!=='archived'||c.id===current)){const option=el('option',c.details.B_COMPANY+' · '+(c.access_state||'active'));option.value=c.id;select.append(option);}select.value=current;label.append(select);row.append(label);

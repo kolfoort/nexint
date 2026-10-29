@@ -1,5 +1,6 @@
+import {getLanguage} from './portal-language.js?v=20261029-whatsapp1';
 export async function mountCounterpartyRole({db,userId,container,message,individual=false}){
- if(individual){const p=document.createElement('p');p.textContent='Private individual · Introducer / Broker';container.append(p);return;}
+ if(individual){const p=document.createElement('p');p.textContent=({en:'Personal account · Broker / Introducer in a personal capacity. Any company representation is recorded separately.',nl:'Persoonlijk account · Broker / Introducer op persoonlijke titel. Eventuele bedrijfsvertegenwoordiging wordt afzonderlijk vastgelegd.',de:'Persönliches Konto · Vermittler/Broker in persönlicher Eigenschaft. Eine Unternehmensvertretung wird gesondert erfasst.',es:'Cuenta personal · Intermediario/Broker a título personal. La representación de una empresa se registra por separado.',ar:'حساب شخصي · وسيط بصفة شخصية. يُسجَّل تمثيل الشركة، إن وجد، بشكل منفصل.'})[getLanguage()];container.append(p);return;}
  const labels={introducer_broker:'Introducer / Broker',end_buyer_user:'End Buyer / End User',jv_partner:'JV Partner',trader_reseller:'Trader / Reseller',supplier_seller:'Supplier / Seller'};
  const form=document.createElement('form');form.className='counterparty-role';
  const heading=document.createElement('h3');heading.textContent='Counterparty type';

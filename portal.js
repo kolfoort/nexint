@@ -5,7 +5,7 @@ import {prepareDocumentPreview,setDocumentAccess} from './document-sharing.js?v=
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
 import {loadAssignedDocuments} from './shared-documents.js?v=20261022-viewrights1';
 import {initClientFile,loadClientFile} from './client-file.js?v=20261029-whatsapp1';
-import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261029-whatsapp1';
+import {initCompanyProfile,loadCompanyAdmin} from './company-profile.js?v=20261029-reps1';
 import { config } from './portal-config.js';
 
 const $ = id => document.getElementById(id);

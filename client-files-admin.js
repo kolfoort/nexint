@@ -4,13 +4,13 @@ import {individualFields,isIndividual,individualParty,mountIdentity} from './ind
 import {loadClientRequests} from './client-requests.js?v=20261028-adminnav2';
 import {initializeAccountLanguage,languageSelect} from './portal-language.js?v=20261029-whatsapp1';
 import {mountMCNDAApprovals} from './mcnda-approval.js?v=20261029-whatsapp1';
-import {mountCounterpartyRole} from './counterparty-role.js?v=20261028-privacy1';
+import {mountCounterpartyRole} from './counterparty-role.js?v=20261029-reps1';
 import {mountJVAdmin} from './jv-client-file.js?v=20261029-whatsapp1';
 import {mountFCOAdmin} from './fco-client-file.js?v=20261029-whatsapp1';
 import {mountSPAAdmin} from './spa-client-file.js?v=20261029-whatsapp1';
 import {prepareDocumentPreview,setDocumentAccess} from './document-sharing.js?v=20261022-viewrights1';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
-import {companyFields} from './company-profile.js?v=20261029-whatsapp1';
+import {companyFields} from './company-profile.js?v=20261029-reps1';
 import {config} from './portal-config.js';
 const $=id=>document.getElementById(id),escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const check=r=>{if(r.error)throw r.error;return r.data};let db,people=[],selected,version=0,companyNameByUser=new Map();
 function message(t){$('status').textContent=t;$('status').hidden=!t}function email(id){return people.find(p=>p.user_id===id)?.email||'Account unavailable'}
@@ -35,6 +35,7 @@ async function refresh(){closePdfPreview();const tick=++version,id=selected;$('c
  function viewFile(view){requestsSection.hidden=view!=='requests';offersSection.hidden=view!=='offers';overview.hidden=view!=='overview';sections.forEach((section,i)=>section.hidden=!(view==='company'?[0,1].includes(i):view==='agreements'?[2,3].includes(i):view==='documents'?i===4:false));for(const b of tabs.children){b.classList.toggle('active',b.dataset.view===view);b.setAttribute('aria-selected',String(b.dataset.view===view))}}
  for(const [key,label] of [['overview','Overview'],['company','Company profile'],['documents','Documents'],['agreements','Agreements'],['offers','Offers'],['requests','Requests']]){const b=document.createElement('button');b.type='button';b.dataset.view=key;b.textContent=label;b.onclick=()=>viewFile(key);tabs.append(b)}file.prepend(tabs,overview);overview.querySelectorAll('[data-dossier-go]').forEach(b=>b.onclick=()=>viewFile(b.dataset.dossierGo));viewFile('overview');
  await loadClientRequests({db,member:{user_id:id},admin:true,isCurrent:()=>tick===version});if(tick!==version)return;
+ const representativeLink=document.createElement('a');representativeLink.href='company-representatives.html'+(profile&&!isIndividual(d)?'?company='+profile.id:'');representativeLink.className='button secondary';representativeLink.textContent='Company representatives & signing authority';sections[0].append(representativeLink);
  if(isIndividual(d))await mountIdentity({db,container:sections[0],userId:id,message});
  const languageResult=await db.rpc('admin_client_language',{p_user_id:id});const clientLanguage=check(languageResult);if(tick!==version)return;
  const languagePanel=document.createElement('section');languagePanel.className='language-preference';languagePanel.innerHTML='<h3>Portal &amp; email language</h3><p>Language changes apply to the portal and future emails. Existing documents and signatures remain unchanged.</p><form><label for="admin-client-language">Portal &amp; email language</label><div class="language-select-slot"></div><p>All documents, agreements, offers and SPAs remain in English. English is the working language of Nexora International.</p><button type="submit" class="secondary">Save language</button></form>';
