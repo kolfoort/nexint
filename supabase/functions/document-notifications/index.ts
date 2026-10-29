@@ -33,7 +33,7 @@ Deno.serve(async req=>{
  const n=data[0];const update=async(values:Record<string,unknown>)=>{const {error}=await db.from('portal_document_notifications').update(values).eq('id',n.id).eq('lease',n.lease);if(error)throw error;};
  let mail;let stage="recipient";
  try{
-  stage='delivery_context';const {data:context,error:contextError}=await db.rpc('document_notification_context',{p_id:n.id,p_lease:n.lease});if(contextError)throw contextError;const visible=context?.allowed===true,url=context?.url||'https://nexint.eu/documents.html',needsSignature=context?.needs_signature===true;
+  stage='delivery_context';const {data:context,error:contextError}=await db.rpc(n.kind==='mcnda_multi'?'multi_mcnda_delivery_context':'document_notification_context',{p_id:n.id,p_lease:n.lease});if(contextError)throw contextError;const visible=context?.allowed===true,url=context?.url||'https://nexint.eu/documents.html',needsSignature=context?.needs_signature===true;
   if(!visible){await update({skipped_at:new Date().toISOString(),leased_at:null,last_error:'Access withdrawn or item no longer awaits action'});return new Response('No longer applicable');}
   stage='smtp_configuration';const password=Deno.env.get('NEXORA_SMTP_PASSWORD');if(!password)throw Error('SMTP unavailable');
   mail=nodemailer.createTransport({host:'smtp.transip.email',port:465,secure:true,auth:{user:'info@nexint.eu',pass:password},connectionTimeout:10000,greetingTimeout:10000,socketTimeout:15000,tls:{minVersion:'TLSv1.2',rejectUnauthorized:true}});

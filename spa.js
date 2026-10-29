@@ -1,6 +1,6 @@
-import {ensurePortalSecurity} from './portal-security.js?v=20261029-mfa1';
-import {confirmAgreement,hashPDF} from './signing-confirmation.js?v=20261029-all-signatures2';
-import {initializeAccountLanguage} from './portal-language.js?v=20261029-mfa1';
+import {ensurePortalSecurity} from './portal-security.js?v=20261029-multi1';
+import {confirmAgreement,hashPDF} from './signing-confirmation.js?v=20261029-multi1';
+import {initializeAccountLanguage} from './portal-language.js?v=20261029-multi1';
 import {config as portalConfig} from './portal-config.js';
 import {initSigningImages} from './signing-images.js?v=20261022-live2';
 import {products} from './spa-products.js?v=20261023-offers1';

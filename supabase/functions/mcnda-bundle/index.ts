@@ -1,0 +1,38 @@
+import {createClient} from 'npm:@supabase/supabase-js@2.102.0';
+import {PDFDocument,StandardFonts,rgb} from 'npm:pdf-lib@1.17.1';
+const db=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,{auth:{persistSession:false}});
+const decode=(s:string)=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+function encode(b:Uint8Array){let s='';for(let i=0;i<b.length;i+=8192)s+=String.fromCharCode(...b.subarray(i,i+8192));return btoa(s)}
+Deno.serve(async req=>{
+ const origin=req.headers.get('origin'),headers={'Access-Control-Allow-Origin':origin&&['https://nexint.eu','https://www.nexint.eu'].includes(origin)?origin:'https://nexint.eu','Access-Control-Allow-Headers':'authorization,apikey,content-type,x-client-info,x-portal-authorization','Access-Control-Allow-Methods':'POST,OPTIONS','Vary':'Origin','Cache-Control':'no-store'};
+ const response=(status:number,data:Record<string,unknown>)=>Response.json(data,{status,headers});
+ if(origin&&!['https://nexint.eu','https://www.nexint.eu'].includes(origin))return response(403,{error:'Origin not allowed'});
+ if(req.method==='OPTIONS')return new Response(null,{status:204,headers});if(req.method!=='POST')return response(405,{error:'POST required'});
+ let body;try{const raw=await req.text();if(raw.length>500)return response(413,{error:'Too large'});body=JSON.parse(raw);if(typeof body.id!=='string'||!/^[0-9a-f-]{36}$/i.test(body.id))throw Error()}catch{return response(400,{error:'Invalid agreement'})}
+ let actor:string,jobLease:string|null=null;
+ if(body.job_token!==undefined){
+  if(typeof body.job_token!=='string'||!/^[0-9a-f]{64}$/.test(body.job_token))return response(403,{error:'Invalid job'});
+  const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(body.job_token)))).map(x=>x.toString(16).padStart(2,'0')).join('');
+  const job=await db.rpc('claim_multi_mcnda_bundle',{p_id:body.id,p_token_hash:digest});if(job.error||!job.data)return response(403,{error:'Job unavailable'});actor=job.data.signer;jobLease=job.data.lease;
+ }else{
+  const jwt=req.headers.get('x-portal-authorization')?.replace(/^Bearer /i,'');if(!jwt)return response(401,{error:'Sign in required'});
+  const auth=await db.auth.getUser(jwt);if(auth.error||!auth.data.user)return response(401,{error:'Sign in required'});
+  const sessionDb=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_ANON_KEY')!,{global:{headers:{Authorization:'Bearer '+jwt}},auth:{persistSession:false}});const security=await sessionDb.rpc('my_portal_security');if(security.error||!security.data?.active||!security.data?.admin||!security.data?.allowed)return response(403,{error:'MFA_REQUIRED'});actor=auth.data.user.id;
+ }
+ const input=await db.rpc('multi_mcnda_bundle_input',{p_id:body.id,p_actor:actor});if(input.error)return response(403,{error:'All confirmed signatures and explicit Nexora approval required'});
+ const {version,signatures,audit_checkpoint}=input.data;if(version.status==='completed')return response(200,{completed:true,hash:version.final_hash});
+ try{
+  const pdf=await PDFDocument.load(decode(version.content_pdf));const originalPages=pdf.getPageCount();const stampResult=await db.from('commission_assets').select('png_base64').eq('name','stamp').maybeSingle();const stamp=stampResult.data?.png_base64;const font=await pdf.embedFont(StandardFonts.Helvetica),bold=await pdf.embedFont(StandardFonts.HelveticaBold),navy=rgb(0,32/255,64/255),gold=rgb(189/255,154/255,69/255);let page=pdf.addPage([595.28,841.89]),y=777;
+  function heading(){page.drawText('NEXORA INTERNATIONAL',{x:43,y:815,size:9,font:bold,color:navy});page.drawLine({start:{x:43,y:803},end:{x:552,y:803},thickness:.7,color:gold});page.drawText('EXECUTION RECORDS',{x:43,y:778,size:14,font:bold,color:navy});y=754}
+  function para(s:string,size=8.5,b=false){const f=b?bold:font;let line='';const lines:string[]=[];for(const word of String(s).split(/\s+/)){if(f.widthOfTextAtSize((line?line+' ':'')+word,size)<=509){line+=(line?' ':'')+word;continue}if(line){lines.push(line);line=''}for(const ch of word){if(f.widthOfTextAtSize(line+ch,size)>509){lines.push(line);line=''}line+=ch}}if(line)lines.push(line);for(const l of lines){page.drawText(l,{x:43,y,size,font:f,color:navy});y-=12}}
+  heading();para('Agreement version: '+version.revision+' | '+version.id);para('Accepted agreement content SHA-256: '+version.content_hash,7);para('The preceding agreement content is unchanged. These records document each separately confirmed electronic acceptance.');y-=14;
+  for(const s of signatures){if(y<310){page=pdf.addPage([595.28,841.89]);heading()}
+   para(s.party.legal_name,10,true);para('Signatory: '+s.signer_name);para('Capacity: '+s.capacity);para('Account: '+s.user_id+' | '+s.email_confirmation.account_email,7.5);para('Accepted at (UTC): '+s.accepted_at);para('Email code confirmed at (UTC): '+s.email_confirmation.confirmed_at);para('Confirmation reference: '+s.email_confirmation.confirmation_id,7.5);para('Signature record SHA-256: '+s.record_hash,7);const image=await pdf.embedPng(decode(s.signature_png)),scale=Math.min(220/image.width,55/image.height);page.drawImage(image,{x:43,y:y-62,width:image.width*scale,height:image.height*scale});if(s.party.is_nexora&&stamp){const img=await pdf.embedPng(decode(stamp.split(',').pop()!)),k=Math.min(100/img.width,65/img.height);page.drawImage(img,{x:420,y:y-65,width:img.width*k,height:img.height*k})}y-=82;
+  }
+  if(y<140){page=pdf.addPage([595.28,841.89]);heading()}
+  para('Audit checkpoint before packaging: '+audit_checkpoint,7);para('The portal retains the immutable accepted content, signatures, confirmation records and version history. The separate evidence export includes subsequent packaging and delivery events.');para('This ordinary electronic signing process is not represented as a qualified electronic signature. Passport copies and confirmation codes are not included.');
+  const total=pdf.getPageCount();for(let i=originalPages;i<total;i++){const p=pdf.getPages()[i];p.drawText('NEXORA INTERNATIONAL | MCNDA | EXECUTION EVIDENCE',{x:43,y:20,size:7,font,color:navy});p.drawText(String(i+1)+' / '+total,{x:520,y:20,size:7,font,color:navy})}
+  pdf.setTitle('Nexora International MCNDA | revision '+version.revision+' | fully signed');pdf.setSubject(version.template_version+'|'+version.content_hash);const bytes=await pdf.save();
+  const done=await db.rpc('multi_mcnda_finish_bundle',{p_id:version.id,p_actor:actor,p_content_hash:version.content_hash,p_pdf:encode(bytes)});if(done.error)throw done.error;return response(200,done.data);
+ }catch{if(jobLease)await db.rpc('fail_multi_mcnda_bundle',{p_id:body.id,p_lease:jobLease});return response(503,{error:'Signatures are preserved. Final PDF packaging is pending; retry from the MCNDA page.'})}
+});

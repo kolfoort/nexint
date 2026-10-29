@@ -1,5 +1,5 @@
-import {ensurePortalSecurity} from './portal-security.js?v=20261029-mfa1';
-import {languageSelect,setLanguage,getLanguage,initializeAccountLanguage} from './portal-language.js?v=20261029-mfa1';
+import {ensurePortalSecurity} from './portal-security.js?v=20261029-multi1';
+import {languageSelect,setLanguage,getLanguage,initializeAccountLanguage} from './portal-language.js?v=20261029-multi1';
 import {config} from '/portal-config.js';
 const $=s=>document.querySelector(s),form=$('#request'),kind=document.documentElement.dataset.requestKind||'product',marine=kind==='marine';
 const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2.102.0');

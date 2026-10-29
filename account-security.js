@@ -1,12 +1,12 @@
 import {config} from './portal-config.js';
-import {getLanguage,setLanguage} from './portal-language.js?v=20261029-mfa1';
-import {securityCopy} from './account-security-copy.js?v=20261029-mfa1';
+import {getLanguage,setLanguage} from './portal-language.js?v=20261029-multi1';
+import {securityCopy} from './account-security-copy.js?v=20261029-multi1';
 const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2.102.0');
 const db=createClient(config.url,config.publishableKey,{auth:{storage:sessionStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const root=document.getElementById('security-root'),make=(tag,text)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;return e};
 let t=securityCopy[getLanguage()]||securityCopy.en,status,busy=false,setup=null;
 const check=r=>{if(r.error)throw r.error;return r.data};
-function destination(){try{const url=new URL(new URL(location.href).searchParams.get('return')||'documents.html',location.origin);if(url.origin!==location.origin||!/^\/(?:documents|document-admin|client-files|admin-home|commission-agreements|spa-agreements|jv-agreements|fco-agreements|quote-requests|company-profile|set-password)\.html$/.test(url.pathname))return '/documents.html';return url.pathname+url.search+url.hash}catch{return '/documents.html'}}
+function destination(){try{const url=new URL(new URL(location.href).searchParams.get('return')||'documents.html',location.origin);if(url.origin!==location.origin||!/^\/(?:documents|document-admin|client-files|admin-home|commission-agreements|spa-agreements|jv-agreements|fco-agreements|quote-requests|company-profile|set-password|mcnda-agreements)\.html$/.test(url.pathname))return '/documents.html';return url.pathname+url.search+url.hash}catch{return '/documents.html'}}
 function button(text,fn,secondary=false){const b=make('button',text);b.type='button';if(secondary)b.className='secondary';b.onclick=()=>run(fn);return b}
 async function run(fn){if(busy)return;busy=true;const controls=[...root.querySelectorAll('button,input,select')];controls.forEach(e=>e.disabled=true);status.textContent=t.working;try{await fn()}catch{status.textContent=t.error}finally{busy=false;controls.filter(e=>e.isConnected).forEach(e=>e.disabled=false)}}
 function actions(...buttons){const row=make('div');row.className='actions';row.append(...buttons);return row}

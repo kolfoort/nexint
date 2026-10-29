@@ -1,5 +1,5 @@
 import {config} from './portal-config.js?v=20261029-all-signatures2';
-import {getLanguage} from './portal-language.js?v=20261029-mfa1';
+import {getLanguage} from './portal-language.js?v=20261029-multi1';
 
 const copy={
  en:['Confirm your MCNDA signature','Send a one-time code to your registered email address. The code confirms only the exact document you have reviewed.','Send confirmation code','Confirmation code','Confirm and continue','Cancel','The code has been sent. It is valid for 10 minutes.','The code is incorrect, expired or already used. Request a new code if needed.','Wait at least one minute between requests. A maximum of five codes per document per hour is allowed.','Unable to send the code. Please try again later.','Send a new code','Document reference','This email confirmation is not a qualified electronic signature.'],
@@ -39,7 +39,7 @@ export async function confirmSigning({db,purpose,documentId,pdfHash,revision,rev
   };
   form.onsubmit=async e=>{
    e.preventDefault();if(busy||!challenge||(reviewed&&!reviewed.checked)||!form.reportValidity())return;busy=true;verify.disabled=true;send.disabled=true;cancel.disabled=true;
-   try{const r=await db.rpc('verify_signing_confirmation',{p_id:challenge,p_code:input.value.trim()});input.value='';if(r.error||!r.data?.verified){status.textContent=t[7];return}close(r.data)}
+   try{const r=await db.rpc(purpose==='mcnda_multi'?'verify_multi_mcnda_confirmation':'verify_signing_confirmation',{p_id:challenge,p_code:input.value.trim()});input.value='';if(r.error||!r.data?.verified){status.textContent=t[7];return}close(r.data)}
    catch{status.textContent=t[7]}finally{busy=false;verify.disabled=false;cancel.disabled=false;send.disabled=Date.now()<retryAt||!!(reviewed&&!reviewed.checked);if(!closed)input.focus()}
   };
  });

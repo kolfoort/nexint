@@ -1,5 +1,6 @@
-import {ensurePortalSecurity} from './portal-security.js?v=20261029-mfa1';
-import {initializeAccountLanguage,setLanguage} from './portal-language.js?v=20261029-mfa1';
+import {mountMultiMCNDAList} from './mcnda-multi-list.js?v=20261029-multi1';
+import {ensurePortalSecurity} from './portal-security.js?v=20261029-multi1';
+import {initializeAccountLanguage,setLanguage} from './portal-language.js?v=20261029-multi1';
 import {prepareDocumentPreview,setDocumentAccess} from './document-sharing.js?v=20261022-viewrights1';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
 import {loadAssignedDocuments} from './shared-documents.js?v=20261022-viewrights1';
@@ -46,6 +47,7 @@ async function loadDocuments() {
   documents = data;
   renderDocuments();
   if(page==='documents')await loadClientFile({db,member,company:companyContext});
+    await mountMultiMCNDAList({db,container:document.querySelector('[data-file-view="agreements"]'),userId:member.user_id});
 }
 async function downloadPDF(bucket, path, title) {
   const blob = check(await db.storage.from(bucket).download(path));
@@ -77,6 +79,7 @@ async function loadSubmissions() {
     mcndaAssignments=check(await db.from('portal_mcnda_assignments').select('*').order('assigned_at',{ascending:false}));
     renderMcndaStatus();
     await loadClientFile({db,member,company:companyContext});
+    await mountMultiMCNDAList({db,container:document.querySelector('[data-file-view="agreements"]'),userId:member.user_id});
   } else renderSubmissions($('incoming-list'),true);
 }
 function renderMcndaStatus() {

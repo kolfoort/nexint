@@ -1,7 +1,8 @@
-import {ensurePortalSecurity} from './portal-security.js?v=20261029-mfa1';
+import {mountMultiMCNDAList} from './mcnda-multi-list.js?v=20261029-multi1';
+import {ensurePortalSecurity} from './portal-security.js?v=20261029-multi1';
 import {individualFields,isIndividual,individualParty,mountIdentity} from './individual-profile.js?v=20261028-privacy1';
 import {loadClientRequests} from './client-requests.js?v=20261028-adminnav2';
-import {initializeAccountLanguage,languageSelect} from './portal-language.js?v=20261029-mfa1';
+import {initializeAccountLanguage,languageSelect} from './portal-language.js?v=20261029-multi1';
 import {mountMCNDAApprovals} from './mcnda-approval.js?v=20261029-all-signatures2';
 import {mountCounterpartyRole} from './counterparty-role.js?v=20261028-privacy1';
 import {mountJVAdmin} from './jv-client-file.js?v=20261027-allreview2';
@@ -40,6 +41,7 @@ async function refresh(){closePdfPreview();const tick=++version,id=selected;$('c
  const clientLanguageSelect=languageSelect(clientLanguage||'','admin-client-language');languagePanel.querySelector('.language-select-slot').append(clientLanguageSelect);sections[0].append(languagePanel);
  languagePanel.querySelector('form').onsubmit=e=>{e.preventDefault();if(!clientLanguageSelect.reportValidity())return;action(e.target.querySelector('button'),async()=>{check(await db.rpc('admin_save_client_language',{p_user_id:id,p_language:clientLanguageSelect.value,p_expected_language:clientLanguage}));await refresh();viewFile('company');message('Language saved.');})};
  await mountCounterpartyRole({db,userId:id,container:sections[0],message,individual:isIndividual(d)});
+ await mountMultiMCNDAList({db,container:sections[3],userId:id,admin:true});
  for(const recipient of signers)await mountMCNDAApprovals({db,recipient,container:sections[3],admin:true,message});
  await mountSPAAdmin({db,clientId:id,section:sections[3],overview,createAfter:$('create-fee')});
  await mountJVAdmin({db,clientId:id,section:sections[3],overview,createAfter:$('create-fee')});
@@ -54,10 +56,10 @@ await mountFCOAdmin({db,clientId:id,section:offersSection,overview,createAfter:d
  $('broker-link').onsubmit=e=>{e.preventDefault();action(e.target.querySelector('button'),async()=>{check(await db.rpc('link_client_broker',{p_client:id,p_broker:e.target.elements.broker.value,p_active:true}));await refresh();viewFile('company');message('Broker linked to client file.')})};
  document.querySelectorAll('[data-unlink]').forEach(b=>b.onclick=()=>action(b,async()=>{check(await db.rpc('link_client_broker',{p_client:id,p_broker:b.dataset.unlink,p_active:false}));await refresh();viewFile('company');message('Broker unlinked. Agreement history is retained.')}));
  function mcndaRecords(){return nda.filter(a=>a.user_id===$('signer').value&&(a.client_user_id===id||(!a.client_user_id&&a.user_id===id)))}
- function updateMcndaAction(){const records=mcndaRecords(),signed=records.find(a=>a.status==='completed'),pending=records.find(a=>a.status==='assigned'),draft=records.find(a=>a.status==='draft_review');$('assign-mcnda').hidden=!!(signed||pending);$('review-mcnda').hidden=!!(signed||pending);$('review-mcnda').textContent=draft?'Withdraw MCNDA draft review access':'Assign MCNDA draft for review';$('mcnda-assignment-state').textContent=signed?'MCNDA signed.':pending?'MCNDA released — awaiting signature.':draft?'MCNDA draft assigned for read-only review. Signing is not enabled.':'No MCNDA assigned.';}
+ function updateMcndaAction(){const draft=mcndaRecords().find(a=>a.status==='draft_review');$('assign-mcnda').hidden=false;$('assign-mcnda').textContent='New standard MCNDA · one or multiple parties';$('review-mcnda').hidden=!draft;$('review-mcnda').textContent='Withdraw earlier MCNDA draft';$('mcnda-assignment-state').textContent='New agreements use the shared MCNDA workspace. Existing earlier requests and signed records are retained.';}
  $('signer').onchange=updateMcndaAction;updateMcndaAction();
- $('review-mcnda').onclick=e=>action(e.target,async()=>{const draft=mcndaRecords().find(a=>a.status==='draft_review');check(await db.rpc('mcnda_review_assignment',draft?{p_action:'withdraw',p_id:draft.id}:{p_action:'share_draft',p_user_id:$('signer').value,p_client_user_id:id}));await refresh();message(draft?'Draft review access withdrawn.':'MCNDA draft assigned for read-only review.');});
- $('assign-mcnda').onclick=e=>action(e.target,async()=>{const draft=mcndaRecords().find(a=>a.status==='draft_review');if(draft)check(await db.rpc('mcnda_review_assignment',{p_action:'release',p_id:draft.id}));else check(await db.rpc('assign_client_mcnda',{p_user_id:$('signer').value,p_client_user_id:id}));await refresh();message('MCNDA assigned to the selected signer. It is available in their client file.')});
+ $('review-mcnda').onclick=e=>action(e.target,async()=>{const draft=mcndaRecords().find(a=>a.status==='draft_review');if(!draft)return;check(await db.rpc('mcnda_review_assignment',{p_action:'withdraw',p_id:draft.id}));await refresh();message('Earlier draft review access withdrawn.');});
+ $('assign-mcnda').onclick=()=>location.assign('mcnda-agreements.html?client='+encodeURIComponent($('signer').value));
  document.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>action(b,async()=>{const draft=nda.find(a=>a.id===b.dataset.cancel&&a.status==='draft_review');check(await db.rpc(draft?'mcnda_review_assignment':'cancel_client_mcnda',draft?{p_action:'withdraw',p_id:draft.id}:{p_id:b.dataset.cancel}));await refresh()}));
  document.querySelectorAll('[data-submission]').forEach(b=>b.onclick=()=>action(b,()=>download('nexora-client-uploads',b.dataset.owner+'/'+b.dataset.submission+'.pdf','MCNDA')));
  document.querySelectorAll('[data-upload]').forEach(b=>b.onclick=()=>action(b,()=>{const x=files.find(x=>x.id===b.dataset.upload);return download('nexora-client-uploads',x.storage_path,x.title)}));
@@ -71,7 +73,7 @@ async function startClientFiles(){
   document.querySelector('main').replaceWith(doc.querySelector('main'));document.querySelector('header + nav#workspace-nav')?.remove();document.body.classList.add('commission-page');
   const style=document.createElement('link');style.rel='stylesheet';style.href='commission.css?v=20261022-live2';document.head.append(style);
   const back=document.createElement('a');back.className='button secondary';back.textContent='Back to client file';back.href='client-files.html?client='+encodeURIComponent(new URLSearchParams(location.search).get('client')||'');document.querySelector('main').prepend(back);
-  await import('./commission.js?v=20261029-mfa1');
+  await import('./commission.js?v=20261029-multi1');
  }else{await init();document.getElementById('workspace-nav').hidden=false;}
 }
 startClientFiles().catch(e=>{const box=document.getElementById('status')||document.getElementById('message');box.textContent=e.message||'Could not load client file.';box.hidden=false;});

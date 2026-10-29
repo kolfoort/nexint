@@ -1,5 +1,5 @@
-import {getLanguage} from './portal-language.js?v=20261029-mfa1';
-import {securityCopy} from './account-security-copy.js?v=20261029-mfa1';
+import {getLanguage} from './portal-language.js?v=20261029-multi1';
+import {securityCopy} from './account-security-copy.js?v=20261029-multi1';
 const watched=new WeakSet();
 export function securityDestination(){
  const destination=location.pathname+location.search+location.hash;
