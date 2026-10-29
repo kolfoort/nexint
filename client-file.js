@@ -1,5 +1,5 @@
 import {loadClientRequests} from './client-requests.js?v=20261028-clientnav1';
-import {mountMCNDAApprovals} from './mcnda-approval.js?v=20261027-mcndafinal1';
+import {mountMCNDAApprovals} from './mcnda-approval.js?v=20261029-all-signatures2';
 import {loadJVClientSummary} from './jv-client-file.js?v=20261027-allreview2';
 import {loadFCOClientSummary} from './fco-client-file.js?v=20261027-allreview2';
 import {loadSPAClientSummary} from './spa-client-file.js?v=20261027-allreview2';

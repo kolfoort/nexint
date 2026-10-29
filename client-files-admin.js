@@ -1,7 +1,7 @@
 import {individualFields,isIndividual,individualParty,mountIdentity} from './individual-profile.js?v=20261028-privacy1';
 import {loadClientRequests} from './client-requests.js?v=20261028-adminnav2';
 import {initializeAccountLanguage,languageSelect} from './portal-language.js?v=20261028-auth-flags';
-import {mountMCNDAApprovals} from './mcnda-approval.js?v=20261027-mcndafinal1';
+import {mountMCNDAApprovals} from './mcnda-approval.js?v=20261029-all-signatures2';
 import {mountCounterpartyRole} from './counterparty-role.js?v=20261028-privacy1';
 import {mountJVAdmin} from './jv-client-file.js?v=20261027-allreview2';
 import {mountFCOAdmin} from './fco-client-file.js?v=20261027-allreview2';
@@ -70,7 +70,7 @@ async function startClientFiles(){
   document.querySelector('main').replaceWith(doc.querySelector('main'));document.querySelector('header + nav#workspace-nav')?.remove();document.body.classList.add('commission-page');
   const style=document.createElement('link');style.rel='stylesheet';style.href='commission.css?v=20261022-live2';document.head.append(style);
   const back=document.createElement('a');back.className='button secondary';back.textContent='Back to client file';back.href='client-files.html?client='+encodeURIComponent(new URLSearchParams(location.search).get('client')||'');document.querySelector('main').prepend(back);
-  await import('./commission.js?v=20261028-lang1');
+  await import('./commission.js?v=20261029-all-signatures2');
  }else{await init();document.getElementById('workspace-nav').hidden=false;}
 }
 startClientFiles().catch(e=>{const box=document.getElementById('status')||document.getElementById('message');box.textContent=e.message||'Could not load client file.';box.hidden=false;});

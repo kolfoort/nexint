@@ -12,3 +12,7 @@ verify_jwt = false
 # Public submission is validated server-side; account actions require a verified JWT.
 # Mail dispatch requires an expiring single-use database token.
 verify_jwt = false
+
+[functions.signing-confirmation]
+# Gateway retains its legacy JWT check; user JWT is verified separately in the handler.
+verify_jwt = true

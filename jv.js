@@ -1,3 +1,4 @@
+import {confirmAgreement,hashPDF} from './signing-confirmation.js?v=20261029-all-signatures2';
 import {initializeAccountLanguage} from './portal-language.js?v=20261028-auth-flags';
 import {config as portalConfig} from './portal-config.js';
 import {initSigningImages} from './signing-images.js?v=20261022-live2';
@@ -75,19 +76,20 @@ async function getTemplate(){if(!templateCache.has(current.template_version))tem
 async function previewJV(){
  const id=current.id,revision=current.revision;let bytes;
  if(current.status==='completed'){const row=checked(await db.from('jv_final_pdfs').select('pdf_base64,pdf_sha256').eq('agreement_id',id).single());bytes=Uint8Array.from(atob(row.pdf_base64),c=>c.charCodeAt(0))}
- else{let assets=null;if(me.role==='client'&&current.status==='awaiting_client'){assets=signingProfile?.get();if(!assets?.signature||!assets?.stamp)throw Error('Open Review & signatures, save your private signature and stamp, then preview the JV.')}const proof=checked(await db.rpc('jv_review',{p_id:id,p_revision:revision,p_asset_version:assets?.version||null}));bytes=await createJVPDF(current,await getTemplate(),null,assets,proof);if(current.id!==id||current.revision!==revision)throw Error('Agreement changed; review again.');reviewEvidence=proof}
+ else{let assets=null;if(me.role==='client'&&current.status==='awaiting_client'){assets=signingProfile?.get();if(!assets?.signature||!assets?.stamp)throw Error('Open Review & signatures, save your private signature and stamp, then preview the JV.')}const proof=checked(await db.rpc('jv_review',{p_id:id,p_revision:revision,p_asset_version:assets?.version||null}));bytes=await createJVPDF(current,await getTemplate(),null,assets,proof);if(current.id!==id||current.revision!==revision)throw Error('Agreement changed; review again.');const pdfHash=await hashPDF(bytes);if(current?.id!==id||current.revision!==revision)throw Error('Document changed; preview again.');reviewEvidence={...proof,pdfHash}}
  closePreview();pdfUrl=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));$('pdf').src=pdfUrl;$('download').href=pdfUrl;$('download').target='_blank';$('download').rel='noopener';$('preview').hidden=false;$('preview').scrollIntoView({behavior:'smooth'});
 }
 async function signOrApprove(){
  if(!reviewEvidence||reviewEvidence.revision!==current.revision)throw Error('Preview the complete Agreement and both Schedules after your last change, then confirm and sign.');
  if(!$('sign-authority').checked||!$('sign-accept').checked||!$('sign-use_saved_assets').checked)throw Error('Confirm authority, agreement and use of signing images.');
  const expected=me.role==='admin'?'J.P. Kolfoort':current.data.representative;if($('sign-name').value.trim()!==expected)throw Error('Enter the exact authorized name: '+expected);
- if(me.role==='client'){const assets=signingProfile?.get();if(!assets?.signature||!assets?.stamp)throw Error('Save your private signature and company stamp first.');await operation('sign',{name:expected,authority:true,accept:true,use_saved_assets:true,asset_version:assets.version,review_token:reviewEvidence.token,schedules_accepted:true});return}
+ if(me.role==='client'){const assets=signingProfile?.get();if(!assets?.signature||!assets?.stamp)throw Error('Save your private signature and company stamp first.');const confirmation=await confirmAgreement({db,kind:'jv',agreement:current,pdfHash:reviewEvidence.pdfHash,reviewToken:reviewEvidence.token});if(!confirmation)return false;await operation('sign',{...confirmation,name:expected,authority:true,accept:true,use_saved_assets:true,asset_version:assets.version,review_token:reviewEvidence.token,schedules_accepted:true});return}
  if(!confirm('Apply J.P. Kolfoort’s signature and the Nexora stamp to this exact client-signed JV and release the final agreement?'))return false;
  const id=current.id;const assetRows=checked(await db.from('commission_assets').select('name,png_base64'));const assets=Object.fromEntries(assetRows.map(x=>[x.name,x.png_base64]));if(!assets.signature||!assets.stamp)throw Error('Nexora signing images are not configured.');
  await api('/api/agreements/'+id+'/action',{action:'prepare_approval',revision:current.revision,verified:true,review_token:reviewEvidence.token});current=adapt(checked(await db.from('jv_agreements').select('*').eq('id',id).single()));
  const bytes=await createJVPDF(current,await getTemplate(),assets);let binary='';for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));
- await operation('approve',{verified:true,approval_token:current.data.approval_request.token,pdf:btoa(binary)});
+ const confirmation=await confirmAgreement({db,kind:'jv',agreement:current,admin:true,bytes});if(!confirmation)return false;
+ await operation('approve',{...confirmation,verified:true,approval_token:current.data.approval_request.token,pdf:btoa(binary)});
 }
 $('new').onclick=()=>act(async()=>{const recipient=$('new-recipient').value;if(!recipient)throw Error('Select a registered client with a company profile.');const a=await api('/api/agreements',{recipient});tab='parties';closePreview();await load(a.id);message('Private draft created from the selected company profile.')});
 $('close-preview').onclick=closePreview;

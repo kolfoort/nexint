@@ -1,42 +1,12 @@
-import {individualFields,isIndividual,individualParty} from './individual-profile.js?v=20261028-privacy1';
+import {confirmSigning} from './signing-confirmation.js?v=20261029-all-signatures2';
+import {isIndividual,individualParty,individualFields} from './individual-profile.js?v=20261028-nexora-alignment';
 async function blobBase64(blob){const bytes=new Uint8Array(await blob.arrayBuffer());let s='';for(let i=0;i<bytes.length;i+=8192)s+=String.fromCharCode(...bytes.subarray(i,i+8192));return btoa(s)}
-import { PDFDocument, StandardFonts, rgb } from './assets/vendor/pdf-lib.esm.min.js';
-import { companyFields } from './company-profile.js?v=20261028-privacy1';
-import { layout } from './nda-layout.js';
+import { companyFields } from './company-profile.js?v=20261028-nexora-alignment';
 const $=id=>document.getElementById(id);
 let specs=companyFields;
 const dateText=d=>new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Amsterdam',day:'numeric',month:'long',year:'numeric'}).format(d);
-function fit(page,text,font,rect,size=9){let [x,y,r,t]=rect;while(font.widthOfTextAtSize(text,size)>r-x && size>6)size-=.25;if(font.widthOfTextAtSize(text,size)>r-x)throw new Error('A company detail is too long to fit. Please shorten the address or company name.');font.encodeText(text);page.drawText(text,{x,y:y+2,size,font,color:rgb(0,.125,.25)});}
-export async function createNda(values,signature,stamp,{now=new Date(),reference='',email='',loadTemplate,draft=false}={}){
- if(!loadTemplate)throw new Error('The private MCNDA template is not available. Please contact Nexora.');
- const pdf=await PDFDocument.load(await loadTemplate()),font=await pdf.embedFont(StandardFonts.Helvetica),pages=pdf.getPages();
- const day=dateText(now),bold=await pdf.embedFont(StandardFonts.HelveticaBold);
- // Fixed label and value columns, with a shared baseline on every row.
- const first=pages[1];first.drawRectangle({x:42,y:482,width:246,height:99,color:rgb(1,1,1)});
- const rows=isIndividual(values)?[['B_COMPANY','Full name'],['PASSPORT_NUMBER','Passport number'],['B_ADDRESS','Home address'],['B_COUNTRY','Country'],['P_POSTCODE','Postal code'],['P_CITY','City'],['B_PHONE','Telephone'],['B_EMAIL','Email'],['ACCOUNT_TYPE','Capacity']]:[['B_COMPANY','Company'],['B_REGISTRATION','Registration'],['B_ADDRESS','Registered office'],['B_COUNTRY','Country'],['B_REPRESENTATIVE','Representative'],['B_TITLE','Title'],['B_PHONE','Telephone'],['B_EMAIL','Email'],['B_WEBSITE','Website']];
- rows.forEach(([key,label],i)=>{const y=572.239-i*10.85;first.drawText(label,{x:42.6,y,size:7.5,font:bold,color:rgb(0,.125,.25)});fit(first,key==='ACCOUNT_TYPE'?'Private individual / Broker':values[key]||'',font,[122.6,y-2,287,y+8],8);});
- for(const d of layout.dates){pages[d.page].drawRectangle({x:d.x,y:d.y-1,width:d.width,height:d.size+4,color:rgb(1,1,1)});const dateFont=d.page===1?bold:font;let size=d.size;while(dateFont.widthOfTextAtSize(day,size)>d.width)size-=.1;pages[d.page].drawText(day,{x:d.x,y:d.y+1,size,font:dateFont,color:rgb(0,32/255,64/255)});}
- const last=pages[7];
- // Rebuild Party B as a table with equal signature/stamp boxes.
- last.drawRectangle({x:35,y:222,width:510,height:293,color:rgb(1,1,1)});
- last.drawRectangle({x:42.6,y:490,width:488,height:20,color:rgb(0,.125,.25)});
- last.drawText('PARTY B',{x:52.6,y:496,size:9,font:bold,color:rgb(1,1,1)});
- const partyRows=isIndividual(values)?[['Full name','B_COMPANY'],['Home address','B_ADDRESS'],['Passport number','PASSPORT_NUMBER'],['Capacity','PERSONAL_CAPACITY']]:[['Company name','B_COMPANY'],['Registered address','B_ADDRESS'],['Represented by','B_REPRESENTATIVE'],['Title','B_TITLE']];
- partyRows.forEach(([label,key],i)=>{const y=473-i*18;last.drawText(label,{x:42.6,y,size:9,font:bold,color:rgb(0,.125,.25)});fit(last,key==='PERSONAL_CAPACITY'?'Private individual - signing personally':values[key]||'',font,[158,y-2,530,y+10],9);});
- const boxes=isIndividual(values)?[{x:42.6,y:289,w:488,h:95,label:'Personal signature - signing in own capacity'}]:[{x:42.6,y:289,w:235,h:95,label:'Authorized signature'},{x:295.6,y:289,w:235,h:95,label:'Company stamp'}];
- boxes.forEach(box=>{last.drawText(box.label,{x:box.x,y:394,size:8,font:bold,color:rgb(0,.125,.25)});last.drawRectangle({x:box.x,y:box.y,width:box.w,height:box.h,borderWidth:.5,borderColor:rgb(.82,.85,.88)});});
- async function imageIn(data,box){const img=await pdf.embedPng(data),scale=Math.min((box.w-20)/img.width,(box.h-16)/img.height);last.drawImage(img,{x:box.x+(box.w-img.width*scale)/2,y:box.y+(box.h-img.height*scale)/2,width:img.width*scale,height:img.height*scale});}
- if(signature)await imageIn(signature,boxes[0]);
- if(stamp&&boxes[1])await imageIn(stamp,boxes[1]);
- last.drawText('Date',{x:42.6,y:273,size:9,font:bold,color:rgb(0,.125,.25)});
- last.drawText(day,{x:158,y:273,size:9,font,color:rgb(0,.125,.25)});
- last.drawText('Portal reference: '+reference,{x:42.6,y:248,size:7,font,color:rgb(.4,.45,.5)});
- fit(last,'Account: '+email+(draft?' | Preview generated: ':' | Submitted: ')+now.toISOString(),font,[42.6,234,530,246],7);
- last.drawText(draft?'Unsigned preview only. This document has not been signed or submitted.':'Client signed only. Awaiting explicit Nexora final approval and countersignature.',{x:42.6,y:226,size:7,font,color:rgb(.4,.45,.5)});
- if(draft)for(const page of pages)page.drawText('UNSIGNED PREVIEW - NOT SUBMITTED',{x:190,y:12,size:8,font:bold,color:rgb(.5,.5,.5)});
- pdf.setTitle((draft?'Unsigned preview - ':'')+'Nexora MCNDA - '+values.B_COMPANY);pdf.setCreationDate(now);pdf.setModificationDate(now);
- return new Blob([await pdf.save()],{type:'application/pdf'});
-}
+import {createNda,MCNDA_VERSION} from './mcnda-pdf.js?v=20261029-all-signatures2';
+export {createNda};
 async function imageFile(file){
  if(!file || !['image/png','image/jpeg'].includes(file.type)||file.size>5*1024*1024)throw new Error('Choose a PNG or JPG smaller than 5 MB.');
  const bitmap=await createImageBitmap(file);try{if(bitmap.width*bitmap.height>24000000)throw new Error('This image is too large. Please use a smaller image.');const c=document.createElement('canvas');const scale=Math.min(1,1400/Math.max(bitmap.width,bitmap.height));c.width=Math.round(bitmap.width*scale);c.height=Math.round(bitmap.height*scale);c.getContext('2d').drawImage(bitmap,0,0,c.width,c.height);return c.toDataURL('image/png');}finally{bitmap.close();}
@@ -52,7 +22,7 @@ export async function bindNda({db,member,check,action,message,onSubmitted,compan
   if(!values||specs.some(([key,,,required])=>required&&!String(values[key]||'').trim())){message('Complete and save all required company profile details before previewing the MCNDA.');return;}
   clearReadPreview();const current=revision;
   try{
-   const blob=await createNda(values,null,null,{draft:true,reference:'Unsigned preview',email:member.email,loadTemplate:async()=>{const result=await db.storage.from('nexora-documents').download('nda-template-unsigned-v20261027.pdf');if(result.error)throw new Error('The MCNDA template could not be loaded. Please contact Nexora.');return result.data.arrayBuffer();}});
+   const blob=await createNda(values,null,null,{draft:true,reference:'Unsigned preview',email:member.email});
    if(current!==revision)return;
    readPreviewUrl=URL.createObjectURL(blob);$('nda-read-frame').src=readPreviewUrl;$('nda-read-download').href=readPreviewUrl;$('nda-read-download').download='Nexora_MCNDA_Unsigned_Preview.pdf';$('nda-read-result').hidden=false;$('nda-read-result').scrollIntoView({behavior:'smooth',block:'start'});
   }catch(error){message(error.message.includes('WinAnsi')?'A company detail contains a character that cannot be displayed in this PDF. Please use Latin characters.':error.message);}
@@ -72,14 +42,16 @@ export async function bindNda({db,member,check,action,message,onSubmitted,compan
   if(!form.reportValidity())return;if(savedAssetsVersion&&!$('nda-saved-assets-consent').checked){message('Please confirm use of your saved signature and stamp for this MCNDA.');return;}if(!signed){message('Please draw your signature or upload a signature image.');return;}if(stampLoading)return;
   invalidate();const current=revision,values=individualParty({...company.getProfile()?.details,...Object.fromEntries(specs.map(([k])=>[k,form.elements[k].value.trim()]))});if(specs.some(([k,,,required])=>required&&!values[k])){message('Please complete all required company details.');return;}
   const id=crypto.randomUUID(),now=new Date();let blob;
-  try{blob=await createNda(values,signatureImage||canvas.toDataURL('image/png'),stamp,{now,reference:id,email:member.email,loadTemplate:async()=>{const result=await db.storage.from('nexora-documents').download('nda-template-unsigned-v20261027.pdf');if(result.error)throw new Error('The private MCNDA template has not been enabled for your account. Please contact Nexora.');return result.data.arrayBuffer();}});}catch(error){message(error.message.includes('WinAnsi')?'A character cannot be included in the PDF. Please use Latin characters for the company details.':error.message);return;}
+  try{blob=await createNda(values,signatureImage||canvas.toDataURL('image/png'),stamp,{now,reference:id,email:member.email});}catch(error){message(error.message.includes('WinAnsi')?'A character cannot be included in the PDF. Please use Latin characters for the company details.':error.message);return;}
   if(current!==revision)return;const url=URL.createObjectURL(blob);review={id,blob,url,values,now,savedAssetsVersion,hasStamp:!!stamp,stampData:stamp,stampPath,profileVersion:company.getProfile()?.version||0,profileId:company.getProfile()?.id||''};$('nda-frame').src=url;$('nda-download').href=url;$('nda-download').download='Nexora_MCNDA_Review.pdf';$('nda-review').hidden=false;message('Review all pages of the PDF, then confirm and submit.');$('nda-review').scrollIntoView({behavior:'smooth'});
  });});
  $('nda-submit').addEventListener('click',()=>action($('nda-submit'),async()=>{
   if(!review||!$('nda-confirm').checked){message('Review the PDF and confirm your authority and agreement before submitting.');return;}
   if(dateText(review.now)!==dateText(new Date())){invalidate();message('The date has changed. Please generate a new preview.');return;}
   if(review.savedAssetsVersion){const latest=check(await db.from('portal_signing_profiles').select('version').eq('user_id',member.user_id).maybeSingle());if(latest?.version!==review.savedAssetsVersion){invalidate();await applyProfile(company.getProfile());message('Your saved signing images changed. Please review and confirm a new MCNDA preview.');return;}}
-  const current=review,path=member.user_id+'/'+current.id+'.pdf';if(current.blob.size>20*1024*1024){message('The PDF exceeds 20 MB. Please use smaller images.');return;}
+  const current=review,pdfHash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await current.blob.arrayBuffer()))).map(x=>x.toString(16).padStart(2,'0')).join('');
+  const confirmation=await confirmSigning({db,purpose:'mcnda_client',documentId:current.id,pdfHash});if(!confirmation)return;if(review!==current||dateText(current.now)!==dateText(new Date())){invalidate();message('The MCNDA or signature date changed. Generate and review a new PDF before signing.');return;}
+  const path=member.user_id+'/'+current.id+'.pdf';if(current.blob.size>20*1024*1024){message('The PDF exceeds 20 MB. Please use smaller images.');return;}
   check(await db.storage.from('nexora-client-uploads').upload(path,current.blob,{contentType:'application/pdf',upsert:false}));
   let newStampPath='',savedStampPath=current.stampPath;
   try {
@@ -88,7 +60,7 @@ export async function bindNda({db,member,check,action,message,onSubmitted,compan
       const stampBlob=await (await fetch(current.stampData)).blob();
       check(await db.storage.from('nexora-company-assets').upload(newStampPath,stampBlob,{contentType:'image/png',upsert:false}));savedStampPath=newStampPath;
     }
-    const result=await db.rpc('submit_mcnda_for_approval',{p_pdf:await blobBase64(current.blob),p_attestation:{name:current.values.B_REPRESENTATIVE,authority:true,acceptance:true,assets_authorized:!!current.savedAssetsVersion,signing_version:current.savedAssetsVersion||null,reviewed_hash:Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await current.blob.arrayBuffer()))).map(x=>x.toString(16).padStart(2,'0')).join('')},p_id:current.id,p_details:{...current.values,B_STAMP_PATH:savedStampPath||'',B_PROFILE_ID:current.profileId},p_expected_version:current.profileVersion,p_note:'Completed and electronically signed via the Nexora portal. Awaiting explicit Nexora countersignature. Template NEX-2026-10-27. Reference: '+current.id+'. Account: '+member.email+'. Submitted: '+current.now.toISOString()+'. Company stamp: '+(current.hasStamp?'included':'not supplied')+'. Representative confirmed authority and agreement.'+(current.savedAssetsVersion?' Saved signing images explicitly authorized for this MCNDA. Signing profile version: '+current.savedAssetsVersion+'.':'')});
+    const result=await db.rpc('submit_mcnda_for_approval',{p_pdf:await blobBase64(current.blob),p_attestation:{confirmation_id:confirmation.confirmation_id,confirmation_token:confirmation.confirmation_token,document_template_version:MCNDA_VERSION,account_type:isIndividual(current.values)?'individual':'company',name:current.values.B_REPRESENTATIVE,authority:true,acceptance:true,assets_authorized:!!current.savedAssetsVersion,signing_version:current.savedAssetsVersion||null,reviewed_hash:pdfHash},p_id:current.id,p_details:{...current.values,MCNDA_TEMPLATE_VERSION:MCNDA_VERSION,B_STAMP_PATH:savedStampPath||'',B_PROFILE_ID:current.profileId},p_expected_version:current.profileVersion,p_note:'Completed and electronically signed via the Nexora portal. Awaiting explicit Nexora countersignature. Template '+MCNDA_VERSION+'. Reference: '+current.id+'. Account: '+member.email+'. Submitted: '+current.now.toISOString()+'. Company stamp: '+(current.hasStamp?'included':'not supplied')+'. '+(isIndividual(current.values)?'Individual signed in a personal capacity and confirmed agreement.':'Representative confirmed authority and agreement.')+(current.savedAssetsVersion?' Saved signing images explicitly authorized for this MCNDA. Signing profile version: '+current.savedAssetsVersion+'.':'')});
     check(result);
   } catch(error){
     await db.storage.from('nexora-client-uploads').remove([path]);
@@ -102,6 +74,11 @@ export async function bindNda({db,member,check,action,message,onSubmitted,compan
   identityReady=false;const current=++stampRevision;clearReadPreview();invalidate();ctx.clearRect(0,0,canvas.width,canvas.height);signed=false;signatureImage=null;stamp=null;stampPath='';savedAssetsVersion=null;savedConsent.hidden=true;$('nda-saved-assets-consent').checked=false;
   $('nda-signature-file').value='';$('nda-stamp').value='';
   const personal=isIndividual(profile?.details);const stampInput=$('nda-stamp');for(const el of [stampInput,stampInput.previousElementSibling,stampInput.previousElementSibling?.previousElementSibling,stampInput.nextElementSibling])if(el)el.hidden=personal;form.querySelector('h3').textContent=personal?'1. Personal details':'1. Company details';form.querySelectorAll('h3')[2].textContent=personal?'2. Personal signature':'3. Authorized signature';savedConsent.lastChild.textContent=personal?' I authorize use of my saved signature on this MCNDA.':' I authorize use of my saved signature and company stamp on this MCNDA.';
+  $('nda-form-intro').querySelector('p').textContent=personal?'Review your personal details and passport number, then sign the Nexora mutual confidentiality agreement in your personal capacity. Review the complete PDF before sharing it with Nexora.':'Review your company details, add your company stamp and sign the Nexora mutual confidentiality agreement. Review the complete PDF before sharing it with Nexora.';
+  $('nda-readonly').querySelector('p').textContent=personal?'Read the complete agreement with your saved personal details before adding a signature. This unsigned preview does not sign or submit the MCNDA.':'Read the complete agreement with your saved company details before adding a signature. This unsigned preview does not sign or submit the MCNDA.';
+  $('nda-review').querySelector('h3').textContent=personal?'3. Review & submit':'4. Review & submit';
+  $('nda-review').querySelector('p').textContent=personal?'Read all eight pages and check your personal details, passport number and signature. This PDF will be shared with Nexora when you submit.':'Read all eight pages and check your company details, signature and stamp. This PDF will be shared with Nexora when you submit.';
+  $('nda-confirm').parentElement.lastChild.textContent=personal?'I have read this MCNDA, agree to its terms, and sign in my personal capacity as the individual identified in the agreement.':'I have read this MCNDA, agree to its terms, and confirm that I am authorized to sign on behalf of the company shown.';
   renderFields(profile?.details||{});for(const [key] of specs)form.elements[key].value=profile?.details[key]||(key==='B_EMAIL'?member.email:'');
   $('nda-stamp-preview').hidden=true;stampLoading=true;$('nda-preview').disabled=true;
   try{
@@ -109,9 +86,9 @@ export async function bindNda({db,member,check,action,message,onSubmitted,compan
    const assets=check(await db.from('portal_signing_profiles').select('signature,stamp,version').eq('user_id',member.user_id).maybeSingle());if(current!==stampRevision)return;
    if(assets?.signature){const img=new Image();img.src=assets.signature;await img.decode();if(current!==stampRevision)return;const scale=Math.min(canvas.width/img.width,canvas.height/img.height);ctx.drawImage(img,(canvas.width-img.width*scale)/2,(canvas.height-img.height*scale)/2,img.width*scale,img.height*scale);signatureImage=assets.signature;signed=true;}
    if(assets?.stamp&&!personal)stamp=assets.stamp;
-   if(assets?.signature||assets?.stamp){savedAssetsVersion=assets.version;savedConsent.hidden=false;}
+   if(assets?.signature||(!personal&&assets?.stamp)){savedAssetsVersion=assets.version;savedConsent.hidden=false;}
    const saved=profile?.details.B_STAMP_PATH;
-   if(!stamp&&saved){const blob=check(await db.storage.from('nexora-company-assets').download(saved));const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);});if(current!==stampRevision)return;stamp=data;stampPath=saved;}
+   if(!personal&&!stamp&&saved){const blob=check(await db.storage.from('nexora-company-assets').download(saved));const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);});if(current!==stampRevision)return;stamp=data;stampPath=saved;}
    if(stamp){$('nda-stamp-preview').src=stamp;$('nda-stamp-preview').hidden=false;}
   }catch(error){message('Saved signing images could not be loaded. Refresh your company profile before preparing the MCNDA.');console.error(error);}
   finally{if(current===stampRevision){stampLoading=false;$('nda-preview').disabled=false;}}
