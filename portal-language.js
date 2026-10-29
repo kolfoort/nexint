@@ -1,4 +1,4 @@
-import {catalog,fragments} from './portal-language-catalog.js?v=20261028-privacy1';
+import {catalog,fragments} from './portal-language-catalog.js?v=20261029-whatsapp1';
 export const portalLanguages=[['en','English'],['nl','Nederlands'],['de','Deutsch'],['es','Español'],['ar','العربية']];
 const supported=new Set(portalLanguages.map(x=>x[0])),storageKey='nexora-portal-language';
 const authPage=/\/(?:client-login|request-access|forgot-password|set-password|account-security|mcnda-agreements)\.html$/.test(location.pathname),websiteLanguageKey=storageKey+'-website';

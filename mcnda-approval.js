@@ -1,4 +1,4 @@
-import {confirmSigning} from './signing-confirmation.js?v=20261029-multi1';
+import {confirmSigning} from './signing-confirmation.js?v=20261029-whatsapp1';
 import {PDFDocument,StandardFonts,rgb} from './assets/vendor/pdf-lib.esm.min.js';
 const check=r=>{if(r.error)throw r.error;return r.data};const el=(t,s,c)=>{const n=document.createElement(t);if(s!==undefined)n.textContent=s;if(c)n.className=c;return n};
 const decode=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));function encode(bytes){let b='';for(let i=0;i<bytes.length;i+=8192)b+=String.fromCharCode(...bytes.subarray(i,i+8192));return btoa(b)}

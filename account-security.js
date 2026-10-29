@@ -1,5 +1,5 @@
 import {config} from './portal-config.js';
-import {getLanguage,setLanguage} from './portal-language.js?v=20261029-multi1';
+import {getLanguage,setLanguage} from './portal-language.js?v=20261029-whatsapp1';
 import {securityCopy} from './account-security-copy.js?v=20261029-multi1';
 const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2.102.0');
 const db=createClient(config.url,config.publishableKey,{auth:{storage:sessionStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});

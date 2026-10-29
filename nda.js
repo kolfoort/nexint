@@ -1,7 +1,7 @@
-import {confirmSigning} from './signing-confirmation.js?v=20261029-multi1';
-import {isIndividual,individualParty,individualFields} from './individual-profile.js?v=20261028-nexora-alignment';
+import {confirmSigning} from './signing-confirmation.js?v=20261029-whatsapp1';
+import {isIndividual,individualParty,individualFields} from './individual-profile.js?v=20261029-whatsapp1';
 async function blobBase64(blob){const bytes=new Uint8Array(await blob.arrayBuffer());let s='';for(let i=0;i<bytes.length;i+=8192)s+=String.fromCharCode(...bytes.subarray(i,i+8192));return btoa(s)}
-import { companyFields } from './company-profile.js?v=20261028-nexora-alignment';
+import { companyFields } from './company-profile.js?v=20261029-whatsapp1';
 const $=id=>document.getElementById(id);
 let specs=companyFields;
 const dateText=d=>new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Amsterdam',day:'numeric',month:'long',year:'numeric'}).format(d);
