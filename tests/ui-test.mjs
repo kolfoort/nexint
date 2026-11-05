@@ -1,0 +1,31 @@
+import {JSDOM} from 'jsdom';
+import vm from 'node:vm';
+import fs from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import ts from 'typescript';
+const root=new URL('..',import.meta.url).pathname.replace(/\/$/,'');
+for(const f of ['supabase/functions/mcnda-bundle/index.ts','supabase/functions/signing-confirmation/index.ts']){
+ const source=await fs.readFile(root+'/'+f,'utf8');
+ const result=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022},reportDiagnostics:true});
+ assert.equal(result.diagnostics?.filter(x=>x.category===ts.DiagnosticCategory.Error).length,0,f);
+}
+const dom=new JSDOM('<p class="legal-summary">Standard penalty</p><div id="mcnda-app"></div><p id="multi-status"></p>',{url:'https://nexint.eu/mcnda-agreements.html'});
+let called;
+const context=vm.createContext({document:dom.window.document,window:dom.window,location:dom.window.location,URL,Blob,console,Event:dom.window.Event,C:Object.fromEntries(['en','nl','de','es','ar'].map(x=>[x,{}])),getLanguage:()=> 'en',agreementKind:v=>v?.snapshot?.document?.kind==='JVA'?'JVA':'MCNDA',MCNDA_STANDARD:'standard',eurParisPolicy:{en:'Standard penalty'},parisPolicy:{en:'Old policy'},readContractFile:async(file,kind,reference)=>{called={file,kind,reference};if(!file)throw Error('Choose PDF');return {metadata:{kind,reference},bytes:new Uint8Array([1])}}});
+let source=await fs.readFile(root+'/mcnda-multi.js','utf8');source=source.replace(/^import .*$/gm,'').replace("window.addEventListener('nexora-language-change',render);init().catch(e=>status(e.message));",'');
+source+='\nglobalThis.hooks={widget:uploadEditor,set:(v,d)=>{selected=v;editorDraft=d},policy:contractPolicy};';
+vm.runInContext(source,context);
+const hooks=context.hooks;hooks.set(null,{});const w=hooks.widget();dom.window.document.body.append(w.element);
+const mode=w.element.querySelector('select'),reference=w.element.querySelector('input:not([type])'),file=w.element.querySelector('input[type=file]'),confirmation=w.element.querySelector('input[type=checkbox]');
+assert.equal(await w.prepare(),null);mode.value='JVA';mode.dispatchEvent(new dom.window.Event('change'));
+assert.equal(reference.required,true);assert.equal(file.required,true);assert.equal(confirmation.required,true);
+assert.match(dom.window.document.querySelector('.legal-summary').textContent,/No standard MCNDA/);
+await assert.rejects(()=>w.prepare(),/complete agreed terms/);
+reference.value='NEXORA-VICTORY-JVA-2026-001';reference.dispatchEvent(new dom.window.Event('input'));
+Object.defineProperty(file,'files',{value:[{name:'Victory.pdf'}]});file.dispatchEvent(new dom.window.Event('change'));
+assert.equal(reference.required,true);assert.equal(file.required,false);
+confirmation.checked=true;confirmation.dispatchEvent(new dom.window.Event('change'));await w.prepare();assert.equal(called.kind,'JVA');assert.equal(called.reference,reference.value);
+reference.value='OTHER-001';reference.dispatchEvent(new dom.window.Event('input'));assert.equal(confirmation.checked,false);await assert.rejects(()=>w.prepare(),/complete agreed terms/);
+hooks.set({snapshot:{document:{kind:'JVA',reference:'FROZEN-001'}}},{});const replacement=hooks.widget();assert.equal(replacement.element.querySelector('input[type=file]').required,true);
+assert.match(hooks.policy(),/No standard MCNDA/);
+console.log('PASS: uploaded editor requires correct kind/reference/file/attestation, resets consent after change, requires new upload for new revision, hides standard conditions; both Edge functions parse.');

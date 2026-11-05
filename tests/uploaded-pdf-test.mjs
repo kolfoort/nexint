@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {PDFDocument} from '../assets/vendor/pdf-lib.esm.min.js';
+import {readContractFile,validateDocumentMetadata} from '../uploaded-contract.js';
+const pdf=await PDFDocument.create();pdf.addPage();const bytes=await pdf.save();
+const file={name:'Victory-final.pdf',size:bytes.length,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength)};
+const result=await readContractFile(file,'JVA','NEXORA-VICTORY-JVA-2026-001');
+assert.equal(result.metadata.pages,1);assert.equal(result.metadata.kind,'JVA');assert.deepEqual(result.bytes,bytes);
+await assert.rejects(()=>readContractFile({...file,size:14000001},'JVA','REF-001'),/maximum 14 MB/);
+await assert.rejects(()=>readContractFile({...file,arrayBuffer:async()=>new TextEncoder().encode('not a pdf').buffer},'JVA','REF-001'),/not a PDF/);
+assert.throws(()=>validateDocumentMetadata({...result.metadata,filename:'../leak.pdf'}),/valid filename/);
+assert.throws(()=>validateDocumentMetadata({...result.metadata,sha256:'wrong'}),/SHA-256/);
+console.log('PASS: PDF parse, unchanged bytes, kind/hash/pages and invalid-file rejection.');

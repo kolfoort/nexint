@@ -1,4 +1,4 @@
-import {mountMultiMCNDAList} from './mcnda-multi-list.js?v=20261029-whatsapp1';
+import {mountMultiMCNDAList} from './mcnda-multi-list.js?v=20261105-upload1';
 import {ensurePortalSecurity} from './portal-security.js?v=20261029-whatsapp1';
 import {initializeAccountLanguage,setLanguage} from './portal-language.js?v=20261029-whatsapp1';
 import {prepareDocumentPreview,setDocumentAccess} from './document-sharing.js?v=20261022-viewrights1';

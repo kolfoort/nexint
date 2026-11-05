@@ -1,4 +1,4 @@
-import {mountMultiMCNDAList} from './mcnda-multi-list.js?v=20261029-whatsapp1';
+import {mountMultiMCNDAList} from './mcnda-multi-list.js?v=20261105-upload1';
 import {ensurePortalSecurity} from './portal-security.js?v=20261029-whatsapp1';
 import {individualFields,isIndividual,individualParty,mountIdentity} from './individual-profile.js?v=20261029-whatsapp1';
 import {loadClientRequests} from './client-requests.js?v=20261028-adminnav2';

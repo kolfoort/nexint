@@ -1,0 +1,1 @@
+{"name":"nexint-portal-validation","private":true,"type":"module","scripts":{"test:signing":"node tests/sql-test.mjs && node tests/ui-test.mjs && node tests/uploaded-pdf-test.mjs"},"devDependencies":{"@electric-sql/pglite":"0.5.15","jsdom":"30.1.3","typescript":"5.9.3"}}
