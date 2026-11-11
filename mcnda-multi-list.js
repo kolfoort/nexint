@@ -38,7 +38,8 @@ export async function mountMultiMCNDAList({db,container,userId,admin=false,tasks
   if(tasks){const item=node('div',undefined,'file-row');item.append(node('strong',label),node('span',status,'meta'));const action=node('a',t.open,'button');action.href=link.href;item.append(action);actionPanel.append(item)}
  }
  container.prepend(panel);
- if(tasks){for(const n of [...tasks.querySelectorAll('p')])if(/No agreements currently require your signature\./.test(n.textContent))n.remove();tasks.prepend(actionPanel)}
+ if(['dd5ca405-fff5-4936-998d-8c5db9c47fa0','9db7c294-8e42-4722-82d1-90e8b977d81a'].includes(userId)&&!admin){for(const n of [...container.children])if(n!==panel)n.hidden=true;}
+ if(tasks){tasks.querySelector('[data-no-pending-agreements]')?.remove();for(const n of [...tasks.querySelectorAll('p')])if(/No agreements currently require your signature\./.test(n.textContent))n.remove();tasks.prepend(actionPanel)}
  // These are empty legacy-form sections, not evidence of absent shared contracts.
  container.querySelectorAll('.file-empty').forEach(n=>{if(/No (legacy MCNDA|Joint Venture Agreement)/.test(n.textContent))n.remove()});
 }
