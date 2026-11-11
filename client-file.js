@@ -1,10 +1,10 @@
 import {getLanguage} from './portal-language.js?v=20261029-whatsapp1';
-import {mountMultiMCNDAList} from './mcnda-multi-list.js?v=20261111-visibility1';
+import {mountMultiMCNDAList} from './mcnda-multi-list.js?v=20261111-visibility2';
 import {loadClientRequests} from './client-requests.js?v=20261028-clientnav1';
 import {mountMCNDAApprovals} from './mcnda-approval.js?v=20261029-whatsapp1';
 import {loadJVClientSummary} from './jv-client-file.js?v=20261029-whatsapp1';
 import {loadFCOClientSummary} from './fco-client-file.js?v=20261029-whatsapp1';
-import {loadSPAClientSummary} from './spa-client-file.js?v=20261111-visibility1';
+import {loadSPAClientSummary} from './spa-client-file.js?v=20261111-visibility2';
 import {pdfBadge,previewButton,closePdfPreview} from './pdf-preview.js?v=20261022-viewrights1';
 import {loadAssignedDocuments} from './shared-documents.js?v=20261022-viewrights1';
 const $=id=>document.getElementById(id);
