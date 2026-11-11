@@ -1,0 +1,12 @@
+import fs from 'node:fs/promises';import vm from 'node:vm';import assert from 'node:assert/strict';
+const source=await fs.readFile(new URL('../mcnda-multi.js',import.meta.url),'utf8');
+const fn=source.match(/function documentRevision\(v\)\{[^\n]+/)[0];
+const revision=vm.runInNewContext('('+fn+')');
+const v={revision:1,snapshot:{document:{filename:'NEXORA-VICTORY-MCNDA-2026-001-R5-REVIEW.pdf'}}};
+assert.equal(revision(v),'5');assert.equal(v.revision,1);
+assert.equal(revision({revision:2}),2);
+for(const expected of ["t('revision')+' '+documentRevision(selected)","t('revision')+' '+documentRevision(v)","'-revision-'+documentRevision(version)"])assert.ok(source.includes(expected),expected);
+assert.ok(source.includes('p_expected_revision:revision||null'));
+assert.ok(source.includes('revision:selected.revision,reviewToken'));
+assert.ok(source.includes('selected.revision!==reviewedVersion.revision'));
+console.log('PASS: PDF dialog, overview, selector and download filenames use document Revision 5; workflow revision 1 remains unchanged for signature integrity and concurrency.');
