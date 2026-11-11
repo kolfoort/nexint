@@ -1,5 +1,5 @@
 import {individualFields,isIndividual,individualParty,mountIdentity} from './individual-profile.js?v=20261029-whatsapp1';
-import {mountLanguagePreference} from './portal-language.js?v=20261029-whatsapp1';
+import {mountLanguagePreference,getLanguage} from './portal-language.js?v=20261029-whatsapp1';
 import {mountCounterpartyRole} from './counterparty-role.js?v=20261029-reps1';
 import {initSigningImages} from './signing-images.js?v=20261022-live2';
 export const companyFields=[['B_COMPANY','Legal company name',100,true],['B_REGISTRATION','Company registration number',60,true],['B_ADDRESS','Registered address',150,true],['B_COUNTRY','Country of incorporation',60,true],['B_REPRESENTATIVE','Authorized representative',80,true],['B_TITLE','Position / title',80,true],['B_PHONE','Telephone',50,true],['B_WHATSAPP','WhatsApp number with country code',32,false],['B_EMAIL','Business email',100,true],['B_WEBSITE','Website',100,false]];
@@ -13,7 +13,7 @@ export async function initCompanyProfile({db,member,check,action,message}){
   const mapping=check(await db.from('portal_company_members').select('company_id').eq('user_id',member.user_id).maybeSingle());
   profile=mapping?check(await db.from('portal_companies').select('*').eq('id',mapping.company_id).single()):null;
   const d=profile?.details||{};$('company-profile-fields').replaceChildren();fields($('company-profile-fields'),'company-',d);for(const [key] of (isIndividual(d)?individualFields:companyFields))form.elements[key].value=d[key]||(key==='B_EMAIL'?member.email:'');
-  $('company-profile-status').textContent=profile?(profile.status==='approved'?'Approved':'Pending review')+' · Version '+profile.version:'No company profile yet';
+  $('company-profile-status').textContent=profile?(profile.status==='approved'?'Approved':'Pending review')+' · '+({en:'Profile version',es:'Versión del perfil',nl:'Profielversie',de:'Profilversion',ar:'إصدار الملف الشخصي'}[getLanguage()]||'Profile version')+' '+profile.version:'No company profile yet';
   $('company-profile-summary').textContent=profile?.details.B_COMPANY||'Your company details will be saved when you submit your MCNDA. You can also save them here first.';
   $('company-profile-stamp-note').textContent=profile?.details.B_STAMP_PATH?'A company stamp is saved privately and will be available when preparing your MCNDA.':'You can add your company stamp when preparing your MCNDA.';
   if(notify)for(const listener of listeners)await listener(profile);
