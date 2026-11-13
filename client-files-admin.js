@@ -34,6 +34,25 @@ async function refresh(){closePdfPreview();const tick=++version,id=selected;$('c
  document.querySelectorAll('[data-upload],[data-shared],[data-submission]').forEach(button=>{let record,bucket,path;if(button.dataset.upload){record=files.find(x=>x.id===button.dataset.upload);bucket='nexora-client-uploads';path=record?.storage_path}else if(button.dataset.shared){record=shared.find(x=>x.id===button.dataset.shared);bucket='nexora-documents';path=record?.storage_path}else{record={title:'Signed MCNDA'};bucket='nexora-client-uploads';path=button.dataset.owner+'/'+button.dataset.submission+'.pdf'}if(!path)return;button.before(previewButton({db,bucket,path,title:record.title}));button.closest('article')?.prepend(pdfBadge())});
  function viewFile(view){requestsSection.hidden=view!=='requests';offersSection.hidden=view!=='offers';overview.hidden=view!=='overview';sections.forEach((section,i)=>section.hidden=!(view==='company'?[0,1].includes(i):view==='agreements'?[2,3].includes(i):view==='documents'?i===4:false));for(const b of tabs.children){b.classList.toggle('active',b.dataset.view===view);b.setAttribute('aria-selected',String(b.dataset.view===view))}}
  for(const [key,label] of [['overview','Overview'],['company','Company profile'],['documents','Documents'],['agreements','Agreements'],['offers','Offers'],['requests','Requests']]){const b=document.createElement('button');b.type='button';b.dataset.view=key;b.textContent=label;b.onclick=()=>viewFile(key);tabs.append(b)}file.prepend(tabs,overview);overview.querySelectorAll('[data-dossier-go]').forEach(b=>b.onclick=()=>viewFile(b.dataset.dossierGo));viewFile('overview');
+ const passwordStatus = document.createElement('p');
+ passwordStatus.className = 'account';
+ passwordStatus.setAttribute('role', 'status');
+ passwordStatus.textContent = 'Password status: Checking…';
+ const overviewHeading = overview.querySelector('h2');
+ if (overviewHeading) overviewHeading.after(passwordStatus);
+ else overview.prepend(passwordStatus);
+ void (async () => {
+   try {
+     const configured = check(await db.rpc('admin_client_has_password', {p_user_id: id}));
+     if (tick !== version) return;
+     passwordStatus.textContent = configured === true
+       ? 'Password status: Set'
+       : configured === false ? 'Password status: Not set' : 'Password status: Unavailable';
+   } catch {
+     if (tick === version) passwordStatus.textContent = 'Password status: Unavailable';
+   }
+ })();
+
  await loadClientRequests({db,member:{user_id:id},admin:true,isCurrent:()=>tick===version});if(tick!==version)return;
  const representativeLink=document.createElement('a');representativeLink.href='company-representatives.html'+(profile&&!isIndividual(d)?'?company='+profile.id:'');representativeLink.className='button secondary';representativeLink.textContent='Company representatives & signing authority';sections[0].append(representativeLink);
  if(isIndividual(d))await mountIdentity({db,container:sections[0],userId:id,message});
