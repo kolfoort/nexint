@@ -17,12 +17,11 @@
 .nex-team-card[aria-label="Oliver Reed"] .nex-team-photo,.nex-team-card[aria-label="Charlotte van Dijk"] .nex-team-photo,.nex-team-card[aria-label="Alexander Brooks"] .nex-team-photo{object-fit:contain;object-position:center bottom;padding:48px 12px 0;box-sizing:border-box}
 
 /* Preserve headroom for JP and John on narrow screens. */
-@media(max-width:650px){.nex-team-card[aria-label="J.P. Kolfoort"] .nex-team-photo,.nex-team-card[aria-label="John Szabo"] .nex-team-photo{object-fit:contain;object-position:center bottom;padding:28px 10px 0;box-sizing:border-box}}
+@media(max-width:650px){.nex-team-card[aria-label="John Szabo"] .nex-team-photo{object-fit:contain;object-position:center bottom;padding:28px 10px 0;box-sizing:border-box}}
 
 /* Match mobile head size and headroom across all human team portraits. */
 @media(max-width:650px){
 .nex-team-section .nex-team-card[aria-label]:not([aria-label="Rocky"]) .nex-team-photo{position:absolute;left:50%;top:calc(24px - var(--portrait-leading,4%));translate:-50% 0;width:auto;height:var(--portrait-height,110%);max-width:none;object-fit:contain;object-position:center top;padding:0;box-sizing:border-box}
-.nex-team-card[aria-label="J.P. Kolfoort"]{--portrait-height:80.3%;--portrait-leading:4.44%}
 .nex-team-card[aria-label="Jeremy Green"]{--portrait-height:118.2%;--portrait-leading:5.97%}
 .nex-team-card[aria-label="John Szabo"]{--portrait-height:130.7%;--portrait-leading:4.02%}
 .nex-team-card[aria-label="Kerstin Schacht"]{--portrait-height:96.4%;--portrait-leading:4.43%}
@@ -73,7 +72,6 @@
 .nex-team-page .nex-team-grid .nex-team-contact{margin-top:auto;font-size:12px}
 @media(max-width:1050px){.nex-team-page .nex-team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.nex-team-page .nex-team-grid{grid-template-columns:1fr}.nex-team-page .nex-team-grid .nex-team-caption{padding:24px}.nex-team-page .nex-team-grid .nex-team-role,.nex-team-page .nex-team-grid .nex-team-quote{min-height:0}}
-.portrait-window:has(img[src$="jp-current-quarterzip.png"]){--portrait-width:98.490%;--portrait-left:4.328%;--portrait-top:-5.578%}
 .portrait-window:has(img[src$="jeremy-green-suit.png"]){--portrait-width:146.826%;--portrait-left:-22.462%;--portrait-top:-7.797%}
 .portrait-window:has(img[src$="john-szabo-forward.png"]){--portrait-width:134.765%;--portrait-left:-16.327%;--portrait-top:3.385%}
 .portrait-window:has(img[src$="kerstin-mature-v2.png"]){--portrait-width:122.013%;--portrait-left:-17.518%;--portrait-top:-7.556%}
