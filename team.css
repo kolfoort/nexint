@@ -73,7 +73,7 @@
 @media(max-width:1050px){.nex-team-page .nex-team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.nex-team-page .nex-team-grid{grid-template-columns:1fr}.nex-team-page .nex-team-grid .nex-team-caption{padding:24px}.nex-team-page .nex-team-grid .nex-team-role,.nex-team-page .nex-team-grid .nex-team-quote{min-height:0}}
 .portrait-window:has(img[src$="jeremy-green-suit.png"]){--portrait-width:146.826%;--portrait-left:-22.462%;--portrait-top:-7.797%}
-.portrait-window:has(img[src$="john-szabo-forward.png"]){--portrait-width:134.765%;--portrait-left:-16.327%;--portrait-top:3.385%}
+.portrait-window:has(img[src$="john-szabo-portrait-20261115.jpg"]){--portrait-width:100%;--portrait-left:0%;--portrait-top:0%}
 .portrait-window:has(img[src$="kerstin-mature-v2.png"]){--portrait-width:122.013%;--portrait-left:-17.518%;--portrait-top:-7.556%}
 .portrait-window:has(img[src$="team-01.png"]){--portrait-width:161.201%;--portrait-left:-40.818%;--portrait-top:-9.728%}
 .portrait-window:has(img[src$="team-02.png"]){--portrait-width:157.709%;--portrait-left:-33.650%;--portrait-top:-8.997%}
